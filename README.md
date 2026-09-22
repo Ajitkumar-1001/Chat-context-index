@@ -83,9 +83,6 @@ The intended flow keeps conversation history in local SQLite storage and returns
 
 Optional caching is designed to reuse eligible model work independently of history storage. The application controls which history to open and when to index it. The initial deployment target is one owning application process per history with durable local storage.
 
-## Acknowledgments
-
-Inspired by [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatIndex) and its approach to organizing and retrieving conversation context through a topic hierarchy.
 
 ## License
 
