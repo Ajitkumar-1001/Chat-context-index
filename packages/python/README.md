@@ -1,5 +1,6 @@
 # chat-context-index (Python import: `cci`)
 
+<<<<<<< HEAD
 Persistent conversation memory for RAG chats and agents. Save original messages in SQLite,
 then prepare recent context plus relevant older evidence for your application's model.
 
@@ -41,3 +42,8 @@ unverified.
 [Integration example](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/examples/python/rag_chat.py)
 and [source repository](https://github.com/Ajitkumar-1001/Chat-context-index).
 Licensed under Apache-2.0; the license text is included in the wheel.
+=======
+Persistent, retrievable conversation memory for AI applications. Reference Python
+implementation — see the [repository README](../../README.md) and
+[Python integration example](../../examples/python/rag_chat.py) for usage.
+>>>>>>> c5efc832ba8bda64aaeccd7a54f0950e8b4f1110

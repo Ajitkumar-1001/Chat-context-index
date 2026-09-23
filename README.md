@@ -88,6 +88,7 @@ asyncio.run(main())
 ```
 
 Use an application-owned path on durable storage to reopen a history later. The [Python](examples/python/rag_chat.py) and [TypeScript](examples/typescript/rag-chat.mjs) adapters connect memory to a host's chat loop. A provider-free call stays lexical; pass an explicit provider and build the index to enable tree navigation.
+<<<<<<< HEAD
 
 ### Choose a model provider
 
@@ -105,6 +106,8 @@ Presets cover OpenAI, Gemini, Anthropic, Groq, OpenRouter, and local Ollama thro
 compatibility endpoints. Set `CCI_BASE_URL` for another compatible service. Other native APIs can implement
 the package's `Provider` contract. See [configuration and limits](evaluations/LIVE_SMOKE.md); these presets
 have offline routing tests, and a successful real-model evaluation is still pending.
+=======
+>>>>>>> c5efc832ba8bda64aaeccd7a54f0950e8b4f1110
 
 ## Measured example
 
