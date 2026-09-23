@@ -138,3 +138,20 @@ Native tests use [the shared fixture](../spec/fixtures/tree-memory.json) against
 They cover hierarchy reuse, reopen across runtimes, source grounding, bad IDs, bounded attempts,
 token-counter hooks, and invalidation during navigation. These are source-checkout checks;
 fresh-wheel/tarball compatibility and live-model evaluations remain separate release gates.
+
+Observed on September 22, 2026: **46 Python checks passed**, **8 native TypeScript checks
+passed**, and the TypeScript build passed. The Python selection includes the memory/example
+tests plus existing index, retrieval, synthesis, cache, and concurrent-failure checks:
+
+```bash
+python -m pytest -q tests/memory tests/examples \
+  tests/conformance/test_index.py tests/conformance/test_failure_index.py \
+  tests/conformance/test_ask.py tests/conformance/test_failure_ask.py \
+  tests/conformance/test_retrieve_lexical.py tests/conformance/test_failure_retrieve.py \
+  tests/conformance/test_cache.py
+```
+
+These checks used the source checkout and existing local dependencies (Python 3.12.11,
+APSW 3.53.4.0, Node 22.23.1). Source fingerprints are in the reports. The TypeScript repository
+RAG adapter imports the current local build; an older installed 0.1.0 tarball lacks the new API
+and must be rebuilt/reinstalled before an existing consumer can use it.

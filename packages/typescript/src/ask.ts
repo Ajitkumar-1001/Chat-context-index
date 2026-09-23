@@ -145,7 +145,12 @@ export async function ask(
 
   const request: ProviderRequest = { operation: "synthesis", prompt: buildSynthesisPrompt(query), evidenceContext: contextText };
   if (budget.calls >= budget.limit) return emit(store, retrieval, { status: "partial", reason: "provider_budget_exhausted", answer: null, citations: [], budget });
-  let response = await provider.complete(request, deadlineAtMs, budget);
+  let response;
+  try { response = await provider.complete(request, deadlineAtMs, budget); }
+  catch (err) {
+    if (!(err instanceof BudgetExceeded)) throw err;
+    return emit(store, retrieval, { status: "partial", reason: "provider_budget_exhausted", answer: null, citations: [], budget });
+  }
   let parsed = parseStructuredResponse(response.text);
   let failureReason = validityFailureReason(parsed, validIds);
 
@@ -155,7 +160,11 @@ export async function ask(
     }
     const repairRequest: ProviderRequest = { operation: "synthesis", prompt: buildRepairPrompt(query, failureReason), evidenceContext: contextText };
     if (budget.calls >= budget.limit) return emit(store, retrieval, { status: "partial", reason: "provider_budget_exhausted", answer: null, citations: [], budget });
-    response = await provider.complete(repairRequest, deadlineAtMs, budget);
+    try { response = await provider.complete(repairRequest, deadlineAtMs, budget); }
+    catch (err) {
+      if (!(err instanceof BudgetExceeded)) throw err;
+      return emit(store, retrieval, { status: "partial", reason: "provider_budget_exhausted", answer: null, citations: [], budget });
+    }
     parsed = parseStructuredResponse(response.text);
     failureReason = validityFailureReason(parsed, validIds);
     if (failureReason !== null) {

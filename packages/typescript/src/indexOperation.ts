@@ -11,7 +11,7 @@ import { createHash } from "node:crypto";
 import { EvidenceBlock, renderEvidenceContext } from "./contextAssembly.js";
 import { ConfigurationError, VersionConflict } from "./errors.js";
 import { prefixedId } from "./ids.js";
-import { BoundedProvider, CallBudget, ProviderRequest } from "./provider.js";
+import { BoundedProvider, CallBudget } from "./provider.js";
 import { Usage, emptyUsage, usageFromBudget } from "./retrieve.js";
 import { HistoryStore } from "./store.js";
 import { mapStorageError } from "./ioWorker.js";

@@ -260,3 +260,18 @@ def test_rag_adapter_uses_host_documents_and_persists_completed_turn(tmp_path):
             answer, _ = await example.chat_turn(store, "ORCHID", "turn-one", retrieve_documents=documents, generate=generate)
             assert (await store.get_messages(10, 10))[0].original_payload["content"] == answer
     asyncio.run(run())
+
+
+def test_synthesis_retry_budget_exhaustion_keeps_evidence(tmp_path):
+    class FailingAnswer(Router):
+        async def complete(self, request):
+            if request.operation == "synthesis":
+                raise ProviderTimeout("fixture")
+            return await super().complete(request)
+    async def run():
+        async with await seed(tmp_path / "retry-answer.db", provider_attempt_limit_ask=4) as store:
+            await index(store, MemoizedProvider(Router(), store.config))
+            result = await ask(store, FIXTURE["query"], MemoizedProvider(FailingAnswer(), store.config), mode="tree")
+            assert result.status == "partial" and result.answer is None and result.evidence
+            assert result.reason == "provider_budget_exhausted" and result.usage.current_provider_calls == 4
+    asyncio.run(run())

@@ -1,5 +1,7 @@
 /** Adapter for an existing host's document retriever and model. Serialize turns per history. */
-import { ingest, prepareContext } from "chat-context-index";
+// Repository example: run the package build first. In an installed host application,
+// import these same exports from "chat-context-index".
+import { ingest, prepareContext } from "../../packages/typescript/dist/index.js";
 
 export async function chatTurn(store, question, turnId, { retrieveDocuments, generate, memoryProvider }) {
   const memory = await prepareContext(store, question, { provider: memoryProvider });

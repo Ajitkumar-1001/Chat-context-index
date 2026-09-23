@@ -43,11 +43,8 @@ function sanitizeFtsQuery(query: string): string {
 function excerptFor(textProjection: string, firstToken: string, window = 200): [string, number] {
   const chars = Array.from(textProjection);
   const lowerJoined = chars.map((c) => c.toLowerCase()).join("");
-  let idx = lowerJoined.indexOf(firstToken.toLowerCase());
-  // indexOf on the lowercased *joined* string can drift from codepoint indices only if
-  // toLowerCase() changes a character's codepoint count — vanishingly rare for this library's
-  // use; consistent with cache_key.py's own documented small-gap tolerance.
-  if (idx < 0) idx = 0;
+  const utf16Offset = lowerJoined.indexOf(firstToken.toLowerCase());
+  const idx = utf16Offset < 0 ? 0 : Array.from(lowerJoined.slice(0, utf16Offset)).length;
   const start = Math.max(0, idx - Math.floor(window / 2));
   const end = Math.min(chars.length, idx + Math.floor(window / 2));
   return [chars.slice(start, end).join(""), start];

@@ -15,8 +15,8 @@ already checks this at ITS OWN emission, but `ask()` can then spend up to the fu
 deadline in provider calls — the widest window in the system — so `ask()` re-checks
 `cache_generation` again immediately before every `answered`/`partial` return.
 
-Usage is never fabricated as zero (contracts/result-schemas.md): `ask()` counts its own
-provider calls and reports them, rather than passing through `retrieve()`'s all-zero `Usage`.
+Usage counts physical navigation and synthesis attempts through one request budget. Missing
+provider token usage stays unknown; cached work is not charged as a new provider call.
 
 Deadline handling (F7): the request deadline is checked before any work (and before requiring a
 provider — ConfigurationError fails early, before partial work), and again after evidence is
@@ -205,7 +205,11 @@ async def ask(
     if budget.calls >= budget.limit:
         return await _emit(store, retrieval, status="partial", reason="provider_budget_exhausted",
                            answer=None, citations=[], budget=budget)
-    response = await provider.complete(request, deadline_at=deadline_at, budget=budget)
+    try:
+        response = await provider.complete(request, deadline_at=deadline_at, budget=budget)
+    except BudgetExceeded:
+        return await _emit(store, retrieval, status="partial", reason="provider_budget_exhausted",
+                           answer=None, citations=[], budget=budget)
     parsed = _parse_structured_response(response.text)
     failure_reason = _validity_failure_reason(parsed, valid_ids)
 
@@ -222,7 +226,11 @@ async def ask(
         if budget.calls >= budget.limit:
             return await _emit(store, retrieval, status="partial", reason="provider_budget_exhausted",
                                answer=None, citations=[], budget=budget)
-        response = await provider.complete(repair_request, deadline_at=deadline_at, budget=budget)
+        try:
+            response = await provider.complete(repair_request, deadline_at=deadline_at, budget=budget)
+        except BudgetExceeded:
+            return await _emit(store, retrieval, status="partial", reason="provider_budget_exhausted",
+                               answer=None, citations=[], budget=budget)
         parsed = _parse_structured_response(response.text)
         failure_reason = _validity_failure_reason(parsed, valid_ids)
         if failure_reason is not None:

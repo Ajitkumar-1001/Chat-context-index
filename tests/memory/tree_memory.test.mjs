@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { HistoryStore, ingest, index, retrieve, ask, prepareContext, packContext, BoundedProvider, clearHistory, cciErrors } from "../../packages/typescript/dist/index.js";
 import { Router, fixture } from "./runtime_roundtrip.mjs";
+import { chatTurn } from "../../examples/typescript/rag-chat.mjs";
 
 async function usingStore(run) {
   const dir = await mkdtemp(path.join(tmpdir(), "cci-tree-"));
@@ -79,6 +80,9 @@ test("structured lexical excerpts stay within the cited source field", () => usi
   const result = await retrieve(store, "TULIP", "lexical");
   assert.equal(result.evidence[0].sourcePointer, "/content/1/text");
   assert.equal(result.evidence[0].excerpt, "TULIP launch target");
+  await ingest(store, store.historyId, [{ role: "user", content: "🌍".repeat(150) + "VIOLET target" }], "test", "unicode");
+  const unicode = await retrieve(store, "VIOLET", "lexical");
+  assert.match(unicode.evidence[0].excerpt, /VIOLET/);
 }));
 
 test("physical retries cannot exceed the request budget", () => usingStore(async store => {
@@ -91,4 +95,17 @@ test("physical retries cannot exceed the request budget", () => usingStore(async
   assert.equal(result.usage.currentProviderCalls, 1);
   assert.ok(result.usage.usageUnknown);
   assert.match(result.evidence[0].excerpt, /Oslo/);
+}));
+
+test("RAG adapter combines host documents with memory and persists the turn", () => usingStore(async store => {
+  const result = await chatTurn(store, "ORCHID", "turn-one", {
+    retrieveDocuments: async () => ["Current deployment runbook"],
+    generate: async request => {
+      assert.match(request.conversationMemory, /Oslo/);
+      assert.deepEqual(request.documents, ["Current deployment runbook"]);
+      assert.equal((await store.getMessages(9, 9))[0].role, "user");
+      return "Use Oslo and follow the runbook.";
+    },
+  });
+  assert.equal((await store.getMessages(10, 10))[0].originalPayload.content, result.answer);
 }));
