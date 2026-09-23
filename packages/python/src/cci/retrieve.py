@@ -11,19 +11,21 @@ concurrent `clear_history()` commits a new `cache_generation` after this request
 Snapshot but before it emits its result, the request fails with `VersionConflict` rather than
 return or cache a stale-generation result.
 
-`tree`/`auto` routing modes fall back to lexical evidence with `index_degraded` reported when
-no tree exists yet — true for every request in this milestone, since `index()` is T053 (out of
-this batch's scope). The fallback path is real production behavior (FR-006), not a stub.
+With an explicit provider, tree/auto modes navigate the persisted hierarchy. Without one,
+retrieval stays local. Tree summaries guide selection; only original messages become evidence.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import time
 
+from .context_assembly import EvidenceBlock, render_evidence_context
 from .errors import VersionConflict
 from .io_worker import fetchone
 from .search import Diagnostic, search
 from .store import HistoryStore
+from .provider import CallBudget, MemoizedProvider
 
 CONTRACT_VERSION = 1
 
@@ -76,6 +78,17 @@ class Usage:
     memo_misses: int = 0
     memo_errors: int = 0
     stage_ms: dict[str, float] = field(default_factory=dict)
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+
+
+def usage_from_budget(budget: CallBudget) -> Usage:
+    return Usage(
+        current_provider_calls=budget.calls, retries=budget.retries,
+        usage_unknown=budget.usage_unknown, memo_hits=budget.memo_hits, memo_misses=budget.memo_misses,
+        input_tokens=None if budget.usage_unknown else budget.input_tokens,
+        output_tokens=None if budget.usage_unknown else budget.output_tokens,
+    )
 
 
 @dataclass(frozen=True)
@@ -128,8 +141,16 @@ async def retrieve(
     query: str,
     mode: str = "auto",
     max_selected_chunks: int | None = None,
+    *,
+    provider: MemoizedProvider | None = None,
+    deadline_s: float | None = None,
+    _budget: CallBudget | None = None,
 ) -> RetrievalResult:
-    limit = max_selected_chunks or store.config.max_selected_chunks
+    limit = store.config.max_selected_chunks if max_selected_chunks is None else max_selected_chunks
+    if mode not in ("auto", "tree", "lexical") or not 1 <= limit <= 5000:
+        raise ValueError("require a valid retrieval mode and 1 <= max_selected_chunks <= 5000")
+    deadline_at = time.monotonic() + (deadline_s if deadline_s is not None else store.config.request_deadline_retrieve_s)
+    budget = _budget if _budget is not None else CallBudget(store.config.provider_attempt_limit_retrieve)
 
     async with store.write_lock:
         async with store.connection:
@@ -138,12 +159,42 @@ async def retrieve(
             tree_exists = await _has_tree(store)
 
     index_degraded = not tree_exists
-    # No tree exists at all in this milestone (index() is T053) — every mode degrades to
-    # lexical. Once a tree exists, `tree`/`auto` would route through the shared
-    # context-assembly renderer (T086) for navigation prompts instead of this fallback.
     actual_mode = "lexical"
-
     diagnostics = list(search_result.diagnostics)
+    candidates = list(search_result.candidates)
+    selected_chunks = []
+    limited = len(candidates) >= limit
+    if mode != "lexical" and provider is not None and tree_exists and query.strip():
+        from .tree_retrieval import navigate_tree
+
+        tree_candidates, selected_chunks, tree_diagnostics, tree_limited = await navigate_tree(
+            store, query, snapshot, provider, budget, deadline_at, limit,
+        )
+        diagnostics.extend(tree_diagnostics)
+        index_degraded = bool(tree_diagnostics)
+        limited |= tree_limited
+        actual_mode = mode if selected_chunks or not tree_diagnostics else "lexical"
+        # Lexical evidence remains available for the unindexed tail and routing misses.
+        candidates = tree_candidates + candidates
+    elif mode == "tree" and tree_exists and provider is None:
+        diagnostics.append(Diagnostic("tree_provider_missing", "retrieve"))
+        index_degraded = True
+
+    await _mid_retrieve_barrier()
+    async with store.write_lock:
+        current = await _capture_snapshot(store)
+    if current.cache_generation != snapshot.cache_generation:
+        raise VersionConflict("history was cleared between snapshot capture and result emission")
+    if selected_chunks and current.index_revision != snapshot.index_revision:
+        candidates = list(search_result.candidates)
+        selected_chunks = []
+        actual_mode = "lexical"
+        index_degraded = True
+        diagnostics.append(Diagnostic("tree_revision_changed", "retrieve"))
+
+    unique = {}
+    for candidate in candidates:
+        unique.setdefault((candidate.message_id, candidate.source_pointer), candidate)
     evidence = [
         Evidence(
             evidence_id=f"ev_{i + 1}",
@@ -153,24 +204,20 @@ async def retrieve(
             excerpt=c.excerpt,
             content_hash=c.content_hash,
         )
-        for i, c in enumerate(search_result.candidates)
+        for i, c in enumerate(unique.values())
     ]
+    bounded = []
+    for item in evidence:
+        if len(render_evidence_context([
+            EvidenceBlock(e.evidence_id, e.source_pointer, e.excerpt) for e in bounded + [item]
+        ])) <= store.config.max_evidence_text_scalars:
+            bounded.append(item)
+    omitted = len(evidence) - len(bounded)
+    evidence = sorted(bounded, key=lambda e: e.seq)
 
     status = "ok" if evidence else "empty"
     if status == "empty" and not diagnostics:
         diagnostics = [Diagnostic(code="no_matching_evidence", stage="retrieve")]
-
-    await _mid_retrieve_barrier()
-
-    # Emission-time VersionConflict (data-model.md case 2): re-check cache_generation right
-    # before returning.
-    current_generation = await _current_cache_generation(store)
-    if current_generation != snapshot.cache_generation:
-        raise VersionConflict(
-            f"cache_generation changed from {snapshot.cache_generation} to "
-            f"{current_generation} between snapshot capture and result emission — a concurrent "
-            "clear_history() invalidated this request"
-        )
 
     return RetrievalResult(
         contract_version=CONTRACT_VERSION,
@@ -181,14 +228,14 @@ async def retrieve(
         routing=Routing(
             requested_mode=mode,
             actual_mode=actual_mode,
-            candidate_count=len(search_result.candidates),
-            selected_chunk_ids=[],
+            candidate_count=len(unique),
+            selected_chunk_ids=selected_chunks,
         ),
         coverage=Coverage(
-            coverage_limited=len(search_result.candidates) >= limit,
+            coverage_limited=limited or omitted > 0,
             index_degraded=index_degraded,
-            omitted_excerpt_count=0,
+            omitted_excerpt_count=omitted,
         ),
         diagnostics=diagnostics,
-        usage=Usage(),
+        usage=usage_from_budget(budget),
     )

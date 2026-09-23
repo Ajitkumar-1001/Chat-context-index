@@ -89,6 +89,13 @@ async def search(store: HistoryStore, query: str, limit: int = DEFAULT_LIMIT) ->
         payload = json.loads(original_payload_json)
         excerpt, offset = _excerpt_for(text_projection, first_token)
         source_pointer = source_pointer_for_offset(payload.get("content"), offset)
+        if isinstance(payload.get("content"), list):
+            # A structured excerpt must stay inside the field named by its pointer.
+            match = max(0, text_projection.lower().find(first_token.lower()))
+            source_pointer = source_pointer_for_offset(payload["content"], match)
+            if source_pointer.endswith("/text"):
+                block = payload["content"][int(source_pointer.split("/")[2])]
+                excerpt, _ = _excerpt_for(block["text"], first_token)
         content_hash = hashlib.sha256(text_projection.encode("utf-8")).hexdigest()
         candidates.append(
             LexicalCandidate(

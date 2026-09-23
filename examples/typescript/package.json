@@ -1,0 +1,10 @@
+{
+  "name": "cci-basic-usage-example",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Runnable example for chat-context-index",
+  "dependencies": {
+    "chat-context-index": "file:../../packages/typescript/chat-context-index-0.1.0.tgz"
+  }
+}

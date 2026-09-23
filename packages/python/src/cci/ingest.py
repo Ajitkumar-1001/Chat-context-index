@@ -46,14 +46,23 @@ ADAPTER_VERSION = "native-1"
 
 
 def _before_commit_barrier() -> None:
-    """No-op by default. Failure-injection tests monkeypatch this to pause or terminate the
-    process right before commit (Failure-Injection.md F1's commit-ambiguity kill point;
-    F10/F-writer's clear-quiescence pause point)."""
+    """No-op by default. Failure-injection tests monkeypatch this to terminate the process
+    right before commit (Failure-Injection.md F1's commit-ambiguity kill point). Synchronous
+    and called without `await` — a real process crash (`os._exit`) needs no async coordination.
+    For an async pause (not a crash), see `_pause_before_commit_barrier` below."""
 
 
 def _after_commit_barrier() -> None:
     """No-op by default. F1's "after commit but before the receipt reaches the caller" kill
     point."""
+
+
+async def _pause_before_commit_barrier() -> None:
+    """No-op by default, awaited. F-writer/T087's clear-quiescence pause point: failure-
+    injection tests monkeypatch this with an async function to pause an in-flight `ingest()`
+    at its commit barrier — while it still holds `store.write_lock` and counts as an in-flight
+    writer — so a concurrent `clear_history()` can be exercised against it (Failure-Injection.md
+    F-writer; data-model.md Snapshot/Generation lifecycle case 3)."""
 
 
 def _validate_batch(messages: list[InputMessage]) -> None:
@@ -260,6 +269,7 @@ async def _ingest_locked(
             )
 
             _before_commit_barrier()
+            await _pause_before_commit_barrier()
     except apsw.Error as exc:
         raise map_storage_error(exc) from exc
 

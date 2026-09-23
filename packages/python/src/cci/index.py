@@ -6,10 +6,8 @@ transaction; only the validated result is committed, and only when the expected
 A second `index()` call with nothing pending and no `rebuild` request makes zero model calls,
 regardless of cache contents.
 
-ponytail: this milestone builds a flat, leaf-only tree (one Node per Chunk, no parent/summary
-grouping) — a degenerate but valid tree. `tree_max_children` grouping into multi-level parent
-nodes is not needed by any test in this task range and is deferred; add it when a caller
-actually needs hierarchical navigation over a tree wider than fits in one `retrieve()` call.
+Consecutive chunks form a bounded-fanout hierarchy. Unchanged branches reuse their summaries;
+only new leaves and changed ancestor groups require model calls.
 """
 
 from __future__ import annotations
@@ -17,7 +15,7 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Callable
 
 import apsw
@@ -27,10 +25,11 @@ from .context_assembly import EvidenceBlock, render_evidence_context
 from .errors import ConfigurationError, VersionConflict
 from .io_worker import fetchall, fetchone
 from .models import Chunk, Node, NodeChunk
-from .provider import MemoizedProvider, ProviderRequest
-from .retrieve import Usage
+from .provider import CallBudget, MemoizedProvider, ProviderRequest
+from .retrieve import Usage, usage_from_budget
 from ._ids import prefixed_id
 from .store import HistoryStore, map_storage_error
+from .tree import plan_hierarchy
 
 INDEXING_OPERATION_VERSION = 1
 
@@ -47,13 +46,6 @@ class IndexReport:
     pending_coverage: Coverage
     provider_usage: Usage
     status: str  # complete | partial
-
-
-def _before_publish_barrier() -> None:
-    """No-op by default. Failure-injection tests (F4) monkeypatch this to pause indexing right
-    after its model input has captured the generation/history/index revision tuple, so a
-    concurrent commit (an ingestion, or another index() call) can land before this proposal
-    tries to publish (Failure-Injection.md F4: stale proposal)."""
 
 
 def _chunk_messages(rows: list[tuple], target_size_scalars: int) -> list[list[tuple]]:
@@ -91,7 +83,7 @@ def _parse_indexing_response(text: str) -> tuple[str, str]:
     if isinstance(parsed, dict) and isinstance(parsed.get("title"), str) and isinstance(
         parsed.get("summary"), str
     ):
-        return parsed["title"], parsed["summary"]
+        return parsed["title"][:120], parsed["summary"][:1200]
     # Malformed model output: fall back to the raw text as a summary rather than failing the
     # whole batch over one unparseable chunk.
     return "Untitled", text[:200]
@@ -162,6 +154,18 @@ async def index(
                 if pending_start <= pending_end
                 else []
             )
+            cursor = await store.connection.execute(
+                "SELECT node_id, history_id, parent_id, sibling_order, message_range, title, "
+                "summary, state, index_revision FROM nodes WHERE history_id = ?",
+                (store.history_id,),
+            )
+            previous = [] if rebuild else [Node(*r) for r in await fetchall(cursor)]
+            cursor = await store.connection.execute(
+                "SELECT DISTINCT nc.node_id FROM node_chunks nc JOIN nodes n "
+                "ON n.node_id = nc.node_id WHERE n.history_id = ?", (store.history_id,),
+            )
+            leaf_ids = {r[0] for r in await fetchall(cursor)}
+            old_leaves = [n for n in previous if n.node_id in leaf_ids]
 
     cache_scope = CacheScope(
         application_namespace=store.config.application_namespace,
@@ -183,46 +187,24 @@ async def index(
         )
 
     limit = store.config.provider_attempt_limit_index
+    budget = CallBudget(limit)
 
     await store.begin_write()
     try:
         chunk_rows_groups = _chunk_messages(rows, store.config.target_chunk_size_scalars)
 
         chunks: list[Chunk] = []
-        nodes: list[Node] = []
+        new_leaves: list[Node] = []
         node_chunks: list[NodeChunk] = []
-        provider_calls = 0
-        memo_hits = 0
-        memo_misses = 0
-        last_committed_seq = pending_start - 1
+        last_committed_seq = index_committed_seq
         status = "complete"
 
-        for order, group in enumerate(chunk_rows_groups):
-            if _monotonic() >= deadline_at or provider_calls >= limit:
-                status = "partial"
-                break
-
+        # Plan before spending: reserve calls for internal summaries as well as leaves.
+        for order, group in enumerate(chunk_rows_groups[:limit]):
             group_start_seq = group[0][0]
             group_end_seq = group[-1][0]
             text = "\n".join(t or "" for _, t in group)
             content_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
-
-            blocks = [
-                EvidenceBlock(evidence_id=f"seq_{seq}", source_pointer="/content", excerpt=t or "")
-                for seq, t in group
-            ]
-            request = ProviderRequest(
-                operation="indexing",
-                prompt=_build_indexing_prompt(),
-                evidence_context=render_evidence_context(blocks),
-            )
-            response = await provider.complete(request, deadline_at=deadline_at, cache_scope=cache_scope)
-            if response.from_cache:
-                memo_hits += 1
-            else:
-                provider_calls += 1
-                memo_misses += 1
-            title, summary = _parse_indexing_response(response.text)
 
             chunk_id = prefixed_id("c")
             chunks.append(
@@ -234,23 +216,58 @@ async def index(
                 )
             )
             node_id = prefixed_id("n")
-            nodes.append(
+            new_leaves.append(
                 Node(
                     node_id=node_id,
                     history_id=store.history_id,
                     parent_id=None,
                     sibling_order=order,
                     message_range=f"{group_start_seq}-{group_end_seq}",
-                    title=title,
-                    summary=summary,
+                    title=None,
+                    summary=None,
                     state="published",
                     index_revision=index_revision + 1,
                 )
             )
             node_chunks.append(NodeChunk(node_id=node_id, chunk_id=chunk_id, chunk_order=0))
-            last_committed_seq = group_end_seq
-
-        _before_publish_barrier()
+        nodes, summaries = [], {}
+        count = len(new_leaves)
+        while count:
+            nodes, summaries = plan_hierarchy(
+                old_leaves + new_leaves[:count], previous,
+                store.config.tree_max_children, index_revision + 1,
+            )
+            if count + len(summaries) <= limit:
+                break
+            count -= 1
+        if not count:
+            return IndexReport(
+                committed_coverage=Coverage(1, index_committed_seq) if index_committed_seq else Coverage(None, None),
+                pending_coverage=Coverage(pending_start, pending_end), provider_usage=Usage(), status="partial",
+            )
+        chunks, node_chunks = chunks[:count], node_chunks[:count]
+        resolved = {n.node_id: n for n in nodes}
+        for leaf, group in zip(new_leaves[:count], chunk_rows_groups[:count]):
+            blocks = [EvidenceBlock(f"seq_{seq}", "/content", t or "") for seq, t in group]
+            response = await provider.complete(
+                ProviderRequest("indexing", _build_indexing_prompt(), render_evidence_context(blocks)),
+                deadline_at=deadline_at, cache_scope=cache_scope, budget=budget,
+            )
+            title, summary = _parse_indexing_response(response.text)
+            resolved[leaf.node_id] = replace(resolved[leaf.node_id], title=title, summary=summary)
+        for nid, children in summaries.items():
+            blocks = [EvidenceBlock(
+                child, "/summary", (resolved[child].title or "") + "\n" + (resolved[child].summary or ""),
+            ) for child in children]
+            response = await provider.complete(
+                ProviderRequest("indexing", _build_indexing_prompt(), render_evidence_context(blocks)),
+                deadline_at=deadline_at, cache_scope=cache_scope, budget=budget,
+            )
+            title, summary = _parse_indexing_response(response.text)
+            resolved[nid] = replace(resolved[nid], title=title, summary=summary)
+        nodes = list(resolved.values())
+        last_committed_seq = chunk_rows_groups[count - 1][-1][0]
+        status = "complete" if count == len(chunk_rows_groups) else "partial"
 
         try:
             async with store.write_lock:
@@ -259,6 +276,7 @@ async def index(
                     if (
                         current_history_revision != history_revision
                         or current_index_revision != index_revision
+                        or await _read_cache_generation(store) != cache_generation
                     ):
                         raise VersionConflict(
                             "index() tree-publish rejected: history_revision/index_revision "
@@ -267,12 +285,30 @@ async def index(
                             "proposal's model input was captured — retry index() to recompute"
                         )
 
+                    if rebuild:
+                        # "Explicit full rebuild" replaces the tree, never appends a second copy
+                        # alongside the first.
+                        await store.connection.execute(
+                            "DELETE FROM node_chunks WHERE node_id IN "
+                            "(SELECT node_id FROM nodes WHERE history_id = ?)",
+                            (store.history_id,),
+                        )
+                        await store.connection.execute(
+                            "DELETE FROM nodes WHERE history_id = ?", (store.history_id,)
+                        )
+                        await store.connection.execute(
+                            "DELETE FROM chunks WHERE history_id = ?", (store.history_id,)
+                        )
+
                     for c in chunks:
                         await store.connection.execute(
                             "INSERT INTO chunks (chunk_id, history_id, source_message_span, "
                             "content_hash, rendering_version) VALUES (?, ?, ?, ?, ?)",
                             (c.chunk_id, c.history_id, c.source_message_span, c.content_hash, c.rendering_version),
                         )
+                    # Publish the complete topology atomically; leaf/chunk identities survive
+                    # incremental indexing. Old internal nodes no longer in the plan disappear.
+                    await store.connection.execute("DELETE FROM nodes WHERE history_id = ?", (store.history_id,))
                     for n in nodes:
                         await store.connection.execute(
                             "INSERT INTO nodes (node_id, history_id, parent_id, sibling_order, "
@@ -309,11 +345,6 @@ async def index(
             if last_committed_seq >= pending_end
             else Coverage(start_seq=last_committed_seq + 1, end_seq=pending_end)
         ),
-        provider_usage=Usage(
-            current_provider_calls=provider_calls,
-            usage_unknown=provider_calls > 0,
-            memo_hits=memo_hits,
-            memo_misses=memo_misses,
-        ),
+        provider_usage=usage_from_budget(budget),
         status=status,
     )

@@ -1,0 +1,58 @@
+name: Release
+
+# PRD §13.4: trusted publishing configuration and protected-tag release jobs. This workflow is
+# CONFIGURATION only — it does not run merely by existing in this repository. It triggers only
+# on a pushed `v*` tag, which is itself a separate, later, explicitly authorized action (PRD
+# §13.4: "No registry account creation, package publication, signing, or upstream repository
+# changes are authorized merely by this PRD"; constitution "Engineering Process Constraints":
+# "package/registry publication is a separate, later action never bundled into ship"). Configure
+# `release` as a protected GitHub Environment (required reviewers) before this can run for real.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish-python:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      # OIDC trusted publishing to PyPI — no long-lived API token stored in this repo.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          python -m pip install build
+          python -m build
+        working-directory: packages/python
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/python/dist
+
+  publish-typescript:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      # npm provenance attestation requires OIDC id-token too.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+      - run: |
+          npm ci
+          npm run build
+        working-directory: packages/typescript
+      - run: npm publish --provenance --access public
+        working-directory: packages/typescript
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

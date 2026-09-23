@@ -217,18 +217,18 @@ async def _run(args: argparse.Namespace) -> int:
             _print_json(receipt)
         elif args.command == "index":
             provider = _build_provider(store, args)
-            report = await index(store, provider=provider, rebuild=args.rebuild)
-            _print_json(report)
+            index_report = await index(store, provider=provider, rebuild=args.rebuild)
+            _print_json(index_report)
         elif args.command == "search":
-            result = await search(store, args.query, limit=args.limit)
-            _print_json(result)
+            search_result = await search(store, args.query, limit=args.limit)
+            _print_json(search_result)
         elif args.command == "retrieve":
-            result = await retrieve(store, args.query, mode=args.mode)
-            _print_json(result)
+            retrieval_result = await retrieve(store, args.query, mode=args.mode)
+            _print_json(retrieval_result)
         elif args.command == "ask":
             provider = _build_provider(store, args)
-            result = await ask(store, args.query, provider=provider, mode=args.mode)
-            _print_json(result)
+            answer_result = await ask(store, args.query, provider=provider, mode=args.mode)
+            _print_json(answer_result)
         elif args.command == "tree":
             if args.node_id is None:
                 _print_json(await _list_root_nodes(store))
@@ -244,8 +244,8 @@ async def _run(args: argparse.Namespace) -> int:
             if not args.confirm:
                 print("error: `clear` is destructive — pass --confirm", file=sys.stderr)
                 return 2
-            report = await clear_history(store, args.history_id)
-            _print_json(report)
+            clear_report = await clear_history(store, args.history_id)
+            _print_json(clear_report)
         else:
             print(f"unknown command {args.command!r}", file=sys.stderr)
             return 2

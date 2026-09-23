@@ -23,7 +23,7 @@ from typing import Callable, Protocol
 from .cache import CachedValue, CACHE_FORMAT_VERSION, CacheScope, MemoCache
 from .cache_key import cache_key, request_digest, scope_digest
 from .config import Config
-from .errors import ProviderTimeout
+from .errors import BudgetExceeded, ProviderTimeout
 from .retry import async_retry
 
 _CACHEABLE_OPERATIONS = frozenset({"indexing", "tree_navigation"})
@@ -64,6 +64,35 @@ class ProviderResponse:
     usage_unknown: bool = False
     from_cache: bool = False
     reused_operation_usage: dict | None = None
+
+
+@dataclass
+class CallBudget:
+    """Per-request physical attempt limit, shared across navigation/indexing steps."""
+
+    limit: int
+    calls: int = 0
+    retries: int = 0
+    input_tokens: int = 0
+    output_tokens: int = 0
+    usage_unknown: bool = False
+    memo_hits: int = 0
+    memo_misses: int = 0
+
+    def admit(self, retry: bool) -> None:
+        if self.calls >= self.limit:
+            raise BudgetExceeded("request provider-attempt budget exhausted")
+        self.calls += 1
+        self.retries += int(retry)
+
+    def record(self, response: ProviderResponse) -> None:
+        if response.from_cache:
+            self.memo_hits += 1
+        elif response.input_tokens is None or response.output_tokens is None or response.usage_unknown:
+            self.usage_unknown = True
+        else:
+            self.input_tokens += response.input_tokens
+            self.output_tokens += response.output_tokens
 
 
 class Provider(Protocol):
@@ -150,6 +179,7 @@ class MemoizedProvider:
         request: ProviderRequest,
         deadline_at: float,
         cache_scope: CacheScope | None = None,
+        budget: CallBudget | None = None,
     ) -> ProviderResponse:
         cacheable = (
             self.cache is not None
@@ -183,7 +213,7 @@ class MemoizedProvider:
                     self.usage_log.memo_hits += 1
                     if cached.reused_operation_usage is not None:
                         self.usage_log.reused_operation_usage_count += 1
-                return ProviderResponse(
+                response = ProviderResponse(
                     text=cached.payload.get("text", ""),
                     input_tokens=cached.payload.get("input_tokens"),
                     output_tokens=cached.payload.get("output_tokens"),
@@ -191,23 +221,40 @@ class MemoizedProvider:
                     from_cache=True,
                     reused_operation_usage=cached.reused_operation_usage,
                 )
+                if budget is not None:
+                    budget.record(response)
+                return response
             if cacheable and self.usage_log is not None:
                 self.usage_log.memo_misses += 1
+            if budget is not None:
+                budget.memo_misses += 1
 
         attempts = 0
 
-        async with self._semaphore:
+        try:
+            await asyncio.wait_for(self._semaphore.acquire(), timeout=max(0, deadline_at - time.monotonic()))
+        except asyncio.TimeoutError as exc:
+            raise ProviderTimeout("provider admission exceeded request deadline") from exc
+        try:
             async def attempt() -> ProviderResponse:
                 nonlocal attempts
+                if budget is not None:
+                    budget.admit(retry=attempts > 0)
                 attempts += 1
                 remaining = deadline_at - time.monotonic()
                 call_timeout = min(self.config.provider_call_deadline_s, max(remaining, 0))
                 try:
                     return await asyncio.wait_for(self.inner.complete(request), timeout=call_timeout)
                 except asyncio.TimeoutError as exc:
+                    if budget is not None:
+                        budget.usage_unknown = True
                     raise ProviderTimeout(
                         f"provider call for operation {request.operation!r} exceeded its deadline"
                     ) from exc
+                except Exception:
+                    if budget is not None:
+                        budget.usage_unknown = True
+                    raise
 
             try:
                 response = await async_retry(
@@ -220,6 +267,8 @@ class MemoizedProvider:
                     self.usage_log.provider_errors += 1
                     self.usage_log.provider_retries += max(0, attempts - 1)
                 raise
+        finally:
+            self._semaphore.release()
 
         if self.usage_log is not None:
             self.usage_log.provider_calls += 1
@@ -258,4 +307,6 @@ class MemoizedProvider:
             except Exception:
                 pass  # a cache write failure never fails the underlying operation (Principle III)
 
+        if budget is not None:
+            budget.record(response)
         return response

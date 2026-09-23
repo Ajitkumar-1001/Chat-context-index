@@ -1,0 +1,126 @@
+{
+  "method": "128 synthetic messages; deterministic marker router; same evidence renderer for full replay and selected context",
+  "environment": {
+    "python": "3.12.11",
+    "apsw": "3.53.4.0",
+    "sqlite": "3.53.4"
+  },
+  "source_sha256": "d8605d0c44f96a924d3eef3248ab659e83eb59883bf8de8e9b5254b362a8146d",
+  "fixture_sha256": "50f38ace01aa3e34b4ef3945b63ad5e2f39dc0be7268901b818a7425570c5604",
+  "history_messages": 128,
+  "source_sequences_returned": [
+    1,
+    127,
+    128
+  ],
+  "indexing": {
+    "provider_calls": 171,
+    "input_chars": 459836,
+    "output_chars": 212439,
+    "batches": [
+      {
+        "committed_coverage": {
+          "start_seq": 1,
+          "end_seq": 49
+        },
+        "pending_coverage": {
+          "start_seq": 50,
+          "end_seq": 128
+        },
+        "provider_usage": {
+          "current_provider_calls": 64,
+          "retries": 0,
+          "usage_unknown": true,
+          "memo_hits": 0,
+          "memo_misses": 0,
+          "memo_errors": 0,
+          "stage_ms": {},
+          "input_tokens": null,
+          "output_tokens": null
+        },
+        "status": "partial"
+      },
+      {
+        "committed_coverage": {
+          "start_seq": 1,
+          "end_seq": 96
+        },
+        "pending_coverage": {
+          "start_seq": 97,
+          "end_seq": 128
+        },
+        "provider_usage": {
+          "current_provider_calls": 64,
+          "retries": 0,
+          "usage_unknown": true,
+          "memo_hits": 0,
+          "memo_misses": 0,
+          "memo_errors": 0,
+          "stage_ms": {},
+          "input_tokens": null,
+          "output_tokens": null
+        },
+        "status": "partial"
+      },
+      {
+        "committed_coverage": {
+          "start_seq": 1,
+          "end_seq": 128
+        },
+        "pending_coverage": {
+          "start_seq": null,
+          "end_seq": null
+        },
+        "provider_usage": {
+          "current_provider_calls": 43,
+          "retries": 0,
+          "usage_unknown": true,
+          "memo_hits": 0,
+          "memo_misses": 0,
+          "memo_errors": 0,
+          "stage_ms": {},
+          "input_tokens": null,
+          "output_tokens": null
+        },
+        "status": "complete"
+      }
+    ],
+    "unchanged_rerun_provider_calls": 0
+  },
+  "query": {
+    "routing": {
+      "requested_mode": "tree",
+      "actual_mode": "tree",
+      "candidate_count": 1,
+      "selected_chunk_ids": [
+        "c_01M35XXKVY4HVVDKXA6QZY8GHJ"
+      ]
+    },
+    "usage": {
+      "current_provider_calls": 4,
+      "retries": 0,
+      "usage_unknown": true,
+      "memo_hits": 0,
+      "memo_misses": 0,
+      "memo_errors": 0,
+      "stage_ms": {},
+      "input_tokens": null,
+      "output_tokens": null
+    },
+    "navigation_input_chars": 19492,
+    "navigation_output_chars": 184,
+    "memory_context_chars": 4868,
+    "full_history_context_chars": 207260,
+    "navigation_plus_memory_input_chars": 24360,
+    "input_character_break_even_queries": 3
+  },
+  "not_measured": [
+    "semantic retrieval quality",
+    "generated-answer correctness",
+    "actual model tokens",
+    "provider prices or dollar savings",
+    "latency comparison",
+    "prompt caching discounts"
+  ],
+  "limitations": "Character accounting is not token or billing accounting. Both baselines omit common answer instructions, documents, query, and answer output. Indexing and routing use a deterministic double."
+}

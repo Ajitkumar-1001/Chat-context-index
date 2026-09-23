@@ -1,32 +1,19 @@
 """cci (chat-context-index): persistent, retrievable conversation memory for AI applications.
 
-Public re-exports of the operations named in contracts/operations.md. `HistoryStore` is this
-implementation's name for the contract's `ContextIndex` — `HistoryStore.open()` is the
-`ContextIndex.open()` entry point (no behavioral divergence, naming only).
+Deliberately does not re-export the operation functions (`ask`, `ingest`, `index`, `retrieve`,
+`search`, `stats`, `export`) at package level: each shares its name with its own submodule
+(`cci.ask` module vs. its `ask` function, etc.), and `from .ask import ask` here would rebind
+the `cci.ask` attribute to the function, shadowing the submodule — breaking any caller that does
+`import cci.retrieve as x` (this project's failure-injection tests monkeypatch module-level
+barriers exactly that way). Import operations from their own submodule instead:
+`from cci.retrieve import retrieve`.
+
+`HistoryStore` has no such collision (the contract's `ContextIndex` — `HistoryStore.open()` is
+`ContextIndex.open()`, naming only) and is safe to re-export here.
 """
 
 from __future__ import annotations
 
-from .ask import ask
-from .clear import clear_history
-from .export import export
-from .import_history import import_history
-from .index import index
-from .ingest import ingest
-from .retrieve import retrieve
-from .search import search
-from .stats import stats
 from .store import HistoryStore
 
-__all__ = [
-    "HistoryStore",
-    "ask",
-    "clear_history",
-    "export",
-    "import_history",
-    "index",
-    "ingest",
-    "retrieve",
-    "search",
-    "stats",
-]
+__all__ = ["HistoryStore"]

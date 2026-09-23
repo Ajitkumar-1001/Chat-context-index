@@ -84,6 +84,16 @@ class Config:
     def validate(self) -> None:
         """Raise ConfigurationError for anything invalid. Called by open() BEFORE any store
         file is created or opened (contracts/operations.md `open()` Check order)."""
+        if not isinstance(self.tree_max_children, int) or not 2 <= self.tree_max_children <= 128:
+            raise ConfigurationError("tree_max_children must be an integer between 2 and 128")
+        for name in ("target_chunk_size_scalars", "max_selected_chunks", "max_evidence_text_scalars",
+                     "provider_attempt_limit_index", "provider_attempt_limit_retrieve",
+                     "provider_attempt_limit_ask", "max_provider_attempts_per_op"):
+            value = getattr(self, name)
+            if not isinstance(value, int) or value <= 0:
+                raise ConfigurationError(f"{name} must be a positive integer")
+        if not isinstance(self.max_tree_navigation_calls, int) or self.max_tree_navigation_calls < 0:
+            raise ConfigurationError("max_tree_navigation_calls must be a non-negative integer")
         if self.cache_backend not in ("none", "sqlite", "redis"):
             raise ConfigurationError(
                 f"cache_backend must be one of 'none', 'sqlite', 'redis'; got {self.cache_backend!r}"

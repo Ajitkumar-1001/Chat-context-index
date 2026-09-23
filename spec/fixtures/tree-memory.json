@@ -1,0 +1,17 @@
+{
+  "description": "Deterministic integration fixture, not a semantic retrieval benchmark.",
+  "query": "Where should the service launch?",
+  "navigation_marker": "ORCHID",
+  "required_source_seq": 1,
+  "messages": [
+    {"role": "user", "content": "ORCHID: The deployment target is Oslo."},
+    {"role": "user", "content": "Unrelated conversation 0."},
+    {"role": "user", "content": "Unrelated conversation 1."},
+    {"role": "user", "content": "Unrelated conversation 2."},
+    {"role": "user", "content": "Unrelated conversation 3."},
+    {"role": "user", "content": "Unrelated conversation 4."},
+    {"role": "user", "content": "Unrelated conversation 5."},
+    {"role": "user", "content": "Unrelated conversation 6."}
+  ],
+  "next_message": {"role": "assistant", "content": "Next step: prepare the deployment checklist."}
+}

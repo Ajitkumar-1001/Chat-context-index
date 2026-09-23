@@ -1,17 +1,19 @@
-"""Failure injection F11 (sequence after clear) and F10 (local-work half, and — since T062 —
-the full case with a real disposable Redis), per spec/fixtures/failure-injection-harness.md
-(AT-18).
+"""Failure injection F11 (sequence after clear), F10 (local-work half, and — since T062 — the
+full case with a real disposable Redis), and F-writer/T087 (in-flight `ingest()` during clear's
+quiescence window), per spec/fixtures/failure-injection-harness.md (AT-18).
 
 F10's local-work-half case pauses a *reader* (data-model.md Snapshot/Generation lifecycle case
-2 — `retrieve()`/`ask()` at read emission); the writer case (F-writer/T087) is out of scope for
-this batch and lives in T087. `index()` tree-publish (case 1) doesn't exist until T053, so it
-isn't a candidate reader/writer case available in this milestone either.
+2 — `retrieve()`/`ask()` at read emission); `index()` tree-publish (case 1) is exercised
+separately by T055's F4 test, not here.
 
 The full F10 case (T063, US6b/M3) additionally makes Redis unreachable during the clear's
 external purge attempt: `logical_clear_complete=true` and `cache_purge_pending=true`, a durable
 pending scope permits later bounded cleanup, and unrelated Redis scopes survive — verified
 against a real disposable Redis container (harness boundaries: a mock cannot prove Redis
 reconnection/command behavior).
+
+F-writer/T087 pauses a *writer* (`ingest()`, at its commit barrier) instead of a reader —
+data-model.md Snapshot/Generation lifecycle case 3, resolving `/speckit-analyze` finding G2.
 """
 
 from __future__ import annotations
@@ -25,9 +27,10 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "python", "src"))
 
+import cci.ingest as ingest_module
 import cci.retrieve as retrieve_module
 from cci.clear import clear_history
-from cci.errors import VersionConflict
+from cci.errors import BudgetExceeded, VersionConflict
 from cci.index import index
 from cci.io_worker import fetchall
 from cci.ingest import ingest
@@ -267,9 +270,124 @@ def test_f10_full_case_redis_unreachable_reports_pending_purge_and_preserves_unr
     asyncio.run(scenario())
 
 
+def test_f_writer_ingest_commits_within_window_is_swept_away_with_the_generation():
+    """T087 case (a): the in-flight `ingest()` commits within the 10s window — its receipt is
+    honest (a normal, successful commit) and its data is swept away with the rest of the
+    pre-clear generation once the clear commits."""
+
+    async def scenario() -> None:
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "fwriter-a.db")
+            store = await HistoryStore.open(path)
+            history_id = store.history_id
+
+            paused = asyncio.Event()
+            resume = asyncio.Event()
+
+            async def pausing_barrier() -> None:
+                paused.set()
+                await resume.wait()
+
+            ingest_module._pause_before_commit_barrier = pausing_barrier
+            try:
+                ingest_task = asyncio.create_task(
+                    ingest(
+                        store, history_id,
+                        [InputMessage(role="user", content="in-flight during clear")],
+                        "src-1", "key-1",
+                    )
+                )
+                await paused.wait()
+
+                # The paused ingest already passed clear's gate and is counted in-flight —
+                # clear_history() must wait for it, not reject or race past it.
+                clear_task = asyncio.create_task(clear_history(store, history_id))
+                resume.set()
+
+                receipt = await ingest_task
+                clear_report = await clear_task
+
+                assert receipt.replayed is False
+                assert receipt.inserted_seq_start == 1, "the receipt is honest about what it committed"
+                assert clear_report.logical_clear_complete is True
+
+                messages = await store.get_messages(1, 100)
+                assert len(messages) == 0, (
+                    "the in-flight write's data is swept away with the rest of the pre-clear "
+                    "generation once the clear commits"
+                )
+            finally:
+                async def _noop() -> None:
+                    return None
+
+                ingest_module._pause_before_commit_barrier = _noop
+
+            await store.aclose()
+
+    asyncio.run(scenario())
+
+
+def test_f_writer_window_expires_clear_fails_and_ingest_continues_unaffected():
+    """T087 case (b): the quiescence window expires before the in-flight `ingest()` commits —
+    `clear_history()` fails explicitly with `BudgetExceeded`, and the `ingest()` is never
+    cancelled — it continues unaffected and its commit still succeeds once resumed."""
+
+    async def scenario() -> None:
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "fwriter-b.db")
+            store = await HistoryStore.open(
+                path, config={"clear_history_quiescence_deadline_s": 0.2},
+            )
+            history_id = store.history_id
+
+            paused = asyncio.Event()
+            resume = asyncio.Event()
+
+            async def pausing_barrier() -> None:
+                paused.set()
+                await resume.wait()
+
+            ingest_module._pause_before_commit_barrier = pausing_barrier
+            try:
+                ingest_task = asyncio.create_task(
+                    ingest(
+                        store, history_id,
+                        [InputMessage(role="user", content="still in flight when clear times out")],
+                        "src-1", "key-1",
+                    )
+                )
+                await paused.wait()
+
+                try:
+                    await clear_history(store, history_id)
+                    raise AssertionError("expected BudgetExceeded — the window must expire first")
+                except BudgetExceeded:
+                    pass
+
+                # The clear's failure must not cancel or otherwise affect the still-running write.
+                resume.set()
+                receipt = await ingest_task
+                assert receipt.replayed is False
+                assert receipt.inserted_seq_start == 1, "the ingest() continues unaffected and still commits"
+
+                messages = await store.get_messages(1, 100)
+                assert len(messages) == 1, "the write that outlived the failed clear is still present"
+            finally:
+                async def _noop() -> None:
+                    return None
+
+                ingest_module._pause_before_commit_barrier = _noop
+
+            await store.aclose()
+
+    asyncio.run(scenario())
+
+
 if __name__ == "__main__":
     test_f11_sequence_after_clear_exceeds_old_high_water_mark()
     test_f10_reader_paused_mid_request_cannot_publish_retired_content()
+    test_f_writer_ingest_commits_within_window_is_swept_away_with_the_generation()
+    test_f_writer_window_expires_clear_fails_and_ingest_continues_unaffected()
     setup_module(None)
     try:
         test_f10_full_case_redis_unreachable_reports_pending_purge_and_preserves_unrelated_scopes()

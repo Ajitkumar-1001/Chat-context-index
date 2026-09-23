@@ -1,0 +1,45 @@
+{
+  "name": "brand-memory-development-probe-v1",
+  "description": "Hand-authored synthetic development cases. No UgenticAI customer data or measured CloneIQ behavior. Not a held-out evaluation or a release gate.",
+  "histories": {
+    "cedar": [
+      {"external_id": "cedar-founder", "role": "user", "content": "My founder story began with repairing bicycles in a garage."},
+      {"external_id": "cedar-tone", "role": "user", "content": "For Cedar Studio, write in a calm, practical voice."},
+      {"external_id": "cedar-price-old-1", "role": "user", "content": "The workshop price is $499."},
+      {"external_id": "cedar-price-old-2", "role": "assistant", "content": "The workshop price is $499 in draft number one."},
+      {"external_id": "cedar-price-old-3", "role": "user", "content": "Keep the workshop price at $499 in the original outline."},
+      {"external_id": "cedar-price-old-4", "role": "assistant", "content": "The workshop price is $499 in the original worksheet."},
+      {"external_id": "cedar-price-old-5", "role": "user", "content": "The workshop price is $499 in the initial email."},
+      {"external_id": "cedar-price-old-6", "role": "assistant", "content": "The workshop price is $499 in the previous campaign."},
+      {"external_id": "cedar-price-old-7", "role": "user", "content": "The workshop price is $499 in the archived brief."},
+      {"external_id": "cedar-price-old-8", "role": "assistant", "content": "The workshop price is $499 in the archived slides."},
+      {"external_id": "cedar-price-old-9", "role": "user", "content": "The workshop price is $499 in the old landing page."},
+      {"external_id": "cedar-colour", "role": "user", "content": "Use a teal heading on the homepage."},
+      {"external_id": "cedar-timezone", "role": "user", "content": "Use UTC for all scheduled reports."},
+      {"external_id": "cedar-tagline", "role": "user", "content": "Our tagline is Small steps, steady progress."},
+      {"external_id": "cedar-tagline-reply", "role": "assistant", "content": "I recorded the revised tagline."},
+      {"external_id": "cedar-option", "role": "user", "content": "For the launch, choose the email-first option."},
+      {"external_id": "cedar-option-reply", "role": "assistant", "content": "We will start with email, then publish the social posts."},
+      {"external_id": "cedar-price-current", "role": "user", "content": "Correction: the workshop price is $799. The earlier $499 offer is retired."},
+      {"external_id": "cedar-price-current-reply", "role": "assistant", "content": "I recorded the price correction."}
+    ],
+    "harbor": [
+      {"external_id": "harbor-tone", "role": "user", "content": "For Harbor Academy, use an energetic, playful voice."},
+      {"external_id": "harbor-code", "role": "user", "content": "Our internal reference is HARBOR_ONLY_77."},
+      {"external_id": "harbor-price", "role": "user", "content": "The workshop price is $199."},
+      {"external_id": "harbor-price-reply", "role": "assistant", "content": "The Harbor offer has been recorded."}
+    ]
+  },
+  "cases": [
+    {"id": "old-founder-story", "history": "cedar", "query": "founder story", "evidence": [{"external_id": "cedar-founder", "contains": "repairing bicycles in a garage"}]},
+    {"id": "old-brand-voice", "history": "cedar", "query": "calm practical", "evidence": [{"external_id": "cedar-tone", "contains": "calm, practical voice"}]},
+    {"id": "correction-after-many-old-matches", "history": "cedar", "query": "workshop price", "evidence": [{"external_id": "cedar-price-current", "contains": "$799"}]},
+    {"id": "recent-price-paraphrase", "history": "cedar", "query": "How much does enrollment cost?", "evidence": [{"external_id": "cedar-price-current", "contains": "$799"}]},
+    {"id": "recent-follow-up", "history": "cedar", "query": "Let's use that option.", "evidence": [{"external_id": "cedar-option", "contains": "email-first option"}]},
+    {"id": "literal-timezone", "history": "cedar", "query": "UTC", "evidence": [{"external_id": "cedar-timezone", "contains": "UTC"}]},
+    {"id": "timezone-outside-recent-reserve", "history": "cedar", "query": "Which timezone should scheduled reports use?", "evidence": [{"external_id": "cedar-timezone", "contains": "UTC"}]},
+    {"id": "second-brand-price", "history": "harbor", "query": "workshop price", "evidence": [{"external_id": "harbor-price", "contains": "$199"}]},
+    {"id": "unknown-delivery-date", "history": "cedar", "query": "delivery deadline", "evidence": []},
+    {"id": "other-brand-reference", "history": "cedar", "query": "HARBOR_ONLY_77", "evidence": [], "forbidden_text": ["HARBOR_ONLY_77"]}
+  ]
+}

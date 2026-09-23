@@ -20,7 +20,7 @@ import apsw
 import apsw.aio
 
 from ._ids import prefixed_id
-from .cache import CacheScope, MemoCache, build_cache
+from .cache import MemoCache, build_cache
 from .config import Config, resolve
 from .provider import UsageLog
 from .errors import (
@@ -421,24 +421,6 @@ class HistoryStore:
         return NodeView(
             node_id=row[0], parent_id=row[1], sibling_order=row[2], message_range=row[3],
             title=row[4], summary=row[5], state=row[6], index_revision=row[7],
-        )
-
-    async def cache_scope(self) -> CacheScope:
-        """Current `CacheScope` for this store — `cache_generation` is read fresh (it changes on
-        `clear_history()`), never cached on the `HistoryStore` instance itself."""
-        async with self.write_lock:
-            async with self._connection:
-                cursor = await self._connection.execute(
-                    "SELECT cache_generation FROM store_meta WHERE id = 1"
-                )
-                row = await fetchone(cursor)
-                assert row is not None
-                cache_generation = row[0]
-        return CacheScope(
-            application_namespace=self.config.application_namespace,
-            store_instance_id=self.store_instance_id,
-            history_id=self.history_id,
-            cache_generation=cache_generation,
         )
 
     async def aclose(self) -> None:

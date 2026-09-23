@@ -104,6 +104,32 @@ def test_index_without_provider_is_configuration_error():
     asyncio.run(scenario())
 
 
+def test_rebuild_replaces_the_tree_rather_than_appending_a_second_copy():
+    async def scenario() -> None:
+        with tempfile.TemporaryDirectory() as d:
+            store = await _seeded_store(os.path.join(d, "idx5.db"))
+            fake = FakeProvider(
+                responses=[
+                    ProviderResponse(text='{"title": "T1", "summary": "S1"}'),
+                    ProviderResponse(text='{"title": "T2", "summary": "S2"}'),
+                ]
+            )
+            provider = MemoizedProvider(inner=fake, config=store.config)
+
+            await index(store, provider=provider, rebuild=True)
+            await index(store, provider=provider, rebuild=True)
+
+            cursor = await store.connection.execute(
+                "SELECT COUNT(*) FROM nodes WHERE history_id = ?", (store.history_id,)
+            )
+            (count,) = [row async for row in cursor][0]
+            assert count == 1, "an explicit full rebuild replaces the tree, never appends a second copy"
+
+            await store.aclose()
+
+    asyncio.run(scenario())
+
+
 def test_index_on_empty_store_is_zero_calls_and_empty_coverage():
     async def scenario() -> None:
         with tempfile.TemporaryDirectory() as d:
@@ -123,5 +149,6 @@ if __name__ == "__main__":
     test_index_builds_a_valid_tree_covering_pending_range()
     test_second_no_change_call_makes_zero_model_calls()
     test_index_without_provider_is_configuration_error()
+    test_rebuild_replaces_the_tree_rather_than_appending_a_second_copy()
     test_index_on_empty_store_is_zero_calls_and_empty_coverage()
     print("Scenario 4 (index()) checks passed")

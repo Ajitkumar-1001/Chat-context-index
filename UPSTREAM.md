@@ -24,6 +24,11 @@ The conceptual foundation retained from ChatIndex: a topic-tree hierarchy over c
 history, with retrieval that can operate at multiple levels of detail (raw messages, chunks,
 topic summaries).
 
+The current hierarchy and bounded router are independent implementations of that idea.
+ContIndex groups consecutive summarized chunks and reuses unchanged branches; it does not
+port ChatIndex's LLM topic-boundary classification or autonomous retrieval tool loop. Generated
+summaries guide retrieval, while returned evidence resolves to original message fields.
+
 ## Major modifications and independent contribution
 
 This derivative is independently maintained and contributes work not present upstream:

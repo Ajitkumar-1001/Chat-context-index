@@ -1,0 +1,759 @@
+{
+  "fixture": "brand-memory-development-probe-v1",
+  "scope": "Hand-authored synthetic development cases. No UgenticAI customer data or measured CloneIQ behavior. Not a held-out evaluation or a release gate.",
+  "recorded_at": "2026-09-23T00:52:21.040158+00:00",
+  "environment": {
+    "python": "3.12.11",
+    "platform": "Darwin",
+    "machine": "arm64",
+    "apsw": "3.53.4.0",
+    "sqlite": "3.53.4"
+  },
+  "fingerprints": {
+    "implementation_sha256": "86b98ad339d34e746595ce295a48971e5746108e0fd7ce1f7eabae3d6e018d1f",
+    "fixture_sha256": "273141e1bf5d67d66ee01ec3f7d18f5f9fd3e96a57233f80c173019987416f96"
+  },
+  "limits": {
+    "max_messages": 8,
+    "max_rendered_chars": 4000,
+    "max_excerpt_chars": 200,
+    "combined_recent_reserve": 4
+  },
+  "provider_calls": 0,
+  "not_measured": [
+    "answer correctness",
+    "semantic citation support",
+    "model abstention",
+    "tokens",
+    "provider cost",
+    "latency comparison",
+    "production CloneIQ behavior",
+    "TypeScript parity"
+  ],
+  "storage_checks": [
+    {
+      "history": "cedar",
+      "same_history_after_reopen": true,
+      "same_messages_after_reopen": true,
+      "retry_replays_without_duplicates": true
+    },
+    {
+      "history": "harbor",
+      "same_history_after_reopen": true,
+      "same_messages_after_reopen": true,
+      "retry_replays_without_duplicates": true
+    }
+  ],
+  "summary": {
+    "recent_only": {
+      "answerable_cases": 8,
+      "cases_with_complete_evidence": 6,
+      "covered_evidence_units": 6,
+      "required_evidence_units": 8,
+      "context_budget_violations": 0,
+      "history_scope_violations": 0
+    },
+    "lexical_only": {
+      "answerable_cases": 8,
+      "cases_with_complete_evidence": 4,
+      "covered_evidence_units": 4,
+      "required_evidence_units": 8,
+      "context_budget_violations": 0,
+      "history_scope_violations": 0
+    },
+    "recent_plus_lexical": {
+      "answerable_cases": 8,
+      "cases_with_complete_evidence": 7,
+      "covered_evidence_units": 7,
+      "required_evidence_units": 8,
+      "context_budget_violations": 0,
+      "history_scope_violations": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "old-founder-story",
+      "history": "cedar",
+      "query": "founder story",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 1,
+          "complete_evidence": false,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [
+            "cedar-founder"
+          ],
+          "covered_sources": [
+            "cedar-founder"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 143,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-founder",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-founder"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 691,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "old-brand-voice",
+      "history": "cedar",
+      "query": "calm practical",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 1,
+          "complete_evidence": false,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [
+            "cedar-tone"
+          ],
+          "covered_sources": [
+            "cedar-tone"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 135,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-tone",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-tone"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 683,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "correction-after-many-old-matches",
+      "history": "cedar",
+      "query": "workshop price",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-price-current"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [
+            "cedar-price-old-1",
+            "cedar-price-old-2",
+            "cedar-price-old-3",
+            "cedar-price-old-4",
+            "cedar-price-old-5",
+            "cedar-price-old-6",
+            "cedar-price-old-7",
+            "cedar-price-old-8"
+          ],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 1,
+          "complete_evidence": false,
+          "rendered_chars": 1061,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-price-old-1",
+            "cedar-price-old-2",
+            "cedar-price-old-3",
+            "cedar-price-old-4",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-price-current"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 1070,
+          "empty_context": false,
+          "omitted_candidates": 4,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "recent-price-paraphrase",
+      "history": "cedar",
+      "query": "How much does enrollment cost?",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-price-current"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 1,
+          "complete_evidence": false,
+          "rendered_chars": 0,
+          "empty_context": true,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-price-current"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 547,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "recent-follow-up",
+      "history": "cedar",
+      "query": "Let's use that option.",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-option"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 1,
+          "complete_evidence": false,
+          "rendered_chars": 0,
+          "empty_context": true,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-option"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 547,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "literal-timezone",
+      "history": "cedar",
+      "query": "UTC",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-timezone"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [
+            "cedar-timezone"
+          ],
+          "covered_sources": [
+            "cedar-timezone"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 118,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-timezone",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-timezone"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 666,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "timezone-outside-recent-reserve",
+      "history": "cedar",
+      "query": "Which timezone should scheduled reports use?",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [
+            "cedar-timezone"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 1,
+          "complete_evidence": false,
+          "rendered_chars": 0,
+          "empty_context": true,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 1,
+          "complete_evidence": false,
+          "rendered_chars": 547,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "second-brand-price",
+      "history": "harbor",
+      "query": "workshop price",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "harbor-tone",
+            "harbor-code",
+            "harbor-price",
+            "harbor-price-reply"
+          ],
+          "covered_sources": [
+            "harbor-price"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 494,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [
+            "harbor-price"
+          ],
+          "covered_sources": [
+            "harbor-price"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 111,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "harbor-tone",
+            "harbor-code",
+            "harbor-price",
+            "harbor-price-reply"
+          ],
+          "covered_sources": [
+            "harbor-price"
+          ],
+          "covered_evidence_units": 1,
+          "required_evidence_units": 1,
+          "complete_evidence": true,
+          "rendered_chars": 494,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "unknown-delivery-date",
+      "history": "cedar",
+      "query": "delivery deadline",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 0,
+          "complete_evidence": null,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 0,
+          "complete_evidence": null,
+          "rendered_chars": 0,
+          "empty_context": true,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 0,
+          "complete_evidence": null,
+          "rendered_chars": 547,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    },
+    {
+      "id": "other-brand-reference",
+      "history": "cedar",
+      "query": "HARBOR_ONLY_77",
+      "strategies": {
+        "recent_only": {
+          "selected_sources": [
+            "cedar-colour",
+            "cedar-timezone",
+            "cedar-tagline",
+            "cedar-tagline-reply",
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 0,
+          "complete_evidence": null,
+          "rendered_chars": 1031,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "lexical_only": {
+          "selected_sources": [],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 0,
+          "complete_evidence": null,
+          "rendered_chars": 0,
+          "empty_context": true,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        },
+        "recent_plus_lexical": {
+          "selected_sources": [
+            "cedar-option",
+            "cedar-option-reply",
+            "cedar-price-current",
+            "cedar-price-current-reply"
+          ],
+          "covered_sources": [],
+          "covered_evidence_units": 0,
+          "required_evidence_units": 0,
+          "complete_evidence": null,
+          "rendered_chars": 547,
+          "empty_context": false,
+          "omitted_candidates": 0,
+          "truncated_excerpts": 0,
+          "within_budget": true,
+          "selected_history_only": true,
+          "forbidden_text_absent": true
+        }
+      }
+    }
+  ]
+}

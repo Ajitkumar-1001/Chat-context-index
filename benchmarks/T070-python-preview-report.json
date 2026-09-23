@@ -1,0 +1,38 @@
+{
+  "environment": {
+    "cci_module_path": "/private/tmp/claude-501/-Users-ajit-dev-cont-index/80e834bb-c49b-43f1-823e-f67d92d8b424/scratchpad/cci-preview-venv/lib/python3.12/site-packages/cci/__init__.py",
+    "dedicated_linux_runner": false,
+    "label": "Python-preview",
+    "machine": "arm64",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [Clang 17.0.0 (clang-1700.0.13.3)]"
+  },
+  "fixture": {
+    "batch_size": 100,
+    "seed": 7,
+    "total_messages": 10000
+  },
+  "results": {
+    "batch_ingest_100_ms": {
+      "p50": 11.72241591848433,
+      "p95": 21.6884589754045,
+      "pass": true,
+      "threshold_p95_ms": 500,
+      "trials": 100
+    },
+    "lexical_search_top8_ms": {
+      "p50": 14.623333001509309,
+      "p95": 20.816874923184514,
+      "pass": true,
+      "threshold_p95_ms": 100,
+      "trials": 50
+    },
+    "store_open_ms": {
+      "p50": 0.8398329373449087,
+      "p95": 0.9977500885725021,
+      "pass": true,
+      "threshold_p95_ms": 2000,
+      "trials": 20
+    }
+  }
+}
