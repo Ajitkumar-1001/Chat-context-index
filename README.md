@@ -29,8 +29,6 @@
 
 The host keeps its document retriever, model, and agent framework. ContIndex supplies conversation context through `prepare_context()` in Python and `prepareContext()` in TypeScript. Reopening the same durable history restores its records and tree. Agent execution checkpoints remain the host's responsibility.
 
-See the [RAG and agent integration guide](docs/rag-and-agent-memory.md) for both languages, provider adapters, token budgets, and storage boundaries. The [project brief](docs/project-brief.md) connects this reusable library to a focused engineering work sample.
-
 | Responsibility | Current approach |
 | :--- | :--- |
 | **Preserve** | Original payloads, source identities, ordering, and replayable ingestion receipts in SQLite. |
@@ -89,13 +87,13 @@ async def main():
 asyncio.run(main())
 ```
 
-Use an application-owned path on durable storage to reopen a history later. The [Python](examples/python/rag_chat.py) and [TypeScript](examples/typescript/rag-chat.mjs) adapters connect memory to a host's chat loop. A provider-free call stays lexical; pass an explicit provider and build the index to enable tree navigation. [Integration examples](docs/rag-and-agent-memory.md) show the actual APIs.
+Use an application-owned path on durable storage to reopen a history later. The [Python](examples/python/rag_chat.py) and [TypeScript](examples/typescript/rag-chat.mjs) adapters connect memory to a host's chat loop. A provider-free call stays lexical; pass an explicit provider and build the index to enable tree navigation.
 
 ## Measured example
 
-The [tree dry run](evaluations/results/tree-memory.json) uses 128 synthetic messages and a deterministic provider double. Full-history evidence contains **207,260 characters**; selected memory contains **4,868**. Navigation adds **19,492 input characters across four calls**. Initial indexing takes **171 calls**; an unchanged rerun takes zero. These are reproducible mechanics and character counts, **not token savings, dollar savings, or semantic recall scores**. [Method and commands](evaluations/README.md#tree-memory-mechanics).
+The [tree dry run](evaluations/results/tree-memory.json) uses 128 synthetic messages and a deterministic provider double. Full-history evidence contains **207,260 characters**; selected memory contains **4,868**. Navigation adds **19,492 input characters across four calls**. Initial indexing takes **171 calls**; an unchanged rerun takes zero. These are reproducible mechanics and character counts, **not token savings, dollar savings, or semantic recall scores**. [Evaluation script](evaluations/tree_memory.py).
 
-The [development evaluation](evaluations/README.md) uses 23 synthetic messages across two histories. All strategies share an eight-message limit, 200-character excerpts, and a 4,000-character limit on rendered evidence, including labels.
+The [development evaluation](evaluations/brand_memory.py) uses 23 synthetic messages across two histories. All strategies share an eight-message limit, 200-character excerpts, and a 4,000-character limit on rendered evidence, including labels.
 
 | Approach | Required source evidence found, across eight answerable cases |
 | :--- | :---: |
@@ -105,7 +103,7 @@ The [development evaluation](evaluations/README.md) uses 23 synthetic messages a
 
 The combined approach recovered older facts and a recent correction, but missed a timezone preference that recent history alone retained. These are small, hand-authored development cases. They establish neither general retrieval accuracy nor answer correctness. Two additional cases check behavior without supporting evidence. No model was called.
 
-The [complete report](evaluations/results/brand-memory.json) includes per-case results, source fingerprints, environment versions, and storage checks. Five example boundary tests and seven existing persistence/ingestion tests passed locally. [Methods, commands, and limitations](evaluations/README.md) document the exact scope.
+The [complete report](evaluations/results/brand-memory.json) includes per-case results, source fingerprints, environment versions, and storage checks. Five example boundary tests and seven existing persistence/ingestion tests passed locally.
 
 ## How it works
 
@@ -132,7 +130,7 @@ flowchart LR
 
 4. **Prepare the next turn.** The context API reserves recent messages, adds retrieved source evidence, deduplicates source fields, and restores conversation order. Labels and escaped delimiters count toward the budget. The host supplies this historical data alongside its document RAG results, trusted instructions, and new question. Optional `ask()` performs retrieval and cited synthesis, but does not include the context API's recent-message reserve.
 
-The hierarchy follows ChatIndex's summary-to-source approach, using an independently implemented chronological grouping algorithm. It does not reproduce upstream's topic-boundary detection. Python's optional memoization remains separate from authoritative history. See the [storage](spec/storage-format.md), [cache](spec/cache-format.md), and [integration](docs/rag-and-agent-memory.md) contracts and limits.
+The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatIndex)'s summary-to-source approach, using an independently implemented chronological grouping algorithm. It does not reproduce upstream's topic-boundary detection. Python's optional memoization remains separate from authoritative history.
 
 ## Current boundaries
 
