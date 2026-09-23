@@ -1,5 +1,11 @@
 # Conversation memory development evaluation
 
+For the installed-wheel development smoke test and configurable provider/model selection, see
+[live-model setup](LIVE_SMOKE.md). Both live evaluators support presets and custom Chat Completions endpoints.
+Its [current report](results/live-smoke.json) is `FAIL`: OpenAI rejected the first indexing call
+with HTTP 429 `credit_balance_exhausted`. Configuration is present; live recall and token usage
+remain unverified. The offline checks below do not establish live-model acceptance.
+
 The original evaluation below measures **source-evidence selection**, using synthetic brand conversations and real
 SQLite storage. It makes zero model calls. It is a development probe, not a held-out benchmark,
 answer-quality evaluation, release gate, or assessment of UgenticAI's private product.
@@ -136,8 +142,8 @@ baselines omit common answer instructions, document results, the question, and a
 
 Native tests use [the shared fixture](../spec/fixtures/tree-memory.json) against real SQLite.
 They cover hierarchy reuse, reopen across runtimes, source grounding, bad IDs, bounded attempts,
-token-counter hooks, and invalidation during navigation. These are source-checkout checks;
-fresh-wheel/tarball compatibility and live-model evaluations remain separate release gates.
+token-counter hooks, and invalidation during navigation. These source-checkout checks are now
+complemented by the installed-package verification below. Live-model evaluation remains open.
 
 Observed on September 22, 2026: **46 Python checks passed**, **8 native TypeScript checks
 passed**, and the TypeScript build passed. The Python selection includes the memory/example
@@ -153,5 +159,35 @@ python -m pytest -q tests/memory tests/examples \
 
 These checks used the source checkout and existing local dependencies (Python 3.12.11,
 APSW 3.53.4.0, Node 22.23.1). Source fingerprints are in the reports. The TypeScript repository
-RAG adapter imports the current local build; an older installed 0.1.0 tarball lacks the new API
-and must be rebuilt/reinstalled before an existing consumer can use it.
+RAG adapter imports the current local build. Existing consumers need to reinstall the fresh
+artifact to receive the new APIs.
+
+## Installed-package verification (September 23, 2026)
+
+[The recorded run](results/package-memory.json) passed on macOS arm64 with Python 3.12.11 and
+Node 22.23.1. It always builds a new wheel and npm archive, installs their runtime dependencies
+in fresh directories outside the checkout, and copies standalone consumers there. Python runs
+with `-I`; neither consumer imports repository source. Import paths, artifact hashes, and both
+source fingerprints are recorded.
+
+Each language creates and indexes a history, appends an unindexed turn, and exits. Separate
+Python and Node processes then reopen each database: Python→Python, Python→TypeScript,
+TypeScript→Python, and TypeScript→TypeScript. All four combinations recover source sequences
+1, 8, and 9, preserve message IDs, and match rendered memory and selected chunks. The checks
+also enforce character and callback-counted budgets, source pointers, bounded navigation,
+zero-call unchanged indexing, public TypeScript declarations, and bundled README/license files.
+The callback uses UTF-8 byte counts as a deterministic test counter, not model token estimates.
+
+```bash
+python -m pip install build
+npm --prefix packages/typescript ci
+python tests/packaging/verify_packages.py \
+  --report evaluations/results/package-memory.json --artifacts-out dist/release
+```
+
+The full local run also passed **106 Python tests** and **8 native TypeScript tests**, with
+real SQLite, disposable Redis containers, fresh artifact conformance, memory/RAG examples,
+and six evaluation-accounting regressions using a separate tiny fixture.
+Python lint and type checks and the TypeScript build passed. Reproduction commands and
+remaining release gates are in [release status](../docs/release-status.md). No real model was
+called; these results establish package mechanics, not semantic recall or cost savings.

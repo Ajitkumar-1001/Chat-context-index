@@ -27,6 +27,42 @@ python3 verify_fixture.py             # self-check: counts, span resolution
 
 See `run_evaluation.py` in this directory. It requires a real configured model provider (PRD
 §16.2: "Run real-provider quality evaluation three times with isolated memo namespaces") — with
-no provider configured, it runs in `--fake-provider` mode instead, which proves the harness's
+no `--provider` option, it uses a deterministic fake instead, which proves the harness's
 control flow and scoring logic deterministically (PRD §16.3's own guidance for using a fake
 provider) but does **not** produce a meaningful SC-011 quality result.
+
+The harness imports the installed `cci` package without adding repository source to `sys.path`.
+Its report records the resolved package path. Use a fresh wheel environment for release runs.
+The shared configurable adapter retains input/output usage, disables SDK retries so package retries remain
+accountable, and closes its shared client. Attempts and observed tokens are reported separately
+for indexing, navigation, and synthesis; missing or failed-call usage remains unknown.
+
+Install `evaluations/requirements-live.txt` for real-provider runs. Selection uses the same
+`CCI_PROVIDER`, `CCI_MODEL`, `CCI_API_KEY`, and `CCI_BASE_URL` settings as the
+[development smoke](../LIVE_SMOKE.md), including preset-specific key variables and compatibility options.
+An explicit `--provider` enables live calls; omitting it always retains the deterministic mode.
+For example, after configuring the secret file, this command makes real requests:
+
+```bash
+python evaluations/held_out/run_evaluation.py --provider gemini \
+  --env-file .env.live-smoke --trials 3 --out evaluations/held_out/live-results.json
+```
+
+`--model` and `--base-url` can override configuration. Models are not hardcoded or restricted to
+OpenAI. The adapter requests at most 1,024 output tokens per held-out call; that is distinct from
+the smaller development smoke's 256-token cap and is recorded in the held-out report.
+
+Indexing repeats bounded batches until complete, stops if coverage makes no progress, and
+reports an error after 16 incomplete batches. All answerable queries stay in scoring denominators,
+including errors and missing answers. A partial/suppressed answer is not credited as correct
+abstention. No citations produces an unknown citation rate, not a passing rate.
+
+Per-query answers, citations, and evidence are retained for rubric and semantic review. The
+automatic correctness field is named `answer_correctness_proxy`; it cannot close the real
+correctness gate. Fake runs mark quality gates `NOT RUN`. The older `results.json` remains a
+fake-provider control-flow artifact, not release evidence. Regression tests use a separate tiny
+fixture and never inspect the reserved held-out labels.
+
+Live execution, reviewed quality scores, and comparisons against full-history and recent/lexical
+baselines remain pending. Agree the model and spend limit before running a live evaluation;
+the per-request package limits are not an evaluation-wide dollar cap.

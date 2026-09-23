@@ -153,6 +153,8 @@ activemq-data/
 
 # Environments
 .env
+.env.local
+.env.live-smoke
 .envrc
 .venv
 env/
@@ -223,3 +225,7 @@ __marimo__/
 vault-context/
 .claude/
 .specify/
+
+# Ignore Markdown documents except README.md (case-insensitive).
+*.[mM][dD]
+![rR][eE][aA][dD][mM][eE].[mM][dD]

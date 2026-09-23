@@ -17,10 +17,11 @@ from __future__ import annotations
 
 import asyncio
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, Protocol
+from typing import Protocol
 
-from .cache import CachedValue, CACHE_FORMAT_VERSION, CacheScope, MemoCache
+from .cache import CACHE_FORMAT_VERSION, CachedValue, CacheScope, MemoCache
 from .cache_key import cache_key, request_digest, scope_digest
 from .config import Config
 from .errors import BudgetExceeded, ProviderTimeout
@@ -181,14 +182,8 @@ class MemoizedProvider:
         cache_scope: CacheScope | None = None,
         budget: CallBudget | None = None,
     ) -> ProviderResponse:
-        cacheable = (
-            self.cache is not None
-            and cache_scope is not None
-            and request.operation in _CACHEABLE_OPERATIONS
-        )
-
         key = sd = rd = None
-        if cacheable:
+        if self.cache is not None and cache_scope is not None and request.operation in _CACHEABLE_OPERATIONS:
             key, sd, rd = self._cache_key(request, cache_scope)
             now = self._now()
             try:
@@ -224,7 +219,7 @@ class MemoizedProvider:
                 if budget is not None:
                     budget.record(response)
                 return response
-            if cacheable and self.usage_log is not None:
+            if self.usage_log is not None:
                 self.usage_log.memo_misses += 1
             if budget is not None:
                 budget.memo_misses += 1
@@ -233,7 +228,7 @@ class MemoizedProvider:
 
         try:
             await asyncio.wait_for(self._semaphore.acquire(), timeout=max(0, deadline_at - time.monotonic()))
-        except asyncio.TimeoutError as exc:
+        except TimeoutError as exc:
             raise ProviderTimeout("provider admission exceeded request deadline") from exc
         try:
             async def attempt() -> ProviderResponse:
@@ -245,7 +240,7 @@ class MemoizedProvider:
                 call_timeout = min(self.config.provider_call_deadline_s, max(remaining, 0))
                 try:
                     return await asyncio.wait_for(self.inner.complete(request), timeout=call_timeout)
-                except asyncio.TimeoutError as exc:
+                except TimeoutError as exc:
                     if budget is not None:
                         budget.usage_unknown = True
                     raise ProviderTimeout(
@@ -276,7 +271,7 @@ class MemoizedProvider:
             if response.usage_unknown:
                 self.usage_log.usage_unknown_count += 1
 
-        if cacheable and key is not None:
+        if self.cache is not None and key is not None and sd is not None and rd is not None:
             # Never cached: only a successful response reaches here (a raised error propagates
             # out of complete() above, never reaching this write) — INV-06.
             now = self._now()

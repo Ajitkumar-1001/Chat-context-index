@@ -1,0 +1,11 @@
+{
+  "description": "Visible synthetic development fixture. Not a held-out quality or cost benchmark.",
+  "query": "Where should the service launch?",
+  "required_source_seq": 1,
+  "messages": [
+    {"role": "user", "content": "The deployment target is Oslo."},
+    {"role": "user", "content": "Invoice exports use CSV."},
+    {"role": "user", "content": "Interface colors are navy and cream."},
+    {"role": "user", "content": "Weekly planning meetings start at 09:00 UTC."}
+  ]
+}

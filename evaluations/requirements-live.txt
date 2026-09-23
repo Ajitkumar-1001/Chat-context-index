@@ -1,0 +1,5 @@
+# Evaluation tooling only; these are not additional package runtime dependencies.
+# The SDK is a transport for the selected provider's Chat Completions compatibility API.
+openai==2.45.0
+httpx==0.28.1
+python-dotenv==1.1.1

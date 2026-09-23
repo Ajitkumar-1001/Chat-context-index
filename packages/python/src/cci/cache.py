@@ -18,8 +18,9 @@ import asyncio
 import json
 import sqlite3
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, Protocol
+from typing import Any, Protocol
 
 CACHE_FORMAT_VERSION = 2  # matches the "v2" prefix in cache_key.py (ADR-004)
 
@@ -72,7 +73,7 @@ def _to_json(value: CachedValue) -> str:
     )
 
 
-def _from_json(raw: str) -> CachedValue | None:
+def _from_json(raw: str | bytes) -> CachedValue | None:
     """Malformed/corrupted records are bypassed, never raised (F9) — returns None."""
     try:
         d = json.loads(raw)

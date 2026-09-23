@@ -104,7 +104,7 @@ def _config_overrides(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _read_messages(path: str) -> list[InputMessage]:
-    raw = sys.stdin.read() if path == "-" else open(path, "r", encoding="utf-8").read()
+    raw = sys.stdin.read() if path == "-" else open(path, encoding="utf-8").read()
     records = json.loads(raw)
     if not isinstance(records, list):
         raise SystemExit("messages file must contain a JSON array of message objects")

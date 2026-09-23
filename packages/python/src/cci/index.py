@@ -15,11 +15,12 @@ from __future__ import annotations
 import hashlib
 import json
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, replace
-from typing import Callable
 
 import apsw
 
+from ._ids import prefixed_id
 from .cache import CacheScope
 from .context_assembly import EvidenceBlock, render_evidence_context
 from .errors import ConfigurationError, VersionConflict
@@ -27,7 +28,6 @@ from .io_worker import fetchall, fetchone
 from .models import Chunk, Node, NodeChunk
 from .provider import CallBudget, MemoizedProvider, ProviderRequest
 from .retrieve import Usage, usage_from_budget
-from ._ids import prefixed_id
 from .store import HistoryStore, map_storage_error
 from .tree import plan_hierarchy
 
@@ -230,7 +230,8 @@ async def index(
                 )
             )
             node_chunks.append(NodeChunk(node_id=node_id, chunk_id=chunk_id, chunk_order=0))
-        nodes, summaries = [], {}
+        nodes: list[Node] = []
+        summaries: dict[str, list[str]] = {}
         count = len(new_leaves)
         while count:
             nodes, summaries = plan_hierarchy(
@@ -242,12 +243,15 @@ async def index(
             count -= 1
         if not count:
             return IndexReport(
-                committed_coverage=Coverage(1, index_committed_seq) if index_committed_seq else Coverage(None, None),
-                pending_coverage=Coverage(pending_start, pending_end), provider_usage=Usage(), status="partial",
+                committed_coverage=(
+                    Coverage(1, index_committed_seq) if index_committed_seq else Coverage(None, None)
+                ),
+                pending_coverage=Coverage(pending_start, pending_end),
+                provider_usage=Usage(), status="partial",
             )
         chunks, node_chunks = chunks[:count], node_chunks[:count]
         resolved = {n.node_id: n for n in nodes}
-        for leaf, group in zip(new_leaves[:count], chunk_rows_groups[:count]):
+        for leaf, group in zip(new_leaves[:count], chunk_rows_groups[:count], strict=True):
             blocks = [EvidenceBlock(f"seq_{seq}", "/content", t or "") for seq, t in group]
             response = await provider.complete(
                 ProviderRequest("indexing", _build_indexing_prompt(), render_evidence_context(blocks)),
@@ -304,11 +308,16 @@ async def index(
                         await store.connection.execute(
                             "INSERT INTO chunks (chunk_id, history_id, source_message_span, "
                             "content_hash, rendering_version) VALUES (?, ?, ?, ?, ?)",
-                            (c.chunk_id, c.history_id, c.source_message_span, c.content_hash, c.rendering_version),
+                            (
+                                c.chunk_id, c.history_id, c.source_message_span,
+                                c.content_hash, c.rendering_version,
+                            ),
                         )
                     # Publish the complete topology atomically; leaf/chunk identities survive
                     # incremental indexing. Old internal nodes no longer in the plan disappear.
-                    await store.connection.execute("DELETE FROM nodes WHERE history_id = ?", (store.history_id,))
+                    await store.connection.execute(
+                        "DELETE FROM nodes WHERE history_id = ?", (store.history_id,)
+                    )
                     for n in nodes:
                         await store.connection.execute(
                             "INSERT INTO nodes (node_id, history_id, parent_id, sibling_order, "

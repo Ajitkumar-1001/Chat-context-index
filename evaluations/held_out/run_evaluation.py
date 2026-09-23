@@ -12,8 +12,9 @@ scores it against SC-011's gates:
     number)
 
 PRD §16.2: "Run real-provider quality evaluation three times with isolated memo namespaces to
-avoid turning cache replay into an apparent independent trial." Pass --provider openai (reads
-OPENAI_API_KEY) for a real run. With no --provider, this runs in --fake-provider mode: a
+avoid turning cache replay into an apparent independent trial." Pass --provider and configure
+CCI_MODEL/CCI_API_KEY (or a preset's key variable) for a real run. With no --provider,
+this runs in deterministic-provider mode: a
 scripted FakeProvider proves the harness's own control flow and scoring logic deterministically
 (PRD §16.3's own guidance for fake providers) — it does NOT produce a meaningful SC-011 result,
 and the report says so explicitly (constitution Principle IV: never infer success from an
@@ -24,22 +25,38 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import importlib.util
 import json
+import os
 import sys
 import tempfile
+from dataclasses import asdict
 from pathlib import Path
+from types import ModuleType
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "packages" / "python" / "src"))
-
+import cci
 from cci.ask import ask
 from cci.errors import CciError
 from cci.index import index
 from cci.ingest import ingest
 from cci.models import InputMessage
-from cci.provider import FakeProvider, MemoizedProvider, ProviderResponse
+from cci.provider import MemoizedProvider, ProviderResponse
 from cci.store import HistoryStore
 
 FIXTURE_PATH = Path(__file__).parent / "fixture.json"
+
+
+def _model_helpers() -> ModuleType:
+    """Load the sibling evaluation adapter without changing the installed package's import path."""
+    name = "cci_live_evaluation_helpers"
+    if name not in sys.modules:
+        spec = importlib.util.spec_from_file_location(name, Path(__file__).parents[1] / "live_smoke.py")
+        if spec is None or spec.loader is None:
+            raise RuntimeError("live evaluation adapter is unavailable")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
+        spec.loader.exec_module(module)
+    return sys.modules[name]
 
 
 class _ScriptedIndexingProvider:
@@ -54,11 +71,39 @@ class _ScriptedIndexingProvider:
         self.call_count += 1
         if request.operation == "indexing":
             return ProviderResponse(text=json.dumps({"title": "Topic", "summary": "Synthetic summary."}))
+        if request.operation == "tree_navigation":
+            return ProviderResponse(text=json.dumps({"node_ids": []}))
         # "synthesis": cannot genuinely answer without understanding content — a fake provider
         # proves control flow, not quality (PRD §16.3). Always abstains structurally by citing
         # nothing, which ask() correctly downgrades to a suppressed/partial answer — this is the
         # honest fake-provider behavior, not a fabricated pass.
         return ProviderResponse(text=json.dumps({"answer": None, "citations": []}))
+
+
+class _MeasuredProvider:
+    """Count attempts and observed tokens by operation, including retries and indexing."""
+
+    def __init__(self, inner, usage):
+        self.inner, self.usage = inner, usage
+
+    async def complete(self, request):
+        stage = self.usage.setdefault(request.operation, {
+            "attempts": 0, "input_tokens_observed": 0, "output_tokens_observed": 0,
+            "usage_unknown": False,
+        })
+        stage["attempts"] += 1
+        try:
+            response = await self.inner.complete(request)
+        except BaseException:
+            stage["usage_unknown"] = True
+            raise
+        if response.usage_unknown or response.input_tokens is None or response.output_tokens is None:
+            stage["usage_unknown"] = True
+        if response.input_tokens is not None:
+            stage["input_tokens_observed"] += response.input_tokens
+        if response.output_tokens is not None:
+            stage["output_tokens_observed"] += response.output_tokens
+        return response
 
 
 def _load_fixture() -> dict:
@@ -118,121 +163,164 @@ async def run_trial(fixture: dict, provider_factory, trial_index: int) -> dict:
     evidence_recalls: list[float] = []
     answer_correct: list[bool] = []
     abstentions_correct = 0
-    absent_total = 0
+    absent_total = sum(not q["answerable"] for q in held_out_queries)
+    answerable_total = len(held_out_queries) - absent_total
     structurally_valid_citations = 0
     total_citations_checked = 0
     errors: list[str] = []
+    usage: dict = {}
+    query_results: list[dict] = []
 
     with tempfile.TemporaryDirectory() as d:
         for label, history in held_out_histories.items():
             # Isolated memo namespace per trial (PRD §16.2) so cache replay across trials never
             # masquerades as an independent trial.
-            store = await HistoryStore.open(
+            async with await HistoryStore.open(
                 str(Path(d) / f"{label}.db"),
                 config={"application_namespace": f"held-out-eval-trial-{trial_index}-{label}"},
-            )
-            await _ingest_history(store, history["messages"])
-            provider = MemoizedProvider(inner=provider_factory(), config=store.config, cache=store.cache)
-            try:
-                await index(store, provider=provider)
-            except CciError as exc:
-                errors.append(f"{label}: index() failed: {exc}")
-
-            for q in [q for q in held_out_queries if q["history_label"] == label]:
+            ) as store:
+                await _ingest_history(store, history["messages"])
+                provider = MemoizedProvider(
+                    inner=_MeasuredProvider(provider_factory(), usage),
+                    config=store.config, cache=store.cache,
+                )
                 try:
-                    result = await ask(store, q["query_text"], provider=provider)
+                    previous_end = 0
+                    for _ in range(16):
+                        report = await index(store, provider=provider)
+                        if report.status == "complete":
+                            break
+                        end = report.committed_coverage.end_seq or 0
+                        if end <= previous_end:
+                            errors.append(f"{label}: indexing stopped without completing coverage")
+                            break
+                        previous_end = end
+                    else:
+                        errors.append(f"{label}: indexing still partial after 16 bounded batches")
                 except CciError as exc:
-                    errors.append(f"{q['query_id']}: ask() failed: {exc}")
-                    continue
+                    errors.append(f"{label}: index() failed: {exc}")
 
-                for c in result.citations:
-                    total_citations_checked += 1
-                    if c.evidence_id in {e.evidence_id for e in result.evidence}:
-                        structurally_valid_citations += 1
+                for q in [q for q in held_out_queries if q["history_label"] == label]:
+                    try:
+                        result = await ask(store, q["query_text"], provider=provider)
+                    except CciError as exc:
+                        errors.append(f"{q['query_id']}: ask() failed: {exc}")
+                        query_results.append({"query_id": q["query_id"], "status": "error"})
+                        continue
 
-                if q["answerable"]:
-                    evidence_recalls.append(
-                        _score_evidence_recall(q["required_evidence_units"], history["messages"], result.evidence)
-                    )
-                    correct = _score_answer_correctness(result.answer, q["answer_rubric"])
-                    if correct is not None:
-                        answer_correct.append(correct)
-                else:
-                    absent_total += 1
-                    if result.status in ("insufficient_evidence", "partial") and result.answer is None:
-                        abstentions_correct += 1
+                    query_results.append({
+                        "query_id": q["query_id"], "query": q["query_text"], "status": result.status,
+                        "answer": result.answer, "citations": [asdict(c) for c in result.citations],
+                        "evidence": [asdict(e) for e in result.evidence], "usage": asdict(result.usage),
+                    })
 
-            await store.aclose()
+                    for c in result.citations:
+                        total_citations_checked += 1
+                        if c.evidence_id in {e.evidence_id for e in result.evidence}:
+                            structurally_valid_citations += 1
 
-    macro_evidence_recall = sum(evidence_recalls) / len(evidence_recalls) if evidence_recalls else 0.0
-    answer_rubric_correctness = sum(answer_correct) / len(answer_correct) if answer_correct else 0.0
+                    if q["answerable"]:
+                        evidence_recalls.append(
+                            _score_evidence_recall(
+                                q["required_evidence_units"], history["messages"], result.evidence
+                            )
+                        )
+                        correct = _score_answer_correctness(result.answer, q["answer_rubric"])
+                        if correct is not None:
+                            answer_correct.append(correct)
+                    else:
+                        # A suppressed/failed synthesis is not evidence of correct abstention.
+                        if result.status == "insufficient_evidence" and result.answer is None:
+                            abstentions_correct += 1
+
+    # Missing answers and failed requests remain in the denominator; neither can improve a score.
+    macro_evidence_recall = sum(evidence_recalls) / answerable_total if answerable_total else 0.0
+    answer_rubric_correctness = sum(answer_correct) / answerable_total if answerable_total else 0.0
     citation_validity = (
-        structurally_valid_citations / total_citations_checked if total_citations_checked else 1.0
+        structurally_valid_citations / total_citations_checked if total_citations_checked else None
     )
 
     return {
         "trial": trial_index,
         "macro_evidence_recall": macro_evidence_recall,
-        "answer_rubric_correctness": answer_rubric_correctness,
+        "answer_correctness_proxy": answer_rubric_correctness,
         "abstention_correct_count": abstentions_correct,
         "absent_total": absent_total,
         "structurally_valid_citation_rate": citation_validity,
         "citations_checked": total_citations_checked,
-        "answerable_queries_scored": len(evidence_recalls),
+        "answerable_queries_scored": answerable_total,
         "answers_produced": len(answer_correct),
         "errors": errors,
+        "provider_usage_by_operation": usage,
+        "query_results": query_results,
     }
 
 
-def _apply_sc011_gates(trial: dict) -> dict:
+def _apply_sc011_gates(trial: dict, *, real_provider: bool = False) -> dict:
+    if not real_provider:
+        return {"status": "NOT RUN — deterministic provider is not a quality evaluation"}
     return {
         "macro_evidence_recall_pass": trial["macro_evidence_recall"] >= 0.85,
-        "answer_rubric_correctness_pass": trial["answer_rubric_correctness"] >= 0.80,
+        "answer_rubric_correctness": "NOT RUN — substring proxy requires rubric review",
         "abstention_pass": trial["abstention_correct_count"] >= 7,
         "citation_validity_pass": trial["structurally_valid_citation_rate"] == 1.0,
-        "semantic_citation_support_precision": "NOT COMPUTED — requires human/model-judge review (PRD §16.2), not fabricated by this automatic harness",
+        "no_execution_errors": not trial["errors"],
+        "semantic_citation_support_precision": (
+            "NOT COMPUTED — requires human/model-judge review (PRD §16.2)"
+        ),
     }
 
 
 async def main_async(args: argparse.Namespace) -> int:
     fixture = _load_fixture()
+    client = None
+    provider_settings = {}
 
-    if args.provider == "openai":
+    if args.provider:
+        helpers = _model_helpers()  # SDK dependencies stay optional for the deterministic harness.
+        if args.env_file:
+            if not Path(args.env_file).is_file():
+                raise ValueError("env_file_missing")
+            helpers.load_dotenv(args.env_file, override=False)
+        selection = dict(os.environ)
+        selection["CCI_PROVIDER"] = args.provider
+        if args.model is not None:
+            selection["CCI_MODEL"] = args.model
+        if args.base_url is not None:
+            selection["CCI_BASE_URL"] = args.base_url
+        settings = helpers.ModelSettings.from_env(selection)
+        provider_settings = settings.public_settings()
+        provider_settings["max_output_tokens_per_call"] = 1_024
+        client = settings.make_client(timeout_s=30)
+
         def provider_factory():
-            import openai  # lazy import (PRD §13.2)
+            return helpers.ChatCompletionsProvider(client, settings)
 
-            class _OpenAIAdapter:
-                async def complete(self, request):
-                    client = openai.AsyncOpenAI()
-                    response = await client.chat.completions.create(
-                        model=args.model,
-                        messages=[
-                            {"role": "system", "content": request.prompt},
-                            {"role": "user", "content": request.evidence_context},
-                        ],
-                    )
-                    choice = response.choices[0]
-                    return ProviderResponse(text=choice.message.content or "")
-
-            return _OpenAIAdapter()
-
-        mode_label = f"real-provider (openai, model={args.model})"
+        mode_label = f"real-provider ({settings.provider}, model={settings.model})"
     else:
         provider_factory = _ScriptedIndexingProvider
         mode_label = "fake-provider (control-flow validation only, NOT a quality result)"
 
     trials = []
-    for trial_index in range(1, args.trials + 1):
-        trial = await run_trial(fixture, provider_factory, trial_index)
-        trial["gates"] = _apply_sc011_gates(trial)
-        trials.append(trial)
+    try:
+        for trial_index in range(1, args.trials + 1):
+            trial = await run_trial(fixture, provider_factory, trial_index)
+            trial["gates"] = _apply_sc011_gates(trial, real_provider=bool(args.provider))
+            trials.append(trial)
+    finally:
+        if client is not None:
+            await client.close()
 
     report = {
         "mode": mode_label,
+        "provider_settings": provider_settings,
         "fixture_meta": fixture["_meta"],
         "trials": trials,
+        "runtime_package": cci.__file__,
+        "release_gate_status": "INCOMPLETE — real-provider quality gates are not fully verified",
         "honest_note": (
-            "This is a real-provider quality result usable against SC-011."
+            "Real-provider measurements; correctness is an automatic proxy. Rubric and semantic "
+            "citation review are still required. Observed tokens are not a dollar-cost comparison."
             if args.provider
             else (
                 "NOT a real quality evaluation — no model provider was configured. This run only "
@@ -254,11 +342,15 @@ async def main_async(args: argparse.Namespace) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--provider", choices=["openai"], default=None)
-    parser.add_argument("--model", default="gpt-4o-mini")
+    parser.add_argument("--provider", default=None, help="Provider label; omit for deterministic mode")
+    parser.add_argument("--model", default=None, help="Provider's model ID; otherwise use CCI_MODEL")
+    parser.add_argument("--base-url", default=None, help="Custom Chat Completions endpoint")
+    parser.add_argument("--env-file", default=None, help="Explicit local configuration file")
     parser.add_argument("--trials", type=int, default=3)
     parser.add_argument("--out", default=None)
     args = parser.parse_args()
+    if args.trials < 1:
+        parser.error("--trials must be positive")
     return asyncio.run(main_async(args))
 
 

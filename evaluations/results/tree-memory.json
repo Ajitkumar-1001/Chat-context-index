@@ -5,7 +5,7 @@
     "apsw": "3.53.4.0",
     "sqlite": "3.53.4"
   },
-  "source_sha256": "4aa2f37cf4628278149892555dad8bab76df5e4bc6bae9d22f9fdc1f7f8bef3f",
+  "source_sha256": "0fa1d7af9bf2008883be5b3a417d773c27b373f907e5187ddb80458667933f67",
   "fixture_sha256": "50f38ace01aa3e34b4ef3945b63ad5e2f39dc0be7268901b818a7425570c5604",
   "history_messages": 128,
   "source_sequences_returned": [
@@ -93,7 +93,7 @@
       "actual_mode": "tree",
       "candidate_count": 1,
       "selected_chunk_ids": [
-        "c_01M35YJ713ZN5NF8CREVNFV5QZ"
+        "c_01M36AWF620S4TB29GCB9N3CEQ"
       ]
     },
     "usage": {

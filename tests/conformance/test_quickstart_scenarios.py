@@ -15,9 +15,7 @@ import tempfile
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "python", "src"))
 
 _REPO_ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
-_PY_DIST_DIR = os.path.join(_REPO_ROOT, "packages", "python", "dist")
 _TS_PACKAGE_DIR = os.path.join(_REPO_ROOT, "packages", "typescript")
-_TS_TARBALL = os.path.join(_TS_PACKAGE_DIR, "chat-context-index-0.1.0.tgz")
 
 _PY: str | None = None
 _NODE_DIR: str | None = None
@@ -25,14 +23,14 @@ _TMP: str | None = None
 
 
 def _find_or_build_wheel() -> str:
-    candidates = [f for f in os.listdir(_PY_DIST_DIR) if f.endswith(".whl")] if os.path.isdir(_PY_DIST_DIR) else []
-    if not candidates:
-        subprocess.run(
-            [sys.executable, "-m", "build", "--wheel"],
-            cwd=os.path.join(_REPO_ROOT, "packages", "python"), check=True, capture_output=True,
-        )
-        candidates = [f for f in os.listdir(_PY_DIST_DIR) if f.endswith(".whl")]
-    return os.path.join(_PY_DIST_DIR, candidates[0])
+    destination = os.path.join(_TMP, "artifacts")
+    subprocess.run(
+        [sys.executable, "-m", "build", "--wheel", "--outdir", destination],
+        cwd=os.path.join(_REPO_ROOT, "packages", "python"), check=True, capture_output=True,
+    )
+    candidates = [f for f in os.listdir(destination) if f.endswith(".whl")]
+    assert len(candidates) == 1
+    return os.path.join(destination, candidates[0])
 
 
 def setup_module(module) -> None:
@@ -44,13 +42,17 @@ def setup_module(module) -> None:
     _PY = os.path.join(venv_dir, "bin", "python")
     subprocess.run([_PY, "-m", "pip", "install", "--quiet", _find_or_build_wheel()], check=True, capture_output=True)
 
-    if not os.path.exists(_TS_TARBALL):
-        subprocess.run(["npm", "pack"], cwd=_TS_PACKAGE_DIR, check=True, capture_output=True)
+    subprocess.run(["npm", "run", "build"], cwd=_TS_PACKAGE_DIR, check=True, capture_output=True)
+    packed = subprocess.run(
+        ["npm", "pack", "--json", "--pack-destination", _TMP],
+        cwd=_TS_PACKAGE_DIR, check=True, capture_output=True, text=True,
+    )
+    tarball = os.path.join(_TMP, json.loads(packed.stdout)[0]["filename"])
     _NODE_DIR = os.path.join(_TMP, "ts-consumer")
     os.makedirs(_NODE_DIR, exist_ok=True)
     with open(os.path.join(_NODE_DIR, "package.json"), "w") as f:
         json.dump({"name": "cci-quickstart-consumer", "version": "0.0.0", "type": "module", "private": True}, f)
-    subprocess.run(["npm", "install", _TS_TARBALL], cwd=_NODE_DIR, check=True, capture_output=True)
+    subprocess.run(["npm", "install", tarball], cwd=_NODE_DIR, check=True, capture_output=True)
 
 
 def teardown_module(module) -> None:
@@ -59,7 +61,7 @@ def teardown_module(module) -> None:
 
 
 def _py(script: str) -> dict:
-    result = subprocess.run([_PY, "-c", script], capture_output=True, text=True, timeout=30)
+    result = subprocess.run([_PY, "-I", "-c", script], cwd=_TMP, capture_output=True, text=True, timeout=30)
     if result.returncode != 0:
         raise RuntimeError(result.stderr)
     return json.loads(result.stdout.strip().splitlines()[-1])

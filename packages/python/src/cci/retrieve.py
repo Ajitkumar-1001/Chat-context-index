@@ -17,15 +17,15 @@ retrieval stays local. Tree summaries guide selection; only original messages be
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import time
+from dataclasses import dataclass, field
 
 from .context_assembly import EvidenceBlock, render_evidence_context
 from .errors import VersionConflict
 from .io_worker import fetchone
-from .search import Diagnostic, search
-from .store import HistoryStore
 from .provider import CallBudget, MemoizedProvider
+from .search import Diagnostic, LexicalCandidate, search
+from .store import HistoryStore
 
 CONTRACT_VERSION = 1
 
@@ -149,7 +149,9 @@ async def retrieve(
     limit = store.config.max_selected_chunks if max_selected_chunks is None else max_selected_chunks
     if mode not in ("auto", "tree", "lexical") or not 1 <= limit <= 5000:
         raise ValueError("require a valid retrieval mode and 1 <= max_selected_chunks <= 5000")
-    deadline_at = time.monotonic() + (deadline_s if deadline_s is not None else store.config.request_deadline_retrieve_s)
+    deadline_at = time.monotonic() + (
+        deadline_s if deadline_s is not None else store.config.request_deadline_retrieve_s
+    )
     budget = _budget if _budget is not None else CallBudget(store.config.provider_attempt_limit_retrieve)
 
     async with store.write_lock:
@@ -192,7 +194,7 @@ async def retrieve(
         index_degraded = True
         diagnostics.append(Diagnostic("tree_revision_changed", "retrieve"))
 
-    unique = {}
+    unique: dict[tuple[str, str], LexicalCandidate] = {}
     for candidate in candidates:
         unique.setdefault((candidate.message_id, candidate.source_pointer), candidate)
     evidence = [
@@ -206,7 +208,7 @@ async def retrieve(
         )
         for i, c in enumerate(unique.values())
     ]
-    bounded = []
+    bounded: list[Evidence] = []
     for item in evidence:
         if len(render_evidence_context([
             EvidenceBlock(e.evidence_id, e.source_pointer, e.excerpt) for e in bounded + [item]

@@ -22,7 +22,6 @@ import apsw.aio
 from ._ids import prefixed_id
 from .cache import MemoCache, build_cache
 from .config import Config, resolve
-from .provider import UsageLog
 from .errors import (
     RuntimeCompatibilityError,
     SchemaVersionError,
@@ -32,6 +31,7 @@ from .errors import (
 )
 from .io_worker import IOWorker, fetchall, fetchone, open_worker_connection
 from .models import Message
+from .provider import UsageLog
 
 # get_messages() pagination (contracts/operations.md `search()`/`get_messages()`/`view_node()`
 # Pagination/size limits).
@@ -192,7 +192,7 @@ def _parse_version(version_string: str) -> tuple[int, int, int]:
     return tuple(int(p) for p in parts)  # type: ignore[return-value]
 
 
-async def _check_runtime(connection: apsw.aio.AsyncConnection) -> None:
+async def _check_runtime(connection: apsw.AsyncConnection) -> None:
     """Verify the LOADED SQLite runtime and FTS5 support — independent of which driver
     version is installed (spec/storage-format.md)."""
     loaded_version = _parse_version(apsw.sqlite_lib_version())
@@ -218,7 +218,7 @@ class HistoryStore:
     config: Config
     history_id: str
     store_instance_id: str
-    _connection: apsw.aio.AsyncConnection
+    _connection: apsw.AsyncConnection
     _io_worker: IOWorker
     cache: MemoCache
     usage_log: UsageLog = field(default_factory=UsageLog)
@@ -266,7 +266,7 @@ class HistoryStore:
                     timeout=timeout_s,
                 )
                 return True
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 return False
 
     @classmethod
@@ -275,7 +275,7 @@ class HistoryStore:
         path: str,
         config: dict | Config | None = None,
         config_file: str | None = None,
-    ) -> "HistoryStore":
+    ) -> HistoryStore:
         # (1) Validate configuration FIRST, before any store file is created or opened.
         if isinstance(config, Config):
             resolved_config = config
@@ -326,7 +326,7 @@ class HistoryStore:
         )
 
     @staticmethod
-    async def _init_fresh(connection: apsw.aio.AsyncConnection) -> tuple[str, str]:
+    async def _init_fresh(connection: apsw.AsyncConnection) -> tuple[str, str]:
         history_id = prefixed_id("t")
         store_instance_id = prefixed_id("si")
         async with connection:
@@ -339,7 +339,7 @@ class HistoryStore:
         return history_id, store_instance_id
 
     @staticmethod
-    async def _resume_existing(connection: apsw.aio.AsyncConnection) -> tuple[str, str]:
+    async def _resume_existing(connection: apsw.AsyncConnection) -> tuple[str, str]:
         cursor = await connection.execute(
             "SELECT history_id, store_instance_id, schema_version FROM store_meta WHERE id = 1"
         )
@@ -363,7 +363,7 @@ class HistoryStore:
         return history_id, store_instance_id
 
     @property
-    def connection(self) -> apsw.aio.AsyncConnection:
+    def connection(self) -> apsw.AsyncConnection:
         return self._connection
 
     @property
@@ -435,7 +435,7 @@ class HistoryStore:
         await self._io_worker.aclose()
         self._closed = True
 
-    async def __aenter__(self) -> "HistoryStore":
+    async def __aenter__(self) -> HistoryStore:
         return self
 
     async def __aexit__(self, *exc_info: object) -> None:

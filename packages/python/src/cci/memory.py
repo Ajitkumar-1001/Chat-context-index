@@ -6,14 +6,13 @@ This API restores conversational context; it never replays tools or resumes a ta
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, replace
-from typing import Callable
-
-from cci.provider import MemoizedProvider
 
 from cci.context_assembly import EvidenceBlock, render_evidence_context
 from cci.errors import VersionConflict
 from cci.models import Message
+from cci.provider import MemoizedProvider
 from cci.retrieve import RetrievalResult, retrieve
 from cci.stats import stats
 from cci.store import HistoryStore
@@ -92,7 +91,9 @@ def pack_context(
         excerpt = item.excerpt[:excerpt_chars]
         bounded = ContextItem(item.message_id, item.seq, item.source_pointer, excerpt)
         text = _render(selected + [bounded])
-        if len(text) > max_chars or (token_counter is not None and token_counter(text) > max_tokens):
+        if len(text) > max_chars or (
+            token_counter is not None and max_tokens is not None and token_counter(text) > max_tokens
+        ):
             continue
         selected.append(bounded)
         truncated += len(excerpt) < len(item.excerpt)
@@ -127,7 +128,11 @@ async def prepare_context(
     tool exchange. Pass the target model tokenizer
     to enforce an optional token budget on this memory text, including its evidence labels.
     """
-    if not isinstance(recent_messages, int) or not 0 <= recent_messages <= max_messages or max_messages > 5_000:
+    if (
+        not isinstance(recent_messages, int)
+        or not 0 <= recent_messages <= max_messages
+        or max_messages > 5_000
+    ):
         raise ValueError("require 0 <= recent_messages <= max_messages <= 5000")
     if max_messages <= 0 or max_chars <= 0:
         raise ValueError("context limits must be positive")

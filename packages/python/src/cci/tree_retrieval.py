@@ -36,7 +36,10 @@ async def navigate_tree(store, query, snapshot, provider, budget, deadline_at, l
         parent = queue.pop(0)
         async with store.write_lock:
             current = await _capture_snapshot(store)
-            if current.index_revision != snapshot.index_revision or current.cache_generation != snapshot.cache_generation:
+            if (
+                current.index_revision != snapshot.index_revision
+                or current.cache_generation != snapshot.cache_generation
+            ):
                 return fallback("tree_revision_changed")
             cursor = await store.connection.execute(
                 "SELECT node_id, title, summary FROM nodes WHERE history_id = ? "
@@ -70,7 +73,7 @@ async def navigate_tree(store, query, snapshot, provider, budget, deadline_at, l
                 provider.complete(request, deadline_at=deadline_at, cache_scope=scope, budget=budget),
                 timeout=max(0, deadline_at - time.monotonic()),
             )
-        except (BudgetExceeded, ProviderError, ProviderTimeout, asyncio.TimeoutError):
+        except (TimeoutError, BudgetExceeded, ProviderError, ProviderTimeout):
             return fallback("tree_provider_unavailable")
         steps += 1
         try:
@@ -85,7 +88,10 @@ async def navigate_tree(store, query, snapshot, provider, budget, deadline_at, l
         limited |= len(ids) > limit - len(selected)
         async with store.write_lock:
             current = await _capture_snapshot(store)
-            if current.index_revision != snapshot.index_revision or current.cache_generation != snapshot.cache_generation:
+            if (
+                current.index_revision != snapshot.index_revision
+                or current.cache_generation != snapshot.cache_generation
+            ):
                 return fallback("tree_revision_changed")
             for nid in ids[:limit - len(selected)]:
                 cursor = await store.connection.execute(
@@ -101,13 +107,16 @@ async def navigate_tree(store, query, snapshot, provider, budget, deadline_at, l
                         continue
                     selected.append(cid)
                     start, end = map(int, span.split("-"))
-                    messages = await store.get_messages(start, min(end, snapshot.snapshot_max_seq), limit=5000)
+                    messages = await store.get_messages(
+                        start, min(end, snapshot.snapshot_max_seq), limit=5000
+                    )
                     limited |= len(messages) >= 5000
                     for message in messages:
                         content = message.original_payload.get("content")
                         parts = [("/content", content)] if isinstance(content, str) else [
                             (f"/content/{i}/text", b["text"]) for i, b in enumerate(content or [])
-                            if isinstance(b, dict) and b.get("type") == "text" and isinstance(b.get("text"), str)
+                            if isinstance(b, dict) and b.get("type") == "text"
+                            and isinstance(b.get("text"), str)
                         ]
                         for pointer, text in parts:
                             if not text:

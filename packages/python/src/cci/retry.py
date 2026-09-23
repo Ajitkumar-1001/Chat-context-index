@@ -11,7 +11,8 @@ from __future__ import annotations
 import asyncio
 import random
 import time
-from typing import Awaitable, Callable, TypeVar
+from collections.abc import Awaitable, Callable
+from typing import TypeVar
 
 from .errors import CciError, ProviderTimeout, StoreBusy
 

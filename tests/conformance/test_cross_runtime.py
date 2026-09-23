@@ -1,7 +1,7 @@
 """Sequential cross-runtime test (AT-11/AT-17), per Failure-Injection.md "Release checks":
-after Python closes a committed store, open it in TypeScript and repeat in reverse — run from
-an installed wheel and npm tarball outside the checkout. These are sequential opens, not
-concurrent cross-runtime writes.
+after source Python closes a committed store, open it in an installed TypeScript tarball and
+repeat in reverse. The fully installed two-runtime memory check lives in tests/packaging/.
+These are sequential opens, not concurrent cross-runtime writes.
 """
 
 from __future__ import annotations
@@ -22,7 +22,6 @@ from cci.store import HistoryStore
 
 _REPO_ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 _TS_PACKAGE_DIR = os.path.join(_REPO_ROOT, "packages", "typescript")
-_TS_TARBALL = os.path.join(_TS_PACKAGE_DIR, "chat-context-index-0.1.0.tgz")
 
 _NODE_CONSUMER_DIR: str | None = None
 
@@ -31,13 +30,17 @@ def setup_module(module) -> None:
     """Installs the packed TypeScript tarball into a fresh consumer directory outside the
     checkout — built once per test session, reused by every test in this module."""
     global _NODE_CONSUMER_DIR
-    if not os.path.exists(_TS_TARBALL):
-        subprocess.run(["npm", "pack"], cwd=_TS_PACKAGE_DIR, check=True, capture_output=True)
     _NODE_CONSUMER_DIR = tempfile.mkdtemp(prefix="cci-ts-consumer-")
+    subprocess.run(["npm", "run", "build"], cwd=_TS_PACKAGE_DIR, check=True, capture_output=True)
+    packed = subprocess.run(
+        ["npm", "pack", "--json", "--pack-destination", _NODE_CONSUMER_DIR],
+        cwd=_TS_PACKAGE_DIR, check=True, capture_output=True, text=True,
+    )
+    tarball = os.path.join(_NODE_CONSUMER_DIR, json.loads(packed.stdout)[0]["filename"])
     with open(os.path.join(_NODE_CONSUMER_DIR, "package.json"), "w") as f:
         json.dump({"name": "cci-cross-runtime-consumer", "version": "0.0.0", "type": "module", "private": True}, f)
     subprocess.run(
-        ["npm", "install", _TS_TARBALL], cwd=_NODE_CONSUMER_DIR, check=True, capture_output=True,
+        ["npm", "install", tarball], cwd=_NODE_CONSUMER_DIR, check=True, capture_output=True,
     )
 
 

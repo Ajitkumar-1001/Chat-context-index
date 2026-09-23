@@ -18,10 +18,11 @@ import apsw.aio
 # Idempotent: apsw.async_controller is a ContextVar. Setting it more than once (e.g. if
 # multiple HistoryStore.open() calls happen in the same process) is harmless — it always
 # resolves to the same controller class.
-apsw.async_controller.set(apsw.aio.AsyncIO)
+# APSW 3.53.4.0's stub types this ContextVar as its value instead of the container.
+apsw.async_controller.set(apsw.aio.AsyncIO)  # type: ignore[attr-defined]
 
 
-async def open_worker_connection(path: str) -> apsw.aio.AsyncConnection:
+async def open_worker_connection(path: str) -> apsw.AsyncConnection:
     """Open one AsyncConnection — this call is what actually starts the dedicated worker
     thread for this connection (apsw.Connection.as_async)."""
     return await apsw.Connection.as_async(path)
@@ -42,12 +43,12 @@ class IOWorker:
     serialized by SQLite's own single-writer WAL semantics (spec/storage-format.md); this
     class's job is lifecycle (close deterministically), not additional serialization."""
 
-    def __init__(self, connection: apsw.aio.AsyncConnection) -> None:
+    def __init__(self, connection: apsw.AsyncConnection) -> None:
         self._connection = connection
         self._closed = False
 
     @property
-    def connection(self) -> apsw.aio.AsyncConnection:
+    def connection(self) -> apsw.AsyncConnection:
         return self._connection
 
     async def aclose(self) -> None:

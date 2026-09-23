@@ -24,6 +24,7 @@ from typing import Any
 
 import apsw
 
+from ._ids import prefixed_id
 from .errors import IdempotencyConflict, InputValidationError, MessageConflict
 from .io_worker import fetchone
 from .models import (
@@ -36,11 +37,12 @@ from .models import (
     canonical_payload_json,
     compute_request_hash,
     message_payload,
-    payload_hash as compute_payload_hash,
     render_text_projection,
 )
+from .models import (
+    payload_hash as compute_payload_hash,
+)
 from .store import HistoryStore, map_storage_error
-from ._ids import prefixed_id
 
 ADAPTER_VERSION = "native-1"
 

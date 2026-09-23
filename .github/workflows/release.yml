@@ -17,7 +17,11 @@ permissions:
   contents: read
 
 jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+
   publish-python:
+    needs: verify
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -37,6 +41,7 @@ jobs:
           packages-dir: packages/python/dist
 
   publish-typescript:
+    needs: verify
     runs-on: ubuntu-latest
     environment: release
     permissions:

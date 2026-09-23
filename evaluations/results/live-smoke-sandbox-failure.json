@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "evaluation": "development_fixture_live_smoke",
+  "timestamp_utc": "2026-09-23T15:40:20.634177+00:00",
+  "runner_sha256": "a5562b9c4aaa1215420705345847cd42ad4cc3242cc6656aa753800ebdd2c817",
+  "provider": "openai",
+  "endpoint": "https://api.openai.com/v1",
+  "limits": {
+    "max_calls": 10,
+    "max_completion_tokens": 256,
+    "max_input_chars_per_call": 8000,
+    "call_timeout_s": 20,
+    "run_timeout_s": 180
+  },
+  "sdk_retries": 0,
+  "package_attempts_per_operation": 1,
+  "status": "FAIL",
+  "checks": {
+    "lexical_evidence_count": 0
+  },
+  "scope": "One synthetic development query; no held-out quality, answer generation, or cost claim.",
+  "package": {
+    "version": "0.1.0",
+    "import_path": "/private/tmp/cont-index-live-eval-20260923/venv/lib/python3.12/site-packages/cci/__init__.py",
+    "python": "3.12.11",
+    "executable": "/private/tmp/cont-index-live-eval-20260923/venv/bin/python",
+    "isolated_python": true,
+    "wheel_sha256": "6bf4412fe38078b3131f796d1541b10c94191aa7bfc64e263f49e38628e56162",
+    "installed_sources_match_wheel": true,
+    "openai_version": "2.45.0"
+  },
+  "fixture_sha256": "19674ad028c831bcee035071a21abbd1d2846d6274f66712398382e47db596b5",
+  "requested_model": "gpt-4o-mini",
+  "error_type": "APIConnectionError",
+  "calls": [
+    {
+      "operation": "indexing",
+      "input_chars": 293,
+      "status": "error",
+      "input_tokens": null,
+      "output_tokens": null,
+      "resolved_model": null,
+      "finish_reason": null,
+      "error_type": "APIConnectionError",
+      "elapsed_s": 0.266
+    }
+  ],
+  "usage": {
+    "attempts": 1,
+    "input_tokens_observed": 0,
+    "output_tokens_observed": 0,
+    "usage_unknown": true,
+    "by_operation": {
+      "indexing": {
+        "attempts": 1,
+        "input_tokens_observed": 0,
+        "output_tokens_observed": 0,
+        "usage_unknown": true
+      }
+    }
+  }
+}

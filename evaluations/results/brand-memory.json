@@ -1,7 +1,7 @@
 {
   "fixture": "brand-memory-development-probe-v1",
   "scope": "Hand-authored synthetic development cases. No UgenticAI customer data or measured CloneIQ behavior. Not a held-out evaluation or a release gate.",
-  "recorded_at": "2026-09-23T01:37:27.365234+00:00",
+  "recorded_at": "2026-09-23T05:12:46.286306+00:00",
   "environment": {
     "python": "3.12.11",
     "platform": "Darwin",
@@ -10,7 +10,7 @@
     "sqlite": "3.53.4"
   },
   "fingerprints": {
-    "implementation_sha256": "c0a07f2d88ac75b3b5e2b486dc759d26ed3e91039ca2080b4ec6df57a6175e00",
+    "implementation_sha256": "22e5f6a4bdf704a75aa89e78f0ae054ca0fd3aaef10f7d502e7723cc0e314f62",
     "fixture_sha256": "273141e1bf5d67d66ee01ec3f7d18f5f9fd3e96a57233f80c173019987416f96"
   },
   "limits": {

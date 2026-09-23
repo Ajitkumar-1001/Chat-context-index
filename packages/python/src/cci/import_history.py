@@ -44,7 +44,7 @@ def _read_records(src_path: str) -> tuple[list[dict], dict]:
     manifest_record)."""
     import hashlib
 
-    with open(src_path, "r", encoding="utf-8") as f:
+    with open(src_path, encoding="utf-8") as f:
         lines = [line.rstrip("\n") for line in f if line.strip()]
 
     if not lines:
@@ -138,7 +138,10 @@ async def import_history(store: HistoryStore, src_path: str) -> ImportReport:
                                     payload_str,
                                     text_projection,
                                     record["payload_hash"],
-                                    json.dumps(record["session_metadata"], sort_keys=True, separators=(",", ":"))
+                                    json.dumps(
+                                        record["session_metadata"], sort_keys=True,
+                                        separators=(",", ":"),
+                                    )
                                     if record.get("session_metadata") is not None else None,
                                     record["created_at"],
                                 ),
