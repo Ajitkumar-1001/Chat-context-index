@@ -145,9 +145,6 @@ The hierarchy follows ChatIndex's summary-to-source approach, using an independe
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 
-## Acknowledgments
-
-Inspired by [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatIndex) and its approach to organizing and retrieving conversation context through a topic hierarchy.
 
 ## License
 
