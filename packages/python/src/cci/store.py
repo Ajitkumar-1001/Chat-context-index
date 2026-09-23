@@ -302,6 +302,10 @@ class HistoryStore:
                 history_id, store_instance_id = await cls._init_fresh(connection)
             else:
                 history_id, store_instance_id = await cls._resume_existing(connection)
+
+            # Cache construction can fail after SQLite has opened its connection and worker.
+            io_worker = IOWorker(connection)
+            cache = build_cache(resolved_config, path)
         except apsw.Error as exc:
             # A raw APSW error (e.g. NotADBError on a corrupted/garbage file) is mapped to the
             # typed taxonomy — never leaked to the caller as-is (Failure-Injection.md F2).
@@ -311,8 +315,6 @@ class HistoryStore:
             await connection.aclose()
             raise
 
-        io_worker = IOWorker(connection)
-        cache = build_cache(resolved_config, path)
         return cls(
             path=path,
             config=resolved_config,
