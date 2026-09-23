@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "title": "Error codes",
+    "description": "Frozen at M0 from contracts/result-schemas.md's error table (PRD §10). This is reference data (the fixed set of exception classes both implementations must define), not a JSON Schema for validating instances. Fixed set — do not add a code without a constitution/plan-level review (Principle VII, 'no new component' discipline).",
+    "source": "contracts/result-schemas.md#error-codes-prd-10",
+    "frozen_at": "2026-09-22"
+  },
+  "codes": [
+    { "code": "ConfigurationError", "condition": "No suitable provider configured for a model-requiring operation; also raised at open() for an invalid config such as a missing application_namespace under Redis mode", "required_behavior": "Fail early, before partial work", "retryable": "no" },
+    { "code": "InputValidationError", "condition": "Invalid/oversize ingest batch; import manifest/record-count mismatch", "required_behavior": "Raise typed error; no partial commit", "retryable": "no" },
+    { "code": "IdempotencyConflict", "condition": "Same ingest key, different request hash", "required_behavior": "Raise before any write", "retryable": "no" },
+    { "code": "MessageConflict", "condition": "Existing external_id, changed content", "required_behavior": "Raise before any write", "retryable": "no" },
+    { "code": "StoreBusy", "condition": "Storage-level contention (e.g. SQLite busy timeout)", "required_behavior": "Raise; no completion claimed", "retryable": "yes" },
+    { "code": "StoreNotEmpty", "condition": "import_history() into a non-empty target", "required_behavior": "Raise; no silent merge", "retryable": "no" },
+    { "code": "StoreError", "condition": "General storage error", "required_behavior": "Raise; never a fake empty/successful history", "retryable": "no" },
+    { "code": "StoreCorrupt", "condition": "Detected storage corruption", "required_behavior": "Raise; never disguised as empty", "retryable": "no" },
+    { "code": "SchemaVersionError", "condition": "Newer-unsupported schema at open()", "required_behavior": "Raise; no file modification", "retryable": "no" },
+    { "code": "RuntimeCompatibilityError", "condition": "Loaded SQLite runtime fails required version/feature check", "required_behavior": "Raise at open()", "retryable": "no" },
+    { "code": "VersionConflict", "condition": "Stale generation at tree-publish commit; stale generation at read emission when a concurrent clear_history invalidated an in-flight retrieve()/ask()", "required_behavior": "Discard/retry bounded, or raise; never emit or cache a stale-generation result", "retryable": "internal-only" },
+    { "code": "ProviderError", "condition": "Provider failure after retries", "required_behavior": "Raise with sanitized stage/usage metadata", "retryable": "no" },
+    { "code": "ProviderTimeout", "condition": "Provider call exceeded its deadline", "required_behavior": "Raise; retryable per backoff policy", "retryable": "yes" },
+    { "code": "BudgetExceeded", "condition": "Budget exhausted before useful work; clear_history quiescence deadline exceeded", "required_behavior": "Raise; no forced final synthesis / no completion claimed", "retryable": "no" },
+    { "code": "Cancelled", "condition": "Caller-initiated cancellation", "required_behavior": "Stop dispatching, propagate, close resources, cache nothing incomplete", "retryable": "no" }
+  ]
+}

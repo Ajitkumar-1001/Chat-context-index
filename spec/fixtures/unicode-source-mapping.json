@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "source": "vault-context/05-Implementation/Contract-Fixtures.md#unicode-and-source-mapping",
+    "description": "Proposed test-design cases — not executed fixtures or passing results.",
+    "frozen_at": "2026-09-22"
+  },
+  "cases": [
+    {
+      "id": "U1",
+      "description": "Unicode scalar-value offset counting, not UTF-16 code units or bytes",
+      "fixture_string": "A😀éZ",
+      "scalar_values": ["A", "😀", "e", "́", "Z"],
+      "notes": "5 Unicode scalar values total. The emoji begins at scalar offset 1 and spans exactly 1 scalar value (not 2, as UTF-16 surrogate-pair-naive counting would produce). Python and TypeScript MUST agree on every offset within this string (spec/normalization.md Unicode; contracts/result-schemas.md TypeScript implementation note).",
+      "acceptance_ids": ["AT-11"]
+    },
+    {
+      "id": "U2",
+      "description": "Precomposed vs. combining-character forms are distinct original strings, both exactly preserved",
+      "operations": [
+        { "op": "ingest", "messages": [
+          { "role": "user", "content": "é" , "note": "precomposed e-acute" },
+          { "role": "user", "content": "é", "note": "e + combining acute accent — visually similar, different bytes" }
+        ]}
+      ],
+      "expected_result": "both strings stored exactly as submitted, distinct from each other",
+      "assert_after": ["reopen", "export", "import"],
+      "acceptance_ids": ["AT-05", "AT-11"]
+    },
+    {
+      "id": "U3",
+      "description": "Source pointer exercised for both simple and nested content fields",
+      "source_pointers_exercised": ["/content", "/content/0/text"],
+      "acceptance_ids": ["AT-05"]
+    },
+    {
+      "id": "U4",
+      "description": "Structural coverage: assistant-first history, consecutive user messages, interleaved system messages, supported tool calls/results, unknown structured blocks",
+      "operations": [
+        { "op": "ingest", "messages": [
+          { "role": "assistant", "content": "assistant-first opening message" },
+          { "role": "user", "content": "first user message" },
+          { "role": "user", "content": "consecutive second user message" },
+          { "role": "system", "content": "interleaved system message" },
+          { "role": "assistant", "content": null, "tool_calls": [{ "type": "supported-tool-call", "id": "call-1" }] },
+          { "role": "tool", "tool_call_id": "call-1", "content": "supported tool result" },
+          { "role": "user", "content": [{ "type": "unknown-block-type", "data": "opaque" }] }
+        ]}
+      ],
+      "expected_result": "every accepted record belongs to exactly one ordered exchange; no record disappears or is misidentified as an ordinary user instruction; the unknown block is stored as opaque data, marked unsupported for interpretation, not silently discarded",
+      "acceptance_ids": ["AT-05", "AT-11"]
+    },
+    {
+      "id": "U5",
+      "description": "A malformed record within an otherwise-supported batch rejects the complete batch",
+      "expected_result": "InputValidationError; no partial commit",
+      "acceptance_ids": ["AT-05"]
+    }
+  ]
+}

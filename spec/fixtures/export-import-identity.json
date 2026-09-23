@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "source": "vault-context/05-Implementation/Contract-Fixtures.md#export-and-import-identity",
+    "description": "Proposed test-design cases — not executed fixtures or passing results.",
+    "frozen_at": "2026-09-22"
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "description": "Round-trip identity: export one committed snapshot, import into an empty store, close, reopen",
+      "operations": ["export (one committed snapshot)", "import_history into an empty target store", "close", "reopen"],
+      "expected_result": {
+        "preserved": ["original message IDs", "original strings", "source identities", "sequence order"],
+        "new_on_import": ["history_id", "store_instance_id", "cache_generation"],
+        "derived_indexing": "not carried over — rebuilt explicitly via a later index() call, may incur model cost"
+      },
+      "acceptance_ids": ["AT-19"]
+    },
+    {
+      "id": "E2",
+      "description": "Import into a non-empty target is rejected, not silently merged",
+      "expected_result": "StoreNotEmpty",
+      "note": "appending a second history intentionally uses ordinary bounded ingest() with explicit source IDs instead of import_history()",
+      "acceptance_ids": ["AT-19"]
+    },
+    {
+      "id": "E3",
+      "description": "Manifest/record-count mismatch is detected before any record is treated as committed",
+      "expected_result": "InputValidationError",
+      "acceptance_ids": ["AT-19"]
+    },
+    {
+      "id": "E4",
+      "description": "A failed multi-batch import truthfully reports committed progress, never claims whole-file rollback",
+      "expected_result": "partial-progress report naming exactly what committed before the failure",
+      "acceptance_ids": ["AT-19"]
+    }
+  ]
+}

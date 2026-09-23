@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chat-context-index"
+version = "0.1.0"
+description = "cci: persistent, retrievable conversation memory for AI applications"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11,<3.15"
+dependencies = [
+    # Pinned at M0 (research.md §2) — SQLite driver, embeds SQLite 3.53.4 (>= required 3.51.3).
+    "apsw==3.53.4.0",
+]
+
+[project.optional-dependencies]
+redis = ["redis>=5.0"]
+openai = ["openai>=1.0"]
+anthropic = ["anthropic>=0.30"]
+
+[project.scripts]
+cci = "cci.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cci"]
+
+[tool.pytest.ini_options]
+# Test runner decision (T005, research.md §10): pytest, ecosystem-standard default.
+testpaths = ["../../tests/conformance"]
+python_files = ["test_*.py"]

@@ -1,0 +1,51 @@
+{
+  "_meta": {
+    "source": "vault-context/05-Implementation/Contract-Fixtures.md#deterministic-candidate-selection-and-evidence",
+    "description": "Proposed test-design cases — not executed fixtures or passing results.",
+    "frozen_at": "2026-09-22"
+  },
+  "cases": [
+    {
+      "id": "R1",
+      "description": "Deterministic interleaving: lexical-first, duplicates removed, stops at the chunk limit",
+      "inputs": {
+        "ranked_lexical_candidates": ["A", "B", "C"],
+        "ranked_tree_candidates": ["B", "D", "A"],
+        "chunk_limit": 3
+      },
+      "expected_result": {
+        "selected_chunks": ["A", "B", "D"],
+        "rule": "alternate lexical-first, remove duplicates, stop at limit; expanding any selected node still respects the same total limit"
+      },
+      "acceptance_ids": ["AT-09", "AT-11"]
+    },
+    {
+      "id": "R2",
+      "description": "Lexical fallback reaches newly committed content while indexing is pending, with degraded coverage disclosed",
+      "operations": [
+        { "op": "ingest", "messages": [{ "role": "user", "content": "cobalt telescope observation log" }] },
+        { "op": "retrieve", "query": "cobalt telescope", "note": "indexing left pending — index() not called" }
+      ],
+      "expected_result": "lexical evidence reaches the committed message; coverage.index_degraded=true disclosed",
+      "acceptance_ids": ["AT-08"]
+    },
+    {
+      "id": "R3",
+      "description": "No evidence found: synthesis makes zero calls, explicit null answer",
+      "operations": [
+        { "op": "ask", "query": "a question with no supporting evidence anywhere in the history" }
+      ],
+      "expected_result": { "status": "insufficient_evidence", "answer": null },
+      "provider_call_count": 0,
+      "acceptance_ids": ["AT-13"]
+    },
+    {
+      "id": "R4",
+      "description": "Invalid citations are structurally rejected; a repair-then-still-invalid answer is suppressed",
+      "mutation_targets": ["evidence_id", "source_pointer", "quote", "history_scope", "sequence_beyond_snapshot"],
+      "expected_result": "after at most one allowed repair attempt, a still-invalid answer is suppressed with invalid_answer diagnostics — never returned to the caller",
+      "note": "a real but irrelevant quote is a semantic-support evaluation concern, not proof that structural validation established relevance — these are measured separately",
+      "acceptance_ids": ["AT-10", "AT-14"]
+    }
+  ]
+}

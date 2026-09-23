@@ -20,7 +20,7 @@
 </div>
 
 > [!NOTE]
-> **Early-stage project.** Implementation has not started, and no installable package is available yet. The capabilities and API below describe intended behavior and may change.
+> **Early-stage project.** Python internals are under development; the public `ContextIndex` interface shown below is not implemented yet. The usage example remains illustrative, and planned features are labeled below.
 
 ## Overview
 
@@ -71,17 +71,34 @@ Other planned operations include search, message access, export/import, history 
 
 ## How it works
 
+The library keeps conversation history in a local SQLite database. The current Python internals provide storage, ingestion, lexical retrieval, and an `ask()` pipeline through a supplied model provider. Topic-tree indexing and cache adapters are planned.
+
 ```mermaid
 flowchart LR
     app["Host application"] -->|"ingest()"| history[("SQLite history + FTS5")]
-    history -->|"retrieve()"| evidence["Relevant original messages"]
+    app -->|"retrieve(query)"| retrieval["Keyword search + snapshot"]
+    history --> retrieval
+    retrieval --> evidence["Original excerpts + source pointers"]
     evidence --> model["Your application's model"]
-    evidence -->|"optional ask()"| answer["Answer with citations"]
+    evidence -->|"optional ask()"| synthesis["Model synthesis + citation checks"]
+    synthesis --> answer["Answer + evidence"]
+    history -.->|"planned: index()"| tree["Topic hierarchy + summaries"]
+    tree -.->|"planned: routing hints"| retrieval
 ```
 
-The intended flow keeps conversation history in local SQLite storage and returns relevant original messages for a new question. Your application can pass those messages to its own model or request a cited answer through `ask()`.
+1. **Save the original conversation.** `ingest()` validates a batch, assigns message IDs and increasing sequence numbers, and stores the original payload separately from its searchable text projection. Messages, FTS5 entries, and the ingestion receipt commit in one SQLite transaction. Retrying the same `source_id`, `idempotency_key`, and input replays the receipt. Deduplication uses source identity; two distinct messages can contain identical text.
 
-Optional caching is designed to reuse eligible model work independently of history storage. The application controls which history to open and when to index it. The initial deployment target is one owning application process per history with durable local storage.
+2. **Organize topics when requested — planned.** An explicit `index()` call will group pending conversation into chunks beneath a time-ordered topic hierarchy. Model-generated titles and summaries will help route queries to original messages. They are navigation aids, never citable evidence. Indexing will update the affected portion of the tree; a provider failure will leave stored messages and lexical search available. Ingestion does not trigger indexing.
+
+3. **Retrieve evidence for a query.** `retrieve()` captures the history revisions and message boundary in a short read transaction, then searches FTS5 within that snapshot. The current implementation uses literal query terms, returns matches in conversation order, and makes no model calls. It returns up to eight matches by default, each with an excerpt, message ID, sequence number, source pointer, and content hash. With no topic tree, `auto` and `tree` requests use this lexical path and report `index_degraded`. A query with no matches returns `status="empty"`; different wording can miss relevant messages. Planned tree routing will supplement this path without requiring embeddings or a vector database.
+
+4. **Optionally generate an answer.** Your application can use the retrieved evidence directly, or call `ask()` to retrieve evidence and send it to a configured provider. With no evidence, `ask()` returns `insufficient_evidence` without calling the model. Otherwise, it requests one synthesis pass and checks that cited evidence IDs belong to this response. Unknown citation IDs allow at most one repair pass; if they remain invalid, the answer is suppressed and the result is `partial`. These checks establish source references, not factual correctness. Historical text is rendered in separate evidence blocks, and recorded tool calls are not executed.
+
+5. **Reuse eligible model work — planned.** Optional `none`, `sqlite`, and `redis` cache modes will sit behind the provider layer, separate from authoritative history storage. Reuse will require an exact match of the effective request and history scope, compatible versions, a validated payload, and an unexpired entry (24-hour lifetime by default). Classification, summaries, and routing results are eligible; final answers and failed requests are excluded. Cache loss will affect reuse without deleting conversation history. The current provider wrapper handles concurrency, timeouts, and retries, but does not yet cache responses.
+
+The host application owns authentication, user-to-history access, provider configuration, and scheduling. The deployment target is one owning application process per history on durable local storage. Opening a history starts an owned SQLite I/O worker; closing it releases the connection and worker. Using a remote model sends the query and selected evidence to that provider.
+
+Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py). The [storage contract](spec/storage-format.md) and [cache contract](spec/cache-format.md) describe the persistence and planned reuse rules in detail.
 
 ## Acknowledgments
 

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.cci.dev/retrieval-result.schema.json",
+  "title": "RetrievalResult",
+  "description": "Frozen at M0 from contracts/result-schemas.md (PRD §7.3). Return shape of retrieve(); AnswerResult (answer-result.schema.json) extends this shape.",
+  "type": "object",
+  "required": ["contract_version", "history_id", "status", "snapshot", "evidence", "routing", "coverage", "diagnostics", "usage"],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Versions this public result schema. Independent of the cci:memo:v2 cache-key prefix — see spec/cache-format.md."
+    },
+    "history_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["ok", "empty", "partial"] },
+    "snapshot": {
+      "type": "object",
+      "required": ["history_revision", "index_revision", "snapshot_max_seq", "cache_generation"],
+      "properties": {
+        "history_revision": { "type": "integer", "minimum": 0 },
+        "index_revision": { "type": "integer", "minimum": 0 },
+        "snapshot_max_seq": { "type": "integer", "minimum": 0 },
+        "cache_generation": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Ordering is NOT currently constrained by the spec (open item — see checklists/readiness.md CHK006). Implementations must not assume a stable order across releases until this is resolved.",
+      "items": {
+        "type": "object",
+        "required": ["evidence_id", "message_id", "seq", "source_pointer", "excerpt", "content_hash"],
+        "properties": {
+          "evidence_id": { "type": "string" },
+          "message_id": { "type": "string" },
+          "seq": { "type": "integer", "minimum": 0 },
+          "source_pointer": {
+            "type": "string",
+            "description": "e.g. '/content' or '/content/0/text'. Offsets on the excerpt count Unicode scalar values, never UTF-16 code units or encoded bytes (AT-11, AT-09)."
+          },
+          "excerpt": { "type": "string" },
+          "content_hash": { "type": "string" }
+        }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "required": ["requested_mode", "actual_mode", "candidate_count", "selected_chunk_ids"],
+      "properties": {
+        "requested_mode": { "type": "string", "enum": ["lexical", "tree", "auto"] },
+        "actual_mode": { "type": "string", "enum": ["lexical", "tree", "auto"] },
+        "candidate_count": { "type": "integer", "minimum": 0 },
+        "selected_chunk_ids": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["coverage_limited", "index_degraded", "omitted_excerpt_count"],
+      "properties": {
+        "coverage_limited": { "type": "boolean" },
+        "index_degraded": { "type": "boolean" },
+        "omitted_excerpt_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "stage", "retryable"],
+        "properties": {
+          "code": { "type": "string" },
+          "stage": { "type": "string" },
+          "retryable": { "type": "boolean" }
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "required": ["current_provider_calls", "retries", "usage_unknown", "memo_hits", "memo_misses", "memo_errors", "stage_ms"],
+      "properties": {
+        "current_provider_calls": { "type": "integer", "minimum": 0 },
+        "retries": { "type": "integer", "minimum": 0 },
+        "input_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "output_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "usage_unknown": {
+          "type": "boolean",
+          "description": "True when provider-reported usage is missing. Missing usage MUST be reported this way, never fabricated as zero."
+        },
+        "memo_hits": { "type": "integer", "minimum": 0 },
+        "memo_misses": { "type": "integer", "minimum": 0 },
+        "memo_errors": { "type": "integer", "minimum": 0 },
+        "stage_ms": {
+          "type": "object",
+          "additionalProperties": { "type": "number", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

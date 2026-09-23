@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.cci.dev/index-report.schema.json",
+  "title": "IndexReport",
+  "description": "Frozen at M0 from contracts/result-schemas.md (PRD §7.3). Return shape of index().",
+  "type": "object",
+  "required": ["committed_coverage", "pending_coverage", "provider_usage", "status"],
+  "properties": {
+    "committed_coverage": {
+      "type": "object",
+      "description": "Message-seq range(s) covered by the committed tree.",
+      "properties": {
+        "start_seq": { "type": "integer", "minimum": 0 },
+        "end_seq": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "pending_coverage": {
+      "type": "object",
+      "description": "Message-seq range(s) not yet indexed.",
+      "properties": {
+        "start_seq": { "type": "integer", "minimum": 0 },
+        "end_seq": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "provider_usage": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Same usage-accounting shape as RetrievalResult.usage; kept open here since index() has no evidence/routing fields to constrain the envelope."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["complete", "partial"],
+      "description": "'partial' on hitting an invocation limit after valid updates — a later index() call resumes the remaining range. Never rolled back merely because the next batch could not run."
+    }
+  }
+}

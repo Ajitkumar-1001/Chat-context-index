@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.cci.dev/answer-result.schema.json",
+  "title": "AnswerResult",
+  "description": "Frozen at M0 from contracts/result-schemas.md (PRD §7.3). Return shape of ask() — RetrievalResult plus answer/status/reason/citations.",
+  "allOf": [
+    { "$ref": "retrieval-result.schema.json" },
+    {
+      "type": "object",
+      "required": ["answer", "status", "citations"],
+      "properties": {
+        "answer": {
+          "type": ["string", "null"],
+          "description": "Null is valid and expected for status=insufficient_evidence. Never invented content when evidence is missing (INV-04)."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["answered", "insufficient_evidence", "partial"],
+          "description": "Distinct from RetrievalResult.status (ok|empty|partial) — this is the answer-specific outcome."
+        },
+        "reason": { "type": ["string", "null"] },
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["evidence_id"],
+            "properties": {
+              "evidence_id": {
+                "type": "string",
+                "description": "MUST reference an evidence_id present in this same response's evidence[] — never across a Snapshot boundary (INV-05)."
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

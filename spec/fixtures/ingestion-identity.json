@@ -1,0 +1,120 @@
+{
+  "_meta": {
+    "source": "vault-context/05-Implementation/Contract-Fixtures.md#ingestion-identity-and-atomic-rejection",
+    "description": "Proposed test-design cases (Contract-Fixtures.md's own framing) — not executed fixtures or passing results. Symbolic message/chunk labels only; do not read these as prescribing concrete wire-field names or generated IDs.",
+    "provider": "deterministic fake provider double; fails the test if a no-model operation calls it",
+    "frozen_at": "2026-09-22"
+  },
+  "cases": [
+    {
+      "id": "I1",
+      "description": "Distinct identities with identical content remain distinct; replay is idempotent",
+      "initial_state": "fresh history",
+      "operations": [
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-1", "messages": [
+          { "role": "user", "external_id": "u-1", "content": "Okay" },
+          { "role": "user", "external_id": "u-2", "content": "Okay" }
+        ]},
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-1", "messages": [
+          { "role": "user", "external_id": "u-1", "content": "Okay" },
+          { "role": "user", "external_id": "u-2", "content": "Okay" }
+        ], "note": "identical replay of the same batch" }
+      ],
+      "expected_result": [
+        "first call: two distinct message IDs, ordered sequences",
+        "second call: original receipt returned, replayed=true, no new write"
+      ],
+      "expected_persistent_changes": "exactly two messages committed, from the first call only",
+      "provider_call_count": 0,
+      "acceptance_ids": ["AT-02", "AT-04"]
+    },
+    {
+      "id": "I2",
+      "description": "Idempotency-key reuse with changed content raises IdempotencyConflict, checked before any per-message MessageConflict",
+      "initial_state": "history after I1",
+      "operations": [
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-1", "messages": [
+          { "role": "user", "external_id": "u-1", "content": "Okay, changed" },
+          { "role": "user", "external_id": "u-2", "content": "Okay" }
+        ], "note": "same key, one message content changed" }
+      ],
+      "expected_result": "IdempotencyConflict",
+      "expected_persistent_changes": "none — messages, receipt, revisions, and lexical data unchanged",
+      "provider_call_count": 0,
+      "acceptance_ids": ["AT-03"],
+      "resolves_checklist": "CHK002 — verifies IdempotencyConflict wins over MessageConflict when both conditions could apply to the same batch"
+    },
+    {
+      "id": "I3",
+      "description": "A new batch key with a per-message identity conflict rejects the complete batch, including unrelated new messages in it",
+      "initial_state": "history after I1",
+      "operations": [
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-2", "messages": [
+          { "role": "user", "external_id": "u-1", "content": "Okay, changed" },
+          { "role": "user", "external_id": "u-3", "content": "New message" }
+        ], "note": "new key; u-1 already exists with different content" }
+      ],
+      "expected_result": "MessageConflict",
+      "expected_persistent_changes": "none — u-3 is not committed even though it has no conflict of its own",
+      "provider_call_count": 0,
+      "acceptance_ids": ["AT-03"]
+    },
+    {
+      "id": "I4",
+      "description": "Without external IDs, a new batch key never deduplicates content",
+      "initial_state": "fresh history",
+      "operations": [
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-1", "messages": [
+          { "role": "user", "content": "Okay" },
+          { "role": "user", "content": "Okay" }
+        ]},
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-1", "messages": [
+          { "role": "user", "content": "Okay" },
+          { "role": "user", "content": "Okay" }
+        ], "note": "identical replay" },
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-2", "messages": [
+          { "role": "user", "content": "Okay" },
+          { "role": "user", "content": "Okay" }
+        ], "note": "same content, new batch key" }
+      ],
+      "expected_result": "message counts after each call: 2, 2, 4",
+      "expected_persistent_changes": "4 total messages after all three calls",
+      "provider_call_count": 0,
+      "acceptance_ids": ["AT-02", "AT-04"]
+    },
+    {
+      "id": "I5",
+      "description": "Source identity participates in message identity — same external_id from two different sources are both retained",
+      "initial_state": "fresh history",
+      "operations": [
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-1", "messages": [
+          { "role": "user", "external_id": "u-1", "content": "From chat-a" }
+        ]},
+        { "op": "ingest", "source_id": "chat-b", "idempotency_key": "batch-1", "messages": [
+          { "role": "user", "external_id": "u-1", "content": "From chat-b" }
+        ]}
+      ],
+      "expected_result": "both messages remain, as distinct identities",
+      "expected_persistent_changes": "2 messages total, identity keyed on (history_id, source_id, external_id)",
+      "provider_call_count": 0,
+      "acceptance_ids": ["AT-03", "AT-11"]
+    },
+    {
+      "id": "I6",
+      "description": "Invalid records and oversize batches are rejected as a complete batch, indexed, before any accepted prefix commits",
+      "initial_state": "fresh history",
+      "operations": [
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-1", "messages": [
+          { "role": "user", "content": "valid record" },
+          { "role": "not-a-real-role", "content": "invalid record" }
+        ]},
+        { "op": "ingest", "source_id": "chat-a", "idempotency_key": "batch-2", "note": "separately, exceed the configured 1,000-message or 8-MiB batch limit, or a single record over 256 KiB" }
+      ],
+      "expected_result": "InputValidationError in both cases, with the failing record indexed in the error",
+      "expected_persistent_changes": "none — no accepted prefix of either batch commits; a rejected batch is not readable through get_messages() or discoverable via search()",
+      "provider_call_count": 0,
+      "acceptance_ids": ["AT-05"]
+    }
+  ],
+  "cross_cutting_check": "For every rejected batch (I3, I6): read raw records and search for the proposed new text — neither path may expose it. Reopen after successful ingestion (I1, I4, I5) and compare original strings and IDs exactly (AT-01)."
+}

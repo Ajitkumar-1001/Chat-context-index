@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "source": "vault-context/05-Implementation/Contract-Fixtures.md#cache-key-mutation-pairs",
+    "description": "Proposed test-design cases — not executed fixtures or passing results. Begin with one schema-valid eligible effective request and a fixed scope; change only the named input per pair, keep every other dependency constant. Reviewed canonical bytes and digest vectors must be saved once spec/schemas/ is frozen (done, this M0 pass) — never regenerate expected values from the implementation under test merely to make a failing fixture pass.",
+    "frozen_at": "2026-09-22"
+  },
+  "mutation_pairs": [
+    { "id": "M1", "mutation": "reorder JSON object properties without changing their values", "expected_relationship": "same canonical bytes and request digest" },
+    { "id": "M2", "mutation": "omit an option versus supply its documented default", "expected_relationship": "same digest after effective-default expansion, where the schema defines equivalence" },
+    { "id": "M3", "mutation": "change only a transport request ID or a secret excluded from the effective request", "expected_relationship": "same request digest" },
+    { "id": "M4", "mutation": "change message whitespace, case, or content; prompt/schema/normalization version; model; deployment revision; effective generation setting", "expected_relationship": "different request digest" },
+    { "id": "M5", "mutation": "change application namespace, store instance, history ID, or cache generation", "expected_relationship": "different scope digest and final key" },
+    { "id": "M6", "mutation": "append unrelated history while a content-only summary's complete effective inputs stay identical", "expected_relationship": "same summary request digest and scope — no blanket history-revision invalidation" },
+    { "id": "M7", "mutation": "change tree context actually supplied to routing or classification", "expected_relationship": "different request digest" },
+    { "id": "M8", "mutation": "supply non-finite numbers, invalid Unicode, or duplicate keys in serialized JSON input", "expected_relationship": "reject before memo lookup/write" }
+  ],
+  "cross_language_check": "run M1–M8 in both Python and TypeScript against the same reviewed canonical-bytes/digest vectors once packages/ exist (AT-11, AT-15) — this file records the mutation-pair design now, at M0; the actual saved digest vectors are generated once an implementation exists to compute them against this frozen key formula (spec/cache-format.md)."
+}
