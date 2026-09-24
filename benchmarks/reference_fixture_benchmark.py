@@ -14,6 +14,9 @@ PRD §12 full workload (opt-in; defaults reproduce the T070/T083 workload exactl
 
   python reference_fixture_benchmark.py --queries 1000 --concurrency 1,4,16 --cold-trials 20
 
+`--paths search,retrieve,prepare` also times `retrieve(mode="lexical")` and
+`prepare_context(mode="lexical")` warm, per concurrency level, and as a fresh-process first call.
+
 `--messages` changes history size for scale points; it is not the reference fixture.
 Process-cold means a fresh interpreter and SQLite connection; the OS page cache is not dropped.
 On an exclusively reserved Linux runner, --filesystem-cold-trials also drops the host page cache
@@ -59,11 +62,21 @@ t0 = time.perf_counter()
 from cci.search import search
 from cci.store import HistoryStore
 t1 = time.perf_counter()
+kind = sys.argv[3] if len(sys.argv) > 3 else "search"
+if kind == "retrieve":
+    from cci.retrieve import retrieve
+elif kind == "prepare":
+    from cci.memory import prepare_context
 async def main():
     start = time.perf_counter()
     store = await HistoryStore.open(sys.argv[1])
     opened = time.perf_counter()
-    await search(store, sys.argv[2], limit=8)
+    if kind == "retrieve":
+        await retrieve(store, sys.argv[2], mode="lexical", max_selected_chunks=8)
+    elif kind == "prepare":
+        await prepare_context(store, sys.argv[2], mode="lexical")
+    else:
+        await search(store, sys.argv[2], limit=8)
     searched = time.perf_counter()
     from cci.io_worker import fetchone
     count = await fetchone(await store.connection.execute("SELECT COUNT(*) FROM messages"))
@@ -144,13 +157,21 @@ async def _run(
     cold_trials: int = 0,
     artifact: str | None = None,
     filesystem_cold_trials: int = 0,
+    paths: tuple[str, ...] = ("search",),
 ) -> dict:
     import apsw
     import cci
     from cci.ingest import ingest
+    from cci.memory import prepare_context
     from cci.models import InputMessage
+    from cci.retrieve import retrieve
     from cci.search import search
     from cci.store import HistoryStore
+
+    extra_paths = {
+        "retrieve": ("retrieve_lexical_ms", lambda q: retrieve(store, q, mode="lexical", max_selected_chunks=8)),
+        "prepare": ("prepare_context_lexical_ms", lambda q: prepare_context(store, q, mode="lexical")),
+    }
 
     rng = random.Random(SEED)
     message_bytes: list[int] = []
@@ -192,6 +213,16 @@ async def _run(
             search_by_concurrency[str(level)] = _summary(
                 latencies, errors=errors, throughput_per_s=len(calls) / elapsed
             )
+        # Opt-in: the full lexical retrieval and context paths (plan-eng-review D19).
+        path_by_concurrency: dict[str, dict[str, dict]] = {}
+        for name in (p for p in paths if p in extra_paths):
+            key, call = extra_paths[name]
+            path_by_concurrency[key] = {}
+            for level in concurrency:
+                latencies, elapsed, errors = await _timed_rounds([lambda q=q: call(q) for q in query_list], level)
+                path_by_concurrency[key][str(level)] = _summary(
+                    latencies, errors=errors, throughput_per_s=len(query_list) / elapsed
+                )
         search_latencies_ms = []
         if "1" not in search_by_concurrency:
             for query in query_list:
@@ -216,6 +247,16 @@ async def _run(
                 cwd=d, capture_output=True, text=True, check=True,
             )
             cold.append(json.loads(completed.stdout))
+
+        path_cold: dict[str, list[dict]] = {}
+        for name in (p for p in paths if p in extra_paths):
+            path_cold[name] = [
+                json.loads(subprocess.run(
+                    [sys.executable, "-I", "-c", _PROCESS_COLD, path, query_list[i % len(query_list)], name],
+                    cwd=d, capture_output=True, text=True, check=True,
+                ).stdout)
+                for i in range(cold_trials)
+            ]
 
         filesystem_cold: list[dict] = []
         for i in range(filesystem_cold_trials):
@@ -301,6 +342,13 @@ async def _run(
             "total_messages": total_messages,
             "raw_trials": cold,
         }
+    if path_by_concurrency:
+        report["paths"] = {
+            key: {"by_concurrency": levels, "process_cold_first_call_ms": _summary(
+                [c["first_search_ms"] for c in path_cold.get(name, [])]
+            )}
+            for name, (key, _) in extra_paths.items() if (levels := path_by_concurrency.get(key))
+        }
     if filesystem_cold:
         report["filesystem_cold"] = {
             "import_ms": _summary([c["import_ms"] for c in filesystem_cold]),
@@ -341,13 +389,15 @@ def main() -> int:
                         help="fresh-interpreter open + first search trials")
     parser.add_argument("--artifact", default=None,
                         help="artifact identity, e.g. git revision and wheel sha256")
+    parser.add_argument("--paths", default="search",
+                        help="comma-separated timed paths: search (default), retrieve, prepare")
     parser.add_argument("--filesystem-cold-trials", type=int, default=0,
                         help="Linux only: drop the HOST page cache before each trial; reserved host required")
     args = parser.parse_args()
     report = asyncio.run(_run(
         args.out, args.label, args.queries, args.messages,
         tuple(int(c) for c in args.concurrency.split(",")), args.cold_trials, args.artifact,
-        args.filesystem_cold_trials,
+        args.filesystem_cold_trials, tuple(args.paths.split(",")),
     ))
     all_pass = all(r["pass"] for r in report["results"].values())
     return 0 if all_pass else 1

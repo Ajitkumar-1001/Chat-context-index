@@ -1,0 +1,3086 @@
+{
+ "_meta": {
+  "purpose": "Development-only generalization check for correction linking (plan-eng-review D4, D16, D18). Never tuned on, never held-out release evidence.",
+  "construction": "Hand-written statement/correction/question triples that avoid the held-out generator's templates and the former correction cue words. Each history has 45 messages: neutral filler, the statement at position 10, the correction at 30, and a verbatim stale repeat of the statement at 35.",
+  "buckets": {
+   "names_old_value": "The correction names the value it replaces (gated: recall >= 0.80).",
+   "does_not_name_old_value": "The correction never names the old value; a lexical system is expected to miss these (reported only)."
+  }
+ },
+ "histories": [
+  {
+   "history_label": "p01",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Billing events go through Kafka.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Kafka is gone as of this week, Pulsar took over.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Billing events go through Kafka.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p01-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p01-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p02",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The staging database runs on MySQL.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "We migrated off MySQL last night; Postgres is live.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The staging database runs on MySQL.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p02-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p02-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p03",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Priya leads the mobile team.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Priya handed off to Marcus this week.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Priya leads the mobile team.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p03-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p03-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p04",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The offsite is booked in Lisbon.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Lisbon fell through, so it is Porto.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The offsite is booked in Lisbon.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p04-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p04-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p05",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Our error tracking uses Sentry.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Sentry's contract ended; Rollbar replaces it.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Our error tracking uses Sentry.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p05-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p05-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p06",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The design review is set for Thursday at 3pm.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Thursday 3pm clashes with the all-hands, so Friday 10am it is.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The design review is set for Thursday at 3pm.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p06-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p06-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p07",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The API gateway is Kong.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "We dropped Kong in favor of Envoy.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The API gateway is Kong.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p07-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p07-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p08",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Nightly backups land in bucket archive-east.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "archive-east filled up, so backups go to archive-west from tonight.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Nightly backups land in bucket archive-east.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p08-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p08-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p09",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "On-call alerts page through PagerDuty.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Opsgenie wakes people up from now on.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "On-call alerts page through PagerDuty.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p09-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p09-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p10",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Release 4.2 ships on the 14th.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "4.2 slipped a week, now the 21st.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Release 4.2 ships on the 14th.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p10-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p10-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p11",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Maya owns the analytics dashboard.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Dev is the new owner there as of today.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Who has the projector remote?",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Maya owns the analytics dashboard.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p11-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p11-session"
+    }
+   ]
+  },
+  {
+   "history_label": "p12",
+   "split": "paraphrase",
+   "message_count": 45,
+   "messages": [
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Our CDN is Fastly.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Snacks are in the kitchen.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "The printer is out of toner again.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Welcome to the new interns!",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Thanks for the quick turnaround.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Heads up: the parking garage closes early.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Cloudflare is serving all static assets now.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Great retro notes, thanks.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "I pushed the formatting fixes.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "The wiki page has the onboarding checklist.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Let me know if the link does not work.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Our CDN is Fastly.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "I'm heading out for the afternoon.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "The build is green again.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Happy birthday to Sam!",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Good morning, everyone.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "The coffee machine on floor two is fixed.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Please remember to submit timesheets.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Nice work on the demo yesterday.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Can someone review my pull request?",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "Lunch is here.",
+     "source_id": "p12-session"
+    },
+    {
+     "role": "user",
+     "content": "I'll be a few minutes late to standup.",
+     "source_id": "p12-session"
+    }
+   ]
+  }
+ ],
+ "queries": [
+  {
+   "query_id": "p01-q1",
+   "history_label": "p01",
+   "split": "paraphrase",
+   "bucket": "names_old_value",
+   "query_text": "Which system carries billing events?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p01-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 31,
+      "end": 37
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Pulsar",
+    "must_not_cite_values": [
+     "Kafka"
+    ]
+   }
+  },
+  {
+   "query_id": "p02-q1",
+   "history_label": "p02",
+   "split": "paraphrase",
+   "bucket": "names_old_value",
+   "query_text": "What does the staging database run on?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p02-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 34,
+      "end": 42
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Postgres",
+    "must_not_cite_values": [
+     "MySQL"
+    ]
+   }
+  },
+  {
+   "query_id": "p03-q1",
+   "history_label": "p03",
+   "split": "paraphrase",
+   "bucket": "names_old_value",
+   "query_text": "Who leads the mobile team?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p03-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 20,
+      "end": 26
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Marcus",
+    "must_not_cite_values": [
+     "Priya"
+    ]
+   }
+  },
+  {
+   "query_id": "p04-q1",
+   "history_label": "p04",
+   "split": "paraphrase",
+   "bucket": "names_old_value",
+   "query_text": "Where is the offsite booked?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p04-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 30,
+      "end": 35
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Porto",
+    "must_not_cite_values": [
+     "Lisbon"
+    ]
+   }
+  },
+  {
+   "query_id": "p05-q1",
+   "history_label": "p05",
+   "split": "paraphrase",
+   "bucket": "names_old_value",
+   "query_text": "Which tool handles error tracking?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p05-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 25,
+      "end": 32
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Rollbar",
+    "must_not_cite_values": [
+     "Sentry"
+    ]
+   }
+  },
+  {
+   "query_id": "p06-q1",
+   "history_label": "p06",
+   "split": "paraphrase",
+   "bucket": "names_old_value",
+   "query_text": "When is the design review?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p06-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 44,
+      "end": 55
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Friday 10am",
+    "must_not_cite_values": [
+     "Thursday at 3pm"
+    ]
+   }
+  },
+  {
+   "query_id": "p07-q1",
+   "history_label": "p07",
+   "split": "paraphrase",
+   "bucket": "names_old_value",
+   "query_text": "Which API gateway do we use?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p07-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 28,
+      "end": 33
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Envoy",
+    "must_not_cite_values": [
+     "Kong"
+    ]
+   }
+  },
+  {
+   "query_id": "p08-q1",
+   "history_label": "p08",
+   "split": "paraphrase",
+   "bucket": "names_old_value",
+   "query_text": "Where do nightly backups land?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p08-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 41,
+      "end": 53
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "archive-west",
+    "must_not_cite_values": [
+     "archive-east"
+    ]
+   }
+  },
+  {
+   "query_id": "p09-q1",
+   "history_label": "p09",
+   "split": "paraphrase",
+   "bucket": "does_not_name_old_value",
+   "query_text": "Which tool sends on-call alerts?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p09-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 0,
+      "end": 8
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Opsgenie",
+    "must_not_cite_values": [
+     "PagerDuty"
+    ]
+   }
+  },
+  {
+   "query_id": "p10-q1",
+   "history_label": "p10",
+   "split": "paraphrase",
+   "bucket": "does_not_name_old_value",
+   "query_text": "When does release 4.2 ship?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p10-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 28,
+      "end": 32
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "21st",
+    "must_not_cite_values": [
+     "14th"
+    ]
+   }
+  },
+  {
+   "query_id": "p11-q1",
+   "history_label": "p11",
+   "split": "paraphrase",
+   "bucket": "does_not_name_old_value",
+   "query_text": "Who owns the analytics dashboard?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p11-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 0,
+      "end": 3
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Dev",
+    "must_not_cite_values": [
+     "Maya"
+    ]
+   }
+  },
+  {
+   "query_id": "p12-q1",
+   "history_label": "p12",
+   "split": "paraphrase",
+   "bucket": "does_not_name_old_value",
+   "query_text": "Which CDN do we use?",
+   "answerable": true,
+   "required_evidence_units": [
+    {
+     "unit_id": "p12-current",
+     "message_index": 29,
+     "acceptable_span": {
+      "start": 0,
+      "end": 10
+     }
+    }
+   ],
+   "answer_rubric": {
+    "correct_value": "Cloudflare",
+    "must_not_cite_values": [
+     "Fastly"
+    ]
+   }
+  }
+ ]
+}

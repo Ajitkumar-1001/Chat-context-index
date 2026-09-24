@@ -2,7 +2,7 @@
 import { renderEvidenceContext } from "./contextAssembly.js";
 import { VersionConflict } from "./errors.js";
 import { BoundedProvider } from "./provider.js";
-import { RetrievalResult, retrieve, currentCacheGeneration } from "./retrieve.js";
+import { RetrievalResult, retrieveWithLinks, currentCacheGeneration, evidenceRank } from "./retrieve.js";
 import { Message } from "./models.js";
 import { HistoryStore } from "./store.js";
 import { excerptForQuery, queryTerms } from "./relevance.js";
@@ -19,6 +19,8 @@ export interface ContextOptions {
   recentMessages?: number; maxMessages?: number; maxChars?: number; excerptChars?: number;
   mode?: "auto" | "tree" | "lexical"; provider?: BoundedProvider;
   maxTokens?: number; tokenCounter?: (text: string) => number;
+  /** `${messageId}:${sourcePointer}` of a candidate -> newer candidates that restate it (plan-eng-review D15). */
+  links?: Map<string, string[]>;
 }
 
 export function messageItem(message: Message): ContextItem | null {
@@ -50,16 +52,34 @@ export function packContext(candidates: ContextItem[], options: ContextOptions =
     if (!unique.has(key)) unique.set(key, item);
   }
   const selected: ContextItem[] = [];
+  const admitted = new Set<string>(), considered = new Set<string>();
   const terms = queryTerms(options.query ?? "");
   let truncated = 0;
-  for (const item of unique.values()) {
+  const admit = (keys: string[]): boolean => {
+    const items = keys.map(k => unique.get(k)!);
+    const bounded = items.map(item => ({ ...item, excerpt: excerptForQuery(item.excerpt, terms, excerptChars) }));
+    const text = render([...selected, ...bounded]);
+    if (selected.length + bounded.length > maxMessages || Array.from(text).length > maxChars ||
+      (options.tokenCounter && options.tokenCounter(text) > options.maxTokens!)) return false;
+    selected.push(...bounded);
+    keys.forEach(k => admitted.add(k));
+    bounded.forEach((b, i) => { if (b.excerpt !== items[i].excerpt) truncated++; });
+    return true;
+  };
+  // A source with newer restatements is packed with them; when both cannot fit, only the newer ones
+  // are packed, and the source is never packed without them (mirrors memory.py pack_context).
+  for (const key of unique.keys()) {
     if (selected.length >= maxMessages) break;
-    const excerpt = excerptForQuery(item.excerpt, terms, excerptChars);
-    const bounded = { ...item, excerpt };
-    const text = render([...selected, bounded]);
-    if (Array.from(text).length > maxChars || (options.tokenCounter && options.tokenCounter(text) > options.maxTokens!)) continue;
-    selected.push(bounded);
-    if (excerpt !== item.excerpt) truncated++;
+    if (considered.has(key)) continue;
+    const newer = (options.links?.get(key) ?? []).filter(k => unique.has(k) && k !== key);
+    considered.add(key);
+    if (newer.some(k => considered.has(k) && !admitted.has(k))) continue;
+    const pending = newer.filter(k => !admitted.has(k));
+    if (admit([key, ...pending])) { pending.forEach(k => considered.add(k)); continue; }
+    for (const k of [...pending].sort((a, b) => unique.get(b)!.seq - unique.get(a)!.seq)) {
+      considered.add(k);
+      admit([k]);
+    }
   }
   selected.sort((a, b) => a.seq - b.seq);
   const text = render(selected);
@@ -73,13 +93,12 @@ export async function prepareContext(store: HistoryStore, query: string, options
     throw new RangeError("require 0 <= recentMessages <= maxMessages <= 5000");
   }
   packContext([], options); // Validate before spending on navigation.
-  const result = await retrieve(store, query, options.mode ?? "auto", maxMessages, { provider: options.provider });
+  const { result, links } = await retrieveWithLinks(store, query, options.mode ?? "auto", maxMessages, { provider: options.provider });
   const end = result.snapshot.snapshotMaxSeq;
   const recent = recentMessages ? await store.getMessages(Math.max(1, end - recentMessages + 1), end, recentMessages) : [];
   const candidates = recent.reverse().flatMap(messageItems);
   // Retrieval IDs retain selection priority after evidence is rendered chronologically.
-  const ranked = [...result.evidence].sort((a, b) =>
-    Number(a.evidenceId.slice(3)) - Number(b.evidenceId.slice(3)));
+  const ranked = [...result.evidence].sort((a, b) => evidenceRank(a.evidenceId) - evidenceRank(b.evidenceId));
   const groups = new Map<string, typeof ranked>();
   for (const evidence of ranked) {
     const key = JSON.stringify([evidence.contentHash, evidence.sourcePointer]);
@@ -87,13 +106,23 @@ export async function prepareContext(store: HistoryStore, query: string, options
     groups.get(key)!.push(evidence);
   }
   const first: typeof ranked = [], copies: typeof ranked = [];
+  const representative = new Map<string, string>();
+  const packKey = (e: { messageId: string; sourcePointer: string }) => `${e.messageId}:${e.sourcePointer}`;
   for (const group of groups.values()) {
     const original = group.reduce((a, b) => a.seq <= b.seq ? a : b);
     first.push(original);
     copies.push(...group.filter(evidence => evidence !== original));
+    for (const evidence of group) representative.set(JSON.stringify([evidence.messageId, evidence.sourcePointer]), packKey(original));
   }
   candidates.push(...[...first, ...copies].map(e => ({ messageId: e.messageId, seq: e.seq, sourcePointer: e.sourcePointer, excerpt: e.excerpt })));
-  const context = packContext(candidates, { ...options, query });
+  // A copy's newer statement also governs the copy chosen to represent it.
+  const packLinks = new Map<string, string[]>();
+  for (const [source, newer] of links) {
+    const from = representative.get(source)!, targets = packLinks.get(from) ?? [];
+    for (const k of newer) { const to = representative.get(k)!; if (!targets.includes(to)) targets.push(to); }
+    packLinks.set(from, targets);
+  }
+  const context = packContext(candidates, { ...options, query, links: packLinks });
   if (await currentCacheGeneration(store) !== result.snapshot.cacheGeneration) throw new VersionConflict("history was cleared while preparing conversation context");
   return { ...context, retrieval: result };
 }

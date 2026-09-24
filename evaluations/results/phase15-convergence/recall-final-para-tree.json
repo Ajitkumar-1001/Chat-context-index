@@ -1,0 +1,46 @@
+{
+  "bar": {
+    "names_old_value_recall": {
+      "floor": 0.8,
+      "pass": true,
+      "value": 1.0
+    },
+    "vs_baseline": {
+      "baseline": "<scratch>/venv-base/lib/python3.12/site-packages/cci/__init__.py",
+      "min": 0.0,
+      "pass": true,
+      "value": 0.5833333333333334
+    }
+  },
+  "bar_pass": true,
+  "bucket_context_recall": {
+    "does_not_name_old_value": 0.25,
+    "names_old_value": 1.0
+  },
+  "cci_module_path": "<scratch>/venv-c3/lib/python3.12/site-packages/cci/__init__.py",
+  "context": {
+    "excerpt_chars": 200,
+    "max_chars": 4000,
+    "max_messages": 8,
+    "recent_messages": 4
+  },
+  "context_recall": 0.75,
+  "context_recall_strict": 0.75,
+  "correction_cases": 12,
+  "correction_context_recall": 0.75,
+  "fixture": "evaluations/paraphrase/fixture.json",
+  "misses": [
+    "p09-q1",
+    "p11-q1",
+    "p12-q1"
+  ],
+  "mode": "tree",
+  "queries": 12,
+  "retrieval_recall": 1.0,
+  "split": "paraphrase",
+  "stale_only_contexts": [
+    "p09-q1",
+    "p11-q1",
+    "p12-q1"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "bar": {
+    "names_old_value_recall": {
+      "floor": 0.8,
+      "pass": false,
+      "value": 0.125
+    }
+  },
+  "bar_pass": false,
+  "bucket_context_recall": {
+    "does_not_name_old_value": 0.25,
+    "names_old_value": 0.125
+  },
+  "cci_module_path": "<scratch>/venv-base/lib/python3.12/site-packages/cci/__init__.py",
+  "context": {
+    "excerpt_chars": 200,
+    "max_chars": 4000,
+    "max_messages": 8,
+    "recent_messages": 4
+  },
+  "context_recall": 0.16666666666666666,
+  "context_recall_strict": 0.16666666666666666,
+  "correction_cases": 12,
+  "correction_context_recall": 0.16666666666666666,
+  "fixture": "evaluations/paraphrase/fixture.json",
+  "misses": [
+    "p01-q1",
+    "p02-q1",
+    "p03-q1",
+    "p04-q1",
+    "p05-q1",
+    "p06-q1",
+    "p07-q1",
+    "p09-q1",
+    "p11-q1",
+    "p12-q1"
+  ],
+  "mode": "lexical",
+  "queries": 12,
+  "retrieval_recall": 0.16666666666666666,
+  "split": "paraphrase",
+  "stale_only_contexts": [
+    "p01-q1",
+    "p02-q1",
+    "p03-q1",
+    "p04-q1",
+    "p05-q1",
+    "p06-q1",
+    "p07-q1",
+    "p09-q1",
+    "p11-q1",
+    "p12-q1"
+  ]
+}

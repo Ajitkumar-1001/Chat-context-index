@@ -1,0 +1,45 @@
+{
+  "bar": {
+    "context_recall": {
+      "floor": 0.85,
+      "pass": true,
+      "value": 1.0
+    },
+    "correction_context_recall": {
+      "floor": 0.85,
+      "pass": true,
+      "value": 1.0
+    },
+    "stale_only_contexts": {
+      "max": 0,
+      "pass": true,
+      "value": 0
+    },
+    "vs_baseline": {
+      "baseline": "<scratch>/venv-base/lib/python3.12/site-packages/cci/__init__.py",
+      "min": -0.02,
+      "pass": true,
+      "value": 0.0
+    }
+  },
+  "bar_pass": true,
+  "bucket_context_recall": {},
+  "cci_module_path": "<scratch>/venv-c3/lib/python3.12/site-packages/cci/__init__.py",
+  "context": {
+    "excerpt_chars": 200,
+    "max_chars": 4000,
+    "max_messages": 8,
+    "recent_messages": 4
+  },
+  "context_recall": 1.0,
+  "context_recall_strict": 1.0,
+  "correction_cases": 41,
+  "correction_context_recall": 1.0,
+  "fixture": "evaluations/held_out/fixture.json",
+  "misses": [],
+  "mode": "tree",
+  "queries": 60,
+  "retrieval_recall": 1.0,
+  "split": "dev",
+  "stale_only_contexts": []
+}
