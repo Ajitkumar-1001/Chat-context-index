@@ -250,3 +250,14 @@ node_modules/
 *.sqlite-*
 *.db
 *.db-*
+
+# Provider attempt journals and allocation/administration records stay local.
+evaluations/results/production-readiness-20260924/accounting.json
+evaluations/results/production-readiness-20260924/provider-readiness.json
+evaluations/results/production-readiness-20260924/live-smoke*/
+evaluations/results/production-readiness-20260924/control-requests/
+evaluations/results/production-readiness-20260924/release-*-applied.json
+
+# Astro generated types (website/)
+.astro/
+.gstack/

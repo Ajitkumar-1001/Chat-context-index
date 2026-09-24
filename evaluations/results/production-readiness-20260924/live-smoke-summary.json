@@ -1,0 +1,23 @@
+{
+  "status": "INCOMPLETE",
+  "scope": "One installed-package development smoke; no held-out trial or cost-saving claim",
+  "started_at_utc": "2026-09-24T18:06:28.223929+00:00",
+  "completed_at_utc": "2026-09-24T18:06:48.250087+00:00",
+  "wheel_sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0",
+  "real_provider": true,
+  "provider": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "attempts": 1,
+  "call_timeout_s": 20.0,
+  "error_type": "CancelledError",
+  "http_status": null,
+  "stop_reason": "request_interrupted_usage_unknown",
+  "actual_input_tokens": null,
+  "actual_output_tokens": null,
+  "usage_unknown": true,
+  "known_attempt_reservation_tokens": 1061,
+  "retry_performed": false,
+  "allocation_reusable": false,
+  "private_report_sha256": "bda1c68617938d3822e769c45a2884b767c47f4c7e41a97f854765e074c8929d",
+  "note": "The request timed out; exhausted quota is not established. Missing usage is not treated as zero cost."
+}

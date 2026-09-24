@@ -5,6 +5,11 @@
   "type": "module",
   "description": "cci: persistent, retrievable conversation memory for AI applications (TypeScript native parity)",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ajitkumar-1001/Chat-context-index.git",
+    "directory": "packages/typescript"
+  },
   "engines": { "node": ">=22" },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

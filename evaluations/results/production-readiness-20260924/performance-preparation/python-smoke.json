@@ -1,0 +1,131 @@
+{
+  "concurrency": {
+    "ingest_100_ms": {
+      "16": {
+        "errors": 0,
+        "p50": 91.54254198074341,
+        "p95": 152.7212499640882,
+        "throughput_messages_per_s": 9576.11001661865,
+        "trials": 32
+      },
+      "4": {
+        "errors": 0,
+        "p50": 27.286041993647814,
+        "p95": 41.29891702905297,
+        "throughput_messages_per_s": 9461.40810441132,
+        "trials": 32
+      }
+    },
+    "search_top8_ms": {
+      "1": {
+        "errors": 0,
+        "p50": 6.808375008404255,
+        "p95": 8.59208288602531,
+        "throughput_per_s": 143.50509403944548,
+        "trials": 20
+      },
+      "16": {
+        "errors": 0,
+        "p50": 92.71470783278346,
+        "p95": 117.47462511993945,
+        "throughput_per_s": 133.42472917140515,
+        "trials": 20
+      },
+      "4": {
+        "errors": 0,
+        "p50": 27.35079196281731,
+        "p95": 36.63866710849106,
+        "throughput_per_s": 124.68241672656706,
+        "trials": 20
+      }
+    }
+  },
+  "environment": {
+    "apsw_version": "3.53.4.0",
+    "artifact": null,
+    "cache_backend": "sqlite",
+    "cci_module_path": "/private/tmp/cci-preflight-20260924/lib/python3.12/site-packages/cci/__init__.py",
+    "cpu_count": 14,
+    "dedicated_linux_runner": false,
+    "filesystem_cold": "NOT RUN",
+    "label": "benchmark-helper-validation-not-reference",
+    "machine": "arm64",
+    "physical_memory_bytes": 25769803776,
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "sqlite_library_version": "3.53.4"
+  },
+  "fixture": {
+    "batch_size": 100,
+    "seed": 7,
+    "total_messages": 1000
+  },
+  "fixture_stats": {
+    "generation_s": 0.139991584001109,
+    "message_bytes_avg": 905.882,
+    "message_bytes_max": 1592,
+    "reference_fixture": false,
+    "store_bytes_after_generation": 8082376
+  },
+  "process_cold": {
+    "first_search_top8_ms": {
+      "p50": 7.413042010739446,
+      "p95": 8.2504169549793,
+      "trials": 2
+    },
+    "import_ms": {
+      "p50": 24.094667052850127,
+      "p95": 26.06220915913582,
+      "trials": 2
+    },
+    "peak_rss_bytes_max": 32653312,
+    "raw_trials": [
+      {
+        "first_search_ms": 8.2504169549793,
+        "import_ms": 26.06220915913582,
+        "observed_messages": 1000,
+        "open_ms": 1.3579579535871744,
+        "ru_maxrss": 32358400
+      },
+      {
+        "first_search_ms": 7.413042010739446,
+        "import_ms": 24.094667052850127,
+        "observed_messages": 1000,
+        "open_ms": 1.3872911222279072,
+        "ru_maxrss": 32653312
+      }
+    ],
+    "store_open_ms": {
+      "p50": 1.3579579535871744,
+      "p95": 1.3872911222279072,
+      "trials": 2
+    },
+    "total_messages": 1000
+  },
+  "resources": {
+    "peak_rss_bytes": 48201728
+  },
+  "results": {
+    "batch_ingest_100_ms": {
+      "p50": 10.23424998857081,
+      "p95": 17.18745892867446,
+      "pass": true,
+      "threshold_p95_ms": 500,
+      "trials": 10
+    },
+    "lexical_search_top8_ms": {
+      "p50": 6.808375008404255,
+      "p95": 8.59208288602531,
+      "pass": true,
+      "threshold_p95_ms": 100,
+      "trials": 20
+    },
+    "store_open_ms": {
+      "p50": 0.7822499610483646,
+      "p95": 1.015417044982314,
+      "pass": true,
+      "threshold_p95_ms": 2000,
+      "trials": 20
+    }
+  }
+}

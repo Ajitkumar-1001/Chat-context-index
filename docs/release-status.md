@@ -1,10 +1,15 @@
 # Release status — September 24, 2026 UTC
 
 Release is **blocked**. Local regression, package installation, cross-language checks, and all
-16 hosted package combinations pass for the 0.1.0 candidate. Reference performance, live
-quality and cost evidence, and developer adoption remain open. PyPI and npm returned 404 for
+16 hosted package combinations passed for the preceding 0.1.0 candidate. The new release
+hardening and npm metadata change have fresh local checks; their hosted validation is pending.
+Reference performance, live quality/cost evidence, and developer adoption remain open. PyPI and npm returned 404 for
 version 0.1.0 at this check. A GitHub [prerelease](https://github.com/Ajitkumar-1001/Chat-context-index/releases/tag/pre-release)
 exists without assets; it did not run the tag-triggered registry release workflow.
+
+The [production-readiness execution record](../evaluations/results/production-readiness-20260924/README.md)
+tracks the current work, including protected releases, exact-artifact publication checks,
+security scanning, prepared reference/human validation, and a failed bounded capacity attempt.
 
 | Gate | Current evidence |
 | --- | --- |
@@ -13,11 +18,12 @@ exists without assets; it did not run the tag-triggered registry release workflo
 | Static checks | Ruff and mypy passed for the Python package |
 | Cross-language retrieval | Shared fixture compares ordered `search()`, `retrieve()`, and prepared context output, including correction and duplicate cases |
 | Cache failure accounting | Python `stats()` reports Redis errors and SQLite fallback lookups/hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend |
-| Fresh local packages | Wheel, source distribution, and npm tarball rebuilt and installed outside the checkout; all nine writer/reader combinations, TypeScript consumer typecheck, package documentation, and default operation passed. [Current report](../evaluations/results/release-readiness/package-memory-20260924.json) |
+| Fresh local packages | Wheel, source distribution, and npm tarball rebuilt and installed outside the checkout after npm repository metadata changed; all nine writer/reader combinations, TypeScript consumer typecheck, package documentation, and default operation passed. [Current report](../evaluations/results/production-readiness-20260924/release-controls/package-memory.json) |
 | Hosted matrix | **Passed:** all 16 Python 3.11–3.14 / Node 22 and 24 / Ubuntu x64 and macOS arm64 package combinations passed with nine writer/reader checks each. Every cell produced the same wheel, sdist, and npm archive hashes as the local package report. [Per-cell evidence](../evaluations/results/release-readiness/hosted-ci-20260924.json), [PR run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36034703337), [merged-main run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36034722343) |
 | Reference performance | **Not run.** Updated installed packages meet the three warm single-request thresholds in [local macOS runs](benchmark-reproduction.md), but Python's process-cold first-search p95 was 112.6 ms and search latency grows at higher concurrency. The dedicated Linux x64 runner, filesystem-cold pass, and scale point remain outstanding |
-| Installed-package live smoke | **Blocked by provider capacity.** The preceding candidate encountered HTTP 429 during indexing; capacity and usage accounting for the current artifacts are unverified |
+| Installed-package live smoke | **INCOMPLETE:** the first attempt timed out; a separately allocated 60-second follow-up recorded 151 input/66 output tokens from two indexing calls before HTTP 503 on the third. Retrieval was not reached. Both failed calls retain unknown-usage reservations; no further generation requests were made. [Latest attempt](../evaluations/results/production-readiness-20260924/live-smoke-extended-summary.json) |
 | Quality, cost, human review | **Not run for these artifacts.** Three frozen trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open |
+| Release protection | GitHub owner approval and tag-only deployment policy configured on `release`; active ruleset protects `v*` tags. Exact-archive workflow and final source-approval gate implemented; registry ownership/trusted publisher setup and final approval remain open |
 
 The package report records fresh source and archive SHA-256 values. It tests deterministic
 memory behavior with no model calls, so it establishes installation and cross-runtime
@@ -36,7 +42,7 @@ Run the local checks with Python development and Redis dependencies installed, n
 installed, and Docker available for the disposable Redis tests:
 
 ```bash
-python -m pytest -q tests/conformance tests/memory tests/examples tests/evaluations
+python -m pytest -q tests/conformance tests/memory tests/examples tests/evaluations tests/benchmarks tests/release
 node --test tests/memory/*.test.mjs
 python -m ruff check packages/python/src/cci
 python -m mypy --config-file packages/python/pyproject.toml packages/python/src/cci --ignore-missing-imports

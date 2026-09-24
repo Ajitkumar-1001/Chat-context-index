@@ -1,0 +1,557 @@
+---
+import { Code } from 'astro:components';
+// Only committed (git-tracked) evidence files are imported; the page is rebuilt from them.
+import hosted from '../../../evaluations/results/release-readiness/hosted-ci-20260924.json';
+import packages from '../../../evaluations/results/release-readiness/package-memory-20260924.json';
+import perfPy from '../../../evaluations/results/release-readiness/performance-macos-20260924.json';
+import perfTs from '../../../evaluations/results/release-readiness/performance-typescript-macos-20260924.json';
+import preflight from '../../../evaluations/results/release-readiness/preflight-20260924.json';
+import recallLexical from '../../../evaluations/results/release-readiness/dev-recall-lexical-20260924.json';
+import recallTree from '../../../evaluations/results/release-readiness/dev-recall-tree-20260924.json';
+
+const repo = 'https://github.com/Ajitkumar-1001/Chat-context-index';
+const blob = `${repo}/blob/main`;
+// Gate wording mirrors docs/release-status.md; update both together.
+const asOf = 'September 24, 2026 (UTC)';
+
+type Status = 'pass' | 'open' | 'blocked';
+const statusLabel: Record<Status, string> = { pass: 'Passed', open: 'Not run', blocked: 'Blocked' };
+
+const ms = (n: number) => `${n.toFixed(1)} ms`;
+const pct = (n: number) => `${Math.round(n * 100)}%`;
+const minor = (v: string) => v.split('.').slice(0, 2).join('.');
+const major = (v: string) => v.replace(/^v/, '').split('.')[0];
+
+const gates: { name: string; status: Status; evidence: string; href?: string }[] = [
+  { name: 'Python regression', status: 'pass', evidence: '224 tests passed locally on macOS arm64 / Python 3.12.11, including disposable Redis and clean-install tests.' },
+  { name: 'TypeScript regression', status: 'pass', evidence: '21 native memory tests passed; the TypeScript build passed on Node 22.23.1.' },
+  { name: 'Static checks', status: 'pass', evidence: 'Ruff and mypy passed for the Python package.' },
+  { name: 'Cross-language retrieval', status: 'pass', evidence: 'A shared fixture compares ordered search(), retrieve(), and prepared-context output across runtimes, including correction and duplicate cases.' },
+  { name: 'Cache failure accounting', status: 'pass', evidence: 'Python stats() reports Redis errors and SQLite fallback lookups and hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend.' },
+  { name: 'Fresh local packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${blob}/evaluations/results/release-readiness/package-memory-20260924.json` },
+  { name: 'Hosted package matrix', status: 'pass', evidence: `All ${hosted.matrix_cells_passed} Python 3.11–3.14 × Node 22/24 × Ubuntu x64/macOS arm64 cells passed and reproduced the local archive hashes.`, href: `${repo}/actions/runs/${hosted.main_ci_run_id}` },
+  { name: 'Reference performance', status: 'open', evidence: 'Local macOS runs meet the three warm single-request thresholds. The dedicated Linux x64 runner, filesystem-cold pass, and scale point are outstanding.' },
+  { name: 'Installed-package live smoke', status: 'blocked', evidence: `Preflight passed with ${preflight.provider_calls} provider calls but is not execution-ready: ${preflight.reason_not_ready}` },
+  { name: 'Quality, cost, and human review', status: 'open', evidence: 'Three frozen held-out trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open.' },
+];
+
+const pythons = [...new Set(hosted.cells.map((c) => minor(c.python)))];
+const matrixRows = [...new Set(hosted.cells.map((c) => `${c.os} ${c.machine}|${major(c.node)}`))].map((key) => {
+  const [platform, node] = key.split('|');
+  return {
+    platform,
+    node,
+    cells: pythons.map((py) =>
+      hosted.cells.find((c) => `${c.os} ${c.machine}` === platform && major(c.node) === node && minor(c.python) === py),
+    ),
+  };
+});
+
+const roles: Record<string, string> = { python: 'Python wheel', python_sdist: 'Python sdist', typescript: 'npm archive' };
+const writers = [...new Set(packages.checks.map((c) => c.writer))];
+const readers = [...new Set(packages.checks.map((c) => c.reader))];
+const checkStatus = (w: string, r: string) => packages.checks.find((c) => c.writer === w && c.reader === r)?.status;
+
+const perfRows = [
+  ['store_open_ms', 'Open the store'],
+  ['batch_ingest_100_ms', 'Ingest a 100-message batch'],
+  ['lexical_search_top8_ms', 'Lexical search, top 8'],
+] as const;
+
+const pythonInstall = `git clone ${repo}.git
+cd Chat-context-index
+python3 -m venv .venv
+.venv/bin/python -m pip install -e ./packages/python
+.venv/bin/python examples/python/brand_memory.py`;
+
+const typescriptInstall = `cd packages/typescript
+npm ci && npm run build && npm pack
+# then, in your application:
+npm install /path/to/chat-context-index-0.1.0.tgz`;
+
+const pythonUsage = `import asyncio
+
+from cci import HistoryStore
+from cci.config import Config
+from cci.ingest import ingest
+from cci.models import InputMessage
+from cci.retrieve import retrieve
+
+
+async def main():
+    async with await HistoryStore.open(
+        "memory.sqlite", config=Config(cache_backend="none")
+    ) as memory:
+        await ingest(
+            memory,
+            memory.history_id,
+            [InputMessage(
+                external_id="preference-001",
+                role="user",
+                content="Use UTC for all scheduled reports.",
+            )],
+            source_id="assistant-app",
+            idempotency_key="turn-001",
+        )
+        result = await retrieve(memory, "UTC", mode="lexical")
+        for evidence in result.evidence:
+            print(evidence.message_id, evidence.excerpt)
+
+
+asyncio.run(main())`;
+
+const typescriptUsage = `import { HistoryStore, ingest, prepareContext } from "chat-context-index";
+
+const memory = await HistoryStore.open("conversation.db", { cacheBackend: "none" });
+try {
+  await ingest(memory, memory.historyId,
+    [{ role: "user", content: "Deploy the service in Oslo." }], "chat", "turn-1");
+} finally { await memory.close(); }
+
+// This can run in a later process using the same durable file.
+const resumed = await HistoryStore.open("conversation.db", { cacheBackend: "none" });
+try {
+  const context = await prepareContext(resumed, "Oslo", { maxChars: 2000 });
+  console.log(context.text); // Pass alongside your instructions, documents, and question.
+} finally { await resumed.close(); }`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>chat-context-index 0.1.0 release status</title>
+    <meta
+      name="description"
+      content="Release status, evidence, and known limitations for the chat-context-index 0.1.0 candidate (Python and TypeScript)."
+    />
+  </head>
+  <body>
+    <header class="wrap hero">
+      <p class="eyebrow">Release document · status as of {asOf}</p>
+      <h1>chat-context-index <span class="version">0.1.0</span></h1>
+      <p class="lede">
+        Persistent conversation memory for RAG chats and agents, with bounded tree retrieval.
+        Python (<code>cci</code>) and native TypeScript packages read and write the same SQLite history.
+      </p>
+      <div class="callout" role="note">
+        <p>
+          <span class="pill blocked">Release blocked</span>
+          The candidate passes local regression, package installation, cross-language checks, and all
+          {hosted.matrix_cells_passed} hosted package combinations. Reference performance, live quality and
+          cost evidence, and developer adoption remain open.
+        </p>
+        <p>
+          Nothing is published yet: PyPI and npm return 404 for 0.1.0, and the
+          <a href={`${repo}/releases/tag/pre-release`}>GitHub prerelease</a> has no assets.
+        </p>
+      </div>
+      <nav aria-label="Sections">
+        <a href="#summary">Summary</a>
+        <a href="#gates">Gates</a>
+        <a href="#compatibility">Compatibility</a>
+        <a href="#performance">Performance</a>
+        <a href="#quality">Quality</a>
+        <a href="#install">Try it</a>
+        <a href="#limits">Limits</a>
+        <a href="#artifacts">Artifacts</a>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <section id="summary">
+        <h2>What 0.1.0 contains</h2>
+        <p>
+          ContIndex gives an existing RAG chat or agent loop persistent conversation memory. The host keeps its
+          document retriever, model, and agent framework; the library supplies conversation context through
+          <code>prepare_context()</code> in Python and <code>prepareContext()</code> in TypeScript.
+        </p>
+        <div class="table">
+          <table>
+            <thead>
+              <tr><th scope="col">Responsibility</th><th scope="col">Approach</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Preserve</th><td>Original payloads, source identities, ordering, and replayable ingestion receipts in SQLite.</td></tr>
+              <tr><th scope="row">Index</th><td>Explicit incremental chunk summaries and a bounded parent/child hierarchy; unchanged branches reuse summaries.</td></tr>
+              <tr><th scope="row">Retrieve</th><td>Bounded model-guided tree navigation with FTS5 fallback. Only original messages become evidence.</td></tr>
+              <tr><th scope="row">Prepare context</th><td>Recent messages plus retrieved sources under record, character, and optional tokenizer limits.</td></tr>
+              <tr><th scope="row">Answer</th><td>Optional <code>ask()</code> synthesizes from retrieved evidence and checks citations through a supplied provider.</td></tr>
+              <tr><th scope="row">Inspect</th><td>Python APIs and a <code>cci</code> CLI for reading, exporting, importing, clearing, and inspecting histories.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="gates">
+        <h2>Release gates</h2>
+        <p class="muted">
+          Mirrors <a href={`${blob}/docs/release-status.md`}>docs/release-status.md</a>. Candidate built from
+          <a href={`${repo}/commit/${hosted.main_merge_sha}`}><code>{hosted.main_merge_sha.slice(0, 7)}</code></a>
+          (PR <a href={`${repo}/pull/${hosted.pull_request}`}>#{hosted.pull_request}</a>).
+        </p>
+        <div class="table">
+          <table class="stack">
+            <thead>
+              <tr><th scope="col">Gate</th><th scope="col">Status</th><th scope="col">Evidence</th></tr>
+            </thead>
+            <tbody>
+              {gates.map((g) => (
+                <tr>
+                  <th scope="row">{g.name}</th>
+                  <td><span class={`pill ${g.status}`}>{statusLabel[g.status]}</span></td>
+                  <td>
+                    {g.evidence}
+                    {g.href && <a class="more" href={g.href}>Evidence</a>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="compatibility">
+        <h2>Compatibility</h2>
+        <p>
+          Python 3.11–3.14 (SQLite through <code>apsw</code> 3.53.4.0) and Node.js 22 or later (ESM,
+          <code>better-sqlite3</code>). Redis is optional and Python-only. Supported topology: one owning
+          application process per history on durable local storage.
+        </p>
+
+        <h3>Hosted package matrix</h3>
+        <p class="muted">
+          Each cell installs the wheel, sdist, and npm archive and runs {hosted.cells[0]?.writer_reader_checks}
+          writer/reader checks. <a href={`${repo}/actions/runs/${hosted.pull_request_ci_run_id}`}>PR run</a> ·
+          <a href={`${repo}/actions/runs/${hosted.main_ci_run_id}`}>main run</a>
+        </p>
+        <div class="table">
+          <table class="matrix">
+            <thead>
+              <tr>
+                <th scope="col">Runner</th>
+                <th scope="col">Node</th>
+                {pythons.map((py) => <th scope="col">Python {py}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {matrixRows.map((row) => (
+                <tr>
+                  <th scope="row"><code>{row.platform}</code></th>
+                  <td>{row.node}</td>
+                  {row.cells.map((c) =>
+                    c ? (
+                      <td>
+                        <span class={`pill ${c.status === 'PASS' ? 'pass' : 'blocked'}`}>
+                          {c.status === 'PASS' ? 'Pass' : c.status}
+                        </span>
+                        <span class="sub">{c.python} · {c.node}</span>
+                      </td>
+                    ) : (
+                      <td>—</td>
+                    ),
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {hosted.limits.map((l) => <p class="note">{l}</p>)}
+
+        <h3>Cross-runtime history files</h3>
+        <p class="muted">
+          Fresh installs outside the checkout, separate write and read processes, {packages.platform}, Python
+          {packages.python}, Node {packages.node}.
+        </p>
+        <div class="table">
+          <table class="matrix">
+            <thead>
+              <tr>
+                <th scope="col">Writer ↓ / Reader →</th>
+                {readers.map((r) => <th scope="col">{roles[r] ?? r}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {writers.map((w) => (
+                <tr>
+                  <th scope="row">{roles[w] ?? w}</th>
+                  {readers.map((r) => {
+                    const s = checkStatus(w, r);
+                    return (
+                      <td>
+                        <span class={`pill ${s === 'PASS' ? 'pass' : 'blocked'}`}>{s === 'PASS' ? 'Pass' : (s ?? 'Missing')}</span>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Not measured by these checks: {packages.not_measured.join(', ')}.</p>
+      </section>
+
+      <section id="performance">
+        <h2>Performance</h2>
+        <p class="muted">
+          Installed candidate packages on a local {perfPy.environment.platform} machine, using a
+          {perfPy.fixture.total_messages.toLocaleString('en-US')}-message reference fixture. This is not the
+          reference run.
+        </p>
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Operation (p95)</th>
+                <th scope="col" class="num">Python</th>
+                <th scope="col" class="num">TypeScript</th>
+                <th scope="col" class="num">Threshold</th>
+              </tr>
+            </thead>
+            <tbody>
+              {perfRows.map(([key, label]) => {
+                const py = perfPy.results[key];
+                const ts = perfTs.results[key];
+                return (
+                  <tr>
+                    <th scope="row">{label}</th>
+                    <td class="num">{ms(py.p95)} <span class={`pill ${py.pass ? 'pass' : 'blocked'}`}>{py.pass ? 'Pass' : 'Fail'}</span></td>
+                    <td class="num">{ms(ts.p95)} <span class={`pill ${ts.pass ? 'pass' : 'blocked'}`}>{ts.pass ? 'Pass' : 'Fail'}</span></td>
+                    <td class="num">{py.threshold_p95_ms.toLocaleString('en-US')} ms</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <ul class="notes">
+          <li>
+            Process-cold first search p95: Python {ms(perfPy.process_cold.first_search_top8_ms.p95)}, TypeScript
+            {ms(perfTs.process_cold.first_search_top8_ms.p95)}.
+          </li>
+          <li>
+            Search latency grows with concurrency: at 16 concurrent requests, p95 is Python
+            {ms(perfPy.concurrency.search_top8_ms['16'].p95)} and TypeScript {ms(perfTs.concurrency.search_top8_ms['16'].p95)}.
+          </li>
+          <li>
+            Dedicated Linux runner: {perfPy.environment.dedicated_linux_runner ? 'yes' : 'no'}. Filesystem-cold
+            pass: {perfPy.environment.filesystem_cold}.
+          </li>
+        </ul>
+      </section>
+
+      <section id="quality">
+        <h2>Retrieval quality</h2>
+        <h3>Development recall (no model calls)</h3>
+        <div class="stats">
+          {[recallLexical, recallTree].map((r) => (
+            <div class="stat">
+              <p class="stat-label">{r.mode} mode · {r.queries} {r.split} queries</p>
+              <p class="stat-value">{pct(r.retrieval_recall)} <span>retrieval</span></p>
+              <p class="stat-value">{pct(r.context_recall)} <span>context</span></p>
+            </div>
+          ))}
+        </div>
+        <p class="note">
+          Development split only; this is iteration evidence, not release evidence. Tree mode uses a stub navigator
+          that keeps every offered node, so it measures evidence loss after perfect navigation, not real navigation
+          quality.
+        </p>
+
+        <h3>Earlier real-model comparison (previous artifacts)</h3>
+        <p class="muted">
+          Previous Python wheel with <code>gemini-3.5-flash-lite</code>; required original evidence recovered in each
+          of two completed trials, out of 32 answerable cases.
+        </p>
+        <div class="table">
+          <table>
+            <thead>
+              <tr><th scope="col">Strategy</th><th scope="col" class="num">Recovered</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Full conversation history</th><td class="num">32 / 32</td></tr>
+              <tr><th scope="row">Recent plus lexical memory</th><td class="num">0 / 32</td></tr>
+              <tr><th scope="row">Tree memory, default context limits</th><td class="num">1 / 32</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">
+          The third trial and answer review stopped after repeated HTTP 429 responses. These results do not support a
+          lower-cost claim and must be rerun against the fixed evidence selection before release.
+          <a href={`${blob}/evaluations/held_out/reports/README.md`}>Full report</a>
+        </p>
+      </section>
+
+      <section id="install">
+        <h2>Try the candidate from source</h2>
+        <p>Registry installs will not work until the release gates close. Build locally instead.</p>
+        <h3>Python</h3>
+        <Code code={pythonInstall} lang="bash" />
+        <Code code={pythonUsage} lang="python" />
+        <h3>TypeScript</h3>
+        <Code code={typescriptInstall} lang="bash" />
+        <Code code={typescriptUsage} lang="ts" />
+        <p class="muted">
+          Without a provider, retrieval uses local keyword search. For tree retrieval, build the index with an
+          explicitly supplied provider. Importing either package makes no model calls. More:
+          <a href={`${blob}/docs/quickstart-no-redis.md`}>local cache</a>,
+          <a href={`${blob}/docs/quickstart-redis.md`}>Redis cache</a>,
+          <a href={`${blob}/examples/python/rag_chat.py`}>Python RAG chat</a>,
+          <a href={`${blob}/examples/typescript/rag-chat.mjs`}>TypeScript RAG chat</a>.
+        </p>
+      </section>
+
+      <section id="limits">
+        <h2>Known limitations</h2>
+        <ul>
+          <li>One owning application process per history on durable local storage. Serverless or distributed deployments need a separate storage design.</li>
+          <li>Local ranking uses light English inflections and can miss paraphrases. Correction priority is a lexical heuristic that can miss implicit changes or link an unrelated revision.</li>
+          <li>Answer quality and automatic conflict resolution are unverified.</li>
+          <li>Context is historical text. The host keeps execution checkpoints, pending tool work, and side-effect replay rules; memory cannot restart an interrupted executor.</li>
+          <li>Total cost includes indexing, updates, navigation, and answering. Shorter final context alone does not prove savings.</li>
+          <li>The host owns authentication, authorization, user-to-history mapping, and scheduling.</li>
+          <li>The TypeScript runtime has no model-call memoization backend.</li>
+        </ul>
+      </section>
+
+      <section id="artifacts">
+        <h2>Candidate artifacts</h2>
+        <p class="muted">
+          SHA-256 of the archives verified in every hosted cell. These files are not published; the hashes identify
+          the tested build.
+        </p>
+        <div class="table">
+          <table>
+            <thead>
+              <tr><th scope="col">File</th><th scope="col">SHA-256</th></tr>
+            </thead>
+            <tbody>
+              {Object.entries(hosted.artifact_sha256).map(([file, sha]) => (
+                <tr><th scope="row"><code>{file}</code></th><td><code class="hash">{sha}</code></td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap">
+      <p>
+        <a href={repo}>Source</a> · <a href={`${blob}/LICENSE`}>Apache License 2.0</a> ·
+        <a href={`${blob}/UPSTREAM.md`}>Upstream attribution</a> (derived from VectifyAI/ChatIndex; not endorsed by
+        VectifyAI).
+      </p>
+      <p class="muted">Figures on this page are read from the committed evidence files at build time.</p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #fbfbf9;
+    --surface: #ffffff;
+    --fg: #1c1d1f;
+    --muted: #5b5f66;
+    --border: #e3e3de;
+    --accent: #2451b5;
+    --pass: #17663a;
+    --pass-bg: #e3f4e8;
+    --open: #8a5300;
+    --open-bg: #fbefd9;
+    --blocked: #a1261d;
+    --blocked-bg: #fbe4e1;
+    --code-bg: #f1f1ec;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121315;
+      --surface: #1a1b1e;
+      --fg: #e8e8e6;
+      --muted: #a0a3a9;
+      --border: #2d2f33;
+      --accent: #8fb0ff;
+      --pass: #7fd99f;
+      --pass-bg: #173222;
+      --open: #f3c075;
+      --open-bg: #3a2a10;
+      --blocked: #ff9d93;
+      --blocked-bg: #3f1a17;
+      --code-bg: #232428;
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 16px; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  :not(pre) > code { font-size: 0.9em; background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+
+  .hero { padding-top: 56px; padding-bottom: 8px; }
+  .eyebrow { color: var(--muted); font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; margin: 0; }
+  h1 { font-size: clamp(2rem, 6vw, 2.9rem); line-height: 1.1; margin: 8px 0 12px; letter-spacing: -0.02em; }
+  .version { color: var(--muted); font-weight: 500; }
+  .lede { font-size: 1.15rem; color: var(--muted); max-width: 62ch; margin: 0 0 24px; }
+  .callout { border: 1px solid var(--border); border-left: 4px solid var(--blocked); background: var(--surface); border-radius: 8px; padding: 4px 20px; }
+  nav { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 28px 0 0; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  nav a { text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+
+  section { padding: 32px 0 8px; scroll-margin-top: 16px; }
+  h2 { font-size: 1.5rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+  h3 { font-size: 1.1rem; margin: 28px 0 8px; }
+  .muted, .note { color: var(--muted); }
+  .note { font-size: 0.92rem; }
+  ul.notes { color: var(--muted); font-size: 0.95rem; padding-left: 20px; }
+  li { margin: 4px 0; }
+
+  .table { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); margin: 12px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.94rem; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child > * { border-bottom: 0; }
+  thead th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  tbody th { font-weight: 600; }
+  .num { text-align: right; white-space: nowrap; }
+  .matrix td { white-space: nowrap; }
+  .sub { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
+  .more { margin-left: 6px; white-space: nowrap; }
+  .hash { word-break: break-all; font-size: 0.8rem; }
+
+  .pill { display: inline-block; font-size: 0.78rem; font-weight: 600; line-height: 1; padding: 5px 9px; border-radius: 999px; white-space: nowrap; vertical-align: 0.1em; }
+  .pill.pass { color: var(--pass); background: var(--pass-bg); }
+  .pill.open { color: var(--open); background: var(--open-bg); }
+  .pill.blocked { color: var(--blocked); background: var(--blocked-bg); }
+  .callout .pill { margin-right: 6px; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .stat { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 12px 16px; }
+  .stat p { margin: 0; }
+  .stat-label { color: var(--muted); font-size: 0.85rem; }
+  .stat-label::first-letter { text-transform: uppercase; }
+  .stat-value { font-size: 1.6rem; font-weight: 650; }
+  .stat-value span { font-size: 0.9rem; font-weight: 400; color: var(--muted); }
+
+  /* Narrow screens: gate name + status on one line, evidence full width below. */
+  @media (max-width: 560px) {
+    table.stack thead { display: none; }
+    table.stack tr { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    table.stack tbody tr:last-child { border-bottom: 0; }
+    table.stack th, table.stack td { padding: 0; border: 0; }
+    table.stack td:last-child { grid-column: 1 / -1; margin-top: 6px; }
+  }
+
+  .astro-code { padding: 14px 16px; border-radius: 8px; font-size: 0.86rem; line-height: 1.55; margin: 12px 0; }
+
+  footer { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 16px; padding-bottom: 40px; font-size: 0.92rem; }
+</style>

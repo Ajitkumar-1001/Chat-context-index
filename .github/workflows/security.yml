@@ -1,0 +1,63 @@
+name: Security
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  source-secrets:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan full Git history without exposing matches
+        run: |
+          mkdir -p reports
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact=100 --log-opts=--all --report-format=json --report-path=/repo/reports/gitleaks.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-secrets
+          path: reports/
+          if-no-files-found: error
+
+  dependencies-and-licenses:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Resolve all Python runtime extras for this audit
+        run: |
+          python -m venv /tmp/cci-audit
+          /tmp/cci-audit/bin/pip install './packages/python[redis,openai,anthropic]'
+          python -m pip install pip-audit pip-licenses pytest
+          mkdir -p reports
+          /tmp/cci-audit/bin/pip freeze --exclude chat-context-index > reports/python-runtime-requirements.txt
+      - name: Audit resolved Python runtime dependencies
+        run: python -m pip_audit --strict --disable-pip --no-deps -r reports/python-runtime-requirements.txt --format=json --output=reports/python-audit.json
+      - name: Audit locked npm dependencies including optional and build dependencies
+        if: success() || failure()
+        run: npm audit --json --audit-level=low > ../../reports/npm-audit.json
+        working-directory: packages/typescript
+      - name: Inventory dependency licenses and verify package attribution
+        if: success() || failure()
+        run: |
+          pip-licenses --python=/tmp/cci-audit/bin/python --format=json --with-urls --output-file=reports/python-licenses.json
+          python scripts/release_controls.py licenses --output reports/licenses.json
+      - name: Test artifact verification rejects tampering and stale evidence
+        if: success() || failure()
+        run: python -m pytest tests/release -q
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-dependencies-and-licenses
+          path: reports/
+          if-no-files-found: error

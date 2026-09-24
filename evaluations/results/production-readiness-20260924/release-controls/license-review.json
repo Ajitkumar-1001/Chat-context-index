@@ -1,0 +1,367 @@
+{
+  "status": "PASS_SCOPED_ENGINEERING_REVIEW",
+  "scope": "Current unbundled wheel,sdist,npm candidate attribution and resolved dependency declarations; no general legal assurance",
+  "unresolved_release_attribution_or_declaration_findings": [],
+  "python": {
+    "scope": "macOS Python3.12 resolved package plus all three runtime extras; no SDK extras requested",
+    "packages": {
+      "chat-context-index": {
+        "name": "chat-context-index",
+        "version": "0.1.0",
+        "license_expression": "Apache-2.0",
+        "license": null,
+        "license_files": [
+          "chat_context_index-0.1.0.dist-info/licenses/LICENSE"
+        ]
+      },
+      "apsw": {
+        "name": "apsw",
+        "version": "3.53.4.0",
+        "license_expression": null,
+        "license": "any-OSI",
+        "license_files": [
+          "apsw-3.53.4.0.dist-info/licenses/LICENSE"
+        ]
+      },
+      "anthropic": {
+        "name": "anthropic",
+        "version": "1.8.0",
+        "license_expression": null,
+        "license": "MIT",
+        "license_files": [
+          "anthropic-1.8.0.dist-info/licenses/LICENSE",
+          "anthropic/_vendor/httpx_aiohttp/LICENSE",
+          "anthropic/_vendor/httpx_aiohttp/NOTICE.md"
+        ]
+      },
+      "anyio": {
+        "name": "anyio",
+        "version": "4.15.1",
+        "license_expression": "MIT",
+        "license": null,
+        "license_files": [
+          "anyio-4.15.1.dist-info/licenses/LICENSE"
+        ]
+      },
+      "idna": {
+        "name": "idna",
+        "version": "3.20",
+        "license_expression": "BSD-3-Clause",
+        "license": null,
+        "license_files": [
+          "idna-3.20.dist-info/licenses/LICENSE.md"
+        ]
+      },
+      "typing-extensions": {
+        "name": "typing_extensions",
+        "version": "4.16.0",
+        "license_expression": "PSF-2.0",
+        "license": null,
+        "license_files": [
+          "typing_extensions-4.16.0.dist-info/licenses/LICENSE"
+        ]
+      },
+      "docstring-parser": {
+        "name": "docstring_parser",
+        "version": "0.18.0",
+        "license_expression": null,
+        "license": "MIT",
+        "license_files": [
+          "docstring_parser-0.18.0.dist-info/licenses/LICENSE.md"
+        ]
+      },
+      "httpx2": {
+        "name": "httpx2",
+        "version": "2.13.1",
+        "license_expression": "BSD-3-Clause",
+        "license": null,
+        "license_files": [
+          "httpx2-2.13.1.dist-info/licenses/LICENSE.md"
+        ]
+      },
+      "httpcore2": {
+        "name": "httpcore2",
+        "version": "2.13.1",
+        "license_expression": "BSD-3-Clause",
+        "license": null,
+        "license_files": [
+          "httpcore2-2.13.1.dist-info/licenses/LICENSE.md"
+        ]
+      },
+      "h11": {
+        "name": "h11",
+        "version": "0.16.0",
+        "license_expression": null,
+        "license": "MIT",
+        "license_files": [
+          "h11-0.16.0.dist-info/licenses/LICENSE.txt"
+        ]
+      },
+      "truststore": {
+        "name": "truststore",
+        "version": "0.10.4",
+        "license_expression": "MIT",
+        "license": null,
+        "license_files": [
+          "truststore-0.10.4.dist-info/licenses/LICENSE"
+        ]
+      },
+      "jiter": {
+        "name": "jiter",
+        "version": "0.17.0",
+        "license_expression": "MIT",
+        "license": null,
+        "license_files": [
+          "jiter-0.17.0.dist-info/licenses/LICENSE"
+        ]
+      },
+      "pydantic": {
+        "name": "pydantic",
+        "version": "2.13.5",
+        "license_expression": "MIT",
+        "license": null,
+        "license_files": [
+          "pydantic-2.13.5.dist-info/licenses/LICENSE"
+        ]
+      },
+      "annotated-types": {
+        "name": "annotated-types",
+        "version": "0.8.0",
+        "license_expression": "MIT",
+        "license": null,
+        "license_files": [
+          "annotated_types-0.8.0.dist-info/licenses/LICENSE"
+        ]
+      },
+      "pydantic-core": {
+        "name": "pydantic_core",
+        "version": "2.46.5",
+        "license_expression": "MIT",
+        "license": null,
+        "license_files": [
+          "pydantic_core-2.46.5.dist-info/licenses/LICENSE"
+        ]
+      },
+      "typing-inspection": {
+        "name": "typing-inspection",
+        "version": "0.4.4",
+        "license_expression": "MIT",
+        "license": null,
+        "license_files": [
+          "typing_inspection-0.4.4.dist-info/licenses/LICENSE"
+        ]
+      },
+      "sniffio": {
+        "name": "sniffio",
+        "version": "1.3.1",
+        "license_expression": null,
+        "license": "MIT OR Apache-2.0",
+        "license_files": [
+          "sniffio-1.3.1.dist-info/LICENSE",
+          "sniffio-1.3.1.dist-info/LICENSE.APACHE2",
+          "sniffio-1.3.1.dist-info/LICENSE.MIT"
+        ]
+      },
+      "openai": {
+        "name": "openai",
+        "version": "3.19.2",
+        "license_expression": "Apache-2.0",
+        "license": null,
+        "license_files": [
+          "openai-3.19.2.dist-info/licenses/LICENSE",
+          "openai/_vendor/httpx_aiohttp/LICENSE"
+        ]
+      },
+      "redis": {
+        "name": "redis",
+        "version": "8.1.0",
+        "license_expression": "MIT",
+        "license": null,
+        "license_files": [
+          "redis-8.1.0.dist-info/licenses/LICENSE"
+        ]
+      }
+    }
+  },
+  "python_runtime_dependency_count": 18,
+  "python_default_runtime_dependencies": [
+    "apsw"
+  ],
+  "python_audit_dependency_count": 48,
+  "python_audit_only_dependency_count": 30,
+  "npm": {
+    "packages": [
+      {
+        "package": "@redis/bloom",
+        "version": "5.12.1",
+        "license": "MIT",
+        "scope": "optional-runtime",
+        "license_files": []
+      },
+      {
+        "package": "@redis/client",
+        "version": "5.12.1",
+        "license": "MIT",
+        "scope": "optional-runtime",
+        "license_files": []
+      },
+      {
+        "package": "@redis/json",
+        "version": "5.12.1",
+        "license": "MIT",
+        "scope": "optional-runtime",
+        "license_files": []
+      },
+      {
+        "package": "@redis/search",
+        "version": "5.12.1",
+        "license": "MIT",
+        "scope": "optional-runtime",
+        "license_files": []
+      },
+      {
+        "package": "@redis/time-series",
+        "version": "5.12.1",
+        "license": "MIT",
+        "scope": "optional-runtime",
+        "license_files": []
+      },
+      {
+        "package": "@types/better-sqlite3",
+        "version": "7.6.13",
+        "license": "MIT",
+        "scope": "build-only",
+        "license_files": [
+          "node_modules/@types/better-sqlite3/LICENSE"
+        ]
+      },
+      {
+        "package": "@types/node",
+        "version": "22.20.4",
+        "license": "MIT",
+        "scope": "build-only",
+        "license_files": [
+          "node_modules/@types/node/LICENSE"
+        ]
+      },
+      {
+        "package": "better-sqlite3",
+        "version": "13.0.3",
+        "license": "MIT",
+        "scope": "runtime",
+        "license_files": [
+          "node_modules/better-sqlite3/LICENSE"
+        ]
+      },
+      {
+        "package": "cluster-key-slot",
+        "version": "1.1.2",
+        "license": "Apache-2.0",
+        "scope": "optional-runtime",
+        "license_files": [
+          "node_modules/cluster-key-slot/LICENSE"
+        ]
+      },
+      {
+        "package": "node-addon-api",
+        "version": "8.9.2",
+        "license": "MIT",
+        "scope": "runtime",
+        "license_files": [
+          "node_modules/node-addon-api/LICENSE.md"
+        ]
+      },
+      {
+        "package": "redis",
+        "version": "5.12.1",
+        "license": "MIT",
+        "scope": "optional-runtime",
+        "license_files": []
+      },
+      {
+        "package": "typescript",
+        "version": "5.9.3",
+        "license": "Apache-2.0",
+        "scope": "build-only",
+        "license_files": [
+          "node_modules/typescript/LICENSE.txt",
+          "node_modules/typescript/ThirdPartyNoticeText.txt"
+        ]
+      },
+      {
+        "package": "undici-types",
+        "version": "6.21.0",
+        "license": "MIT",
+        "scope": "build-only",
+        "license_files": [
+          "node_modules/undici-types/LICENSE"
+        ]
+      }
+    ],
+    "archive_contents": {
+      "chat_context_index-0.1.0.tar.gz": {
+        "sha256": "6e35f129f73546bdbe5cb09812389a124240034e97b4f0b5cfe51823490a3a2c",
+        "node_modules_present": false,
+        "member_count": 33,
+        "root_components": [
+          "chat_context_index-0.1.0"
+        ]
+      },
+      "chat_context_index-0.1.0-py3-none-any.whl": {
+        "sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0",
+        "node_modules_present": false,
+        "member_count": 33,
+        "root_components": [
+          "cci",
+          "chat_context_index-0.1.0.dist-info"
+        ]
+      },
+      "chat-context-index-0.1.0.tgz": {
+        "sha256": "b3eda16aebc9e13116cc68b8418332b3d245c539154c6f836b0f9bf49bfcacc9",
+        "node_modules_present": false,
+        "member_count": 50,
+        "root_components": [
+          "package"
+        ]
+      }
+    }
+  },
+  "observations": [
+    {
+      "package": "apsw3.53.4.0",
+      "declaration": "any-OSI",
+      "resolution": "Installed LICENSE gives explicit permissive redistribution terms and alternative use under any OSI-approved open-source license. Official APSW documentation explains the same identifier. No missing license or unresolved shorthand.",
+      "reference": "https://rogerbinns.github.io/apsw/copyright.html"
+    },
+    {
+      "package": "certifi2026.7.22",
+      "declaration": "MPL-2.0",
+      "scope": "Audit-tool dependency only in this resolved environment; absent from18-package runtime closure",
+      "resolution": "Installed LICENSE carries the MPL notice and Mozilla source location. Not bundled or modified in the candidate archives. No additional license action for these cci artifacts.",
+      "reference": "https://github.com/certifi/python-certifi/blob/master/LICENSE"
+    },
+    {
+      "package": "sniffio1.3.1",
+      "declaration": "Apache Software License; MIT License",
+      "resolution": "Installed LICENSE explicitly offers either Apache-2.0 or MIT; both license files are present. This is a dual-license choice, not missing metadata."
+    },
+    {
+      "package": "redis5.12.1 and five @redis modules",
+      "declaration": "MIT",
+      "resolution": "These six separately installed upstream npm packages omit top-level LICENSE files. redis README links the license; the exact upstream redis@5.12.1 tag contains MIT LICENSE. No Redis payload or node_modules is bundled in our npm archive, so this is an upstream package-layout observation rather than an omitted notice in our archives. If redistribution later bundles those dependencies, preserve their license and copyright notice.",
+      "reference": "https://raw.githubusercontent.com/redis/node-redis/redis@5.12.1/LICENSE"
+    },
+    {
+      "package": "ChatIndex pinned7df2c9208db6f113f85a6c09295bec7f0f2114e7",
+      "resolution": "Pinned upstream Git tree contains LICENSE and no separate NOTICE. Current package LICENSE/UPSTREAM.md copies pass artifact verification.",
+      "reference": "https://github.com/VectifyAI/ChatIndex/tree/7df2c9208db6f113f85a6c09295bec7f0f2114e7"
+    }
+  ],
+  "distribution_observation": "Our wheel contains cci and its dist-info; sdist contains this Python package source; npm contains package/dist and our package metadata/docs/attribution. Dependency distributions are resolved by the package managers rather than bundled in these archives.",
+  "future_recheck_trigger": "Different resolved dependencies, vendoring/bundling, changed upstream notices or modified dependency code require the corresponding scoped check again; no new unconditional owner/legal review gate.",
+  "upstream_license_comparison": {
+    "status": "PASS",
+    "pinned_upstream_and_repository_license_identical": true,
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  }
+}
