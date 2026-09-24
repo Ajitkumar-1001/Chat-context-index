@@ -33,12 +33,31 @@ the index with `cci.index.index` and pass a `cci.provider.MemoizedProvider` to i
 model calls. Context limits include rendered source labels; an optional tokenizer callback
 can enforce a model-specific memory token budget.
 
+Python's default `cache_backend="sqlite"` can memoize eligible indexing and tree-navigation
+calls when the host passes the store's cache to its provider wrapper:
+
+```python
+from cci.index import index
+from cci.provider import MemoizedProvider
+
+async def index_with_cache(memory, my_adapter):
+    provider = MemoizedProvider(my_adapter, memory.config, cache=memory.cache,
+                                usage_log=memory.usage_log)
+    return await index(memory, provider=provider)
+```
+
+Open with `cache_backend="redis"`, `application_namespace`, and `redis_url` to use Redis with
+SQLite fallback after installing `chat-context-index[redis]`. `cci.stats.stats(memory)` reports
+Redis errors and fallback lookups/hits. Answer synthesis is never cached. See the
+[Redis example](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/docs/quickstart-redis.md).
+
 Use one owning application process per history on durable local storage. The host controls
 authentication, history ownership, turn scheduling, and execution checkpoints. Conversation
-memory does not resume unfinished tools. Real-model evaluation exposes a source-selection gap
-under default context limits; answer quality and total dollar savings remain unverified.
+memory does not resume unfinished tools. A source-selection gap in an earlier wheel is fixed
+in development tests; current held-out answer quality and total dollar savings remain unverified.
 See the [evaluation report](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/evaluations/held_out/reports/README.md).
 
 [Integration example](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/examples/python/rag_chat.py)
 and [source repository](https://github.com/Ajitkumar-1001/Chat-context-index).
-Licensed under Apache-2.0; the license text is included in the wheel.
+Licensed under Apache-2.0; license text and [upstream attribution](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/UPSTREAM.md)
+are included in the wheel.

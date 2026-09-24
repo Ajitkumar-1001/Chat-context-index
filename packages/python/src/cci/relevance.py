@@ -6,7 +6,7 @@ from unicodedata import category, normalize
 
 _STOP_WORDS = frozenset(
     "a an and are as at be been by can could did do does for from had has have how i in is it "
-    "me of on or our please should that the their this to us was were what when where which "
+    "me of on or our please should that the their this to us was we were what when where which "
     "who why will with would you your".split()
 )
 
@@ -25,16 +25,70 @@ def _words(text: str) -> Iterator[tuple[int, int, str]]:
             start = None
 
 
+def _key(word: str) -> str:
+    """A small, deterministic inflection key shared with the TypeScript implementation."""
+    if word in ("chosen", "chose"):
+        return "choos"
+    if word in ("used", "using"):
+        return "use"
+    if len(word) < 4 or not word.isascii() or not word.isalpha():
+        return word
+    if len(word) == 4:
+        if word.endswith("e") or (word.endswith("s") and not word.endswith(("ss", "us", "is"))):
+            return word[:-1]
+        return word
+    if word.endswith("ies"):
+        return word[:-3] + "y"
+    if word.endswith("ied"):
+        return word[:-3] + "y"
+    doubled = False
+    if word.endswith("ing") and len(word) >= 6:
+        base = word[:-3]
+        doubled = True
+    elif word.endswith("ed") and len(word) >= 5:
+        base = word[:-2]
+        doubled = True
+    elif word.endswith("es") and len(word) >= 5:
+        base = word[:-2]
+    elif word.endswith("s") and not word.endswith(("ss", "us", "is")):
+        base = word[:-1]
+    elif word.endswith("e"):
+        base = word[:-1]
+    else:
+        return word
+    if doubled and len(base) > 2 and base[-1] == base[-2] and base[-1] not in "aeiou":
+        base = base[:-1]
+    return base
+
+
 def query_terms(query: str) -> list[str]:
-    """At most 32 distinct content terms from 4,096 query scalars; operators stay literal."""
+    """At most 32 distinct inflection keys from 4,096 query scalars."""
     return list(
-        dict.fromkeys(word for _, _, word in _words(query[:4096]) if word and word not in _STOP_WORDS)
+        dict.fromkeys(_key(word) for _, _, word in _words(query[:4096]) if word and word not in _STOP_WORDS)
     )[:32]
+
+
+def fts_term_expression(key: str) -> str:
+    """Only literal, bounded inflections are sent to FTS; user operators stay inert."""
+    if not key.isascii() or not key.isalpha() or len(key) < 3:
+        return '"' + key.replace('"', '""') + '"'
+    forms = [key, key + "e", key + "s", key + "es", key + "ed", key + "ing"]
+    if key and key[-1] not in "aeiouy":
+        forms.extend((key + key[-1] + "ed", key + key[-1] + "ing"))
+    if key == "choos":
+        forms.extend(("chosen", "chose"))
+    if key == "use":
+        forms.extend(("used", "using"))
+    if key.endswith("y"):
+        forms.extend((key[:-1] + "ies", key[:-1] + "ied"))
+    return "(" + " OR ".join(
+        '"' + form.replace('"', '""') + '"' for form in dict.fromkeys(forms) if _key(form) == key
+    ) + ")"
 
 
 def relevance(text: str, terms: Sequence[str]) -> int:
     """Distinct term coverage avoids giving repeated old text a frequency advantage."""
-    return len(set(terms).intersection(word for _, _, word in _words(text))) if terms else 0
+    return len(set(terms).intersection(_key(word) for _, _, word in _words(text))) if terms else 0
 
 
 def excerpt_for_query(text: str, terms: Sequence[str], window: int) -> str:
@@ -46,7 +100,7 @@ def excerpt_for_query(text: str, terms: Sequence[str], window: int) -> str:
     if len(text) <= window or not terms:
         return text[:window]
     wanted = set(terms)
-    matches = [(start, end, word) for start, end, word in _words(text) if word in wanted]
+    matches = [(start, end, _key(word)) for start, end, word in _words(text) if _key(word) in wanted]
     counts: Counter[str] = Counter()
     left = 0
     best_score = best_start = best_end = 0

@@ -1,0 +1,114 @@
+{
+  "concurrency": {
+    "ingest_100_ms": {
+      "16": {
+        "errors": 0,
+        "p50": 129.88587492145598,
+        "p95": 195.99612499587238,
+        "throughput_messages_per_s": 7486.33596818107,
+        "trials": 32
+      },
+      "4": {
+        "errors": 0,
+        "p50": 29.811416985467076,
+        "p95": 52.107749972492456,
+        "throughput_messages_per_s": 8100.0892576047,
+        "trials": 32
+      }
+    },
+    "search_top8_ms": {
+      "1": {
+        "errors": 0,
+        "p50": 43.99645794183016,
+        "p95": 58.77049989067018,
+        "throughput_per_s": 21.523306338146277,
+        "trials": 1000
+      },
+      "16": {
+        "errors": 0,
+        "p50": 839.183459058404,
+        "p95": 965.6226669903845,
+        "throughput_per_s": 18.287524311702544,
+        "trials": 1000
+      },
+      "4": {
+        "errors": 0,
+        "p50": 190.36508398130536,
+        "p95": 241.49583303369582,
+        "throughput_per_s": 19.79996468589156,
+        "trials": 1000
+      }
+    }
+  },
+  "environment": {
+    "apsw_version": "3.53.4.0",
+    "artifact": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0",
+    "cache_backend": "sqlite",
+    "cci_module_path": "/private/tmp/cci-preflight-20260924/lib/python3.12/site-packages/cci/__init__.py",
+    "cpu_count": 14,
+    "dedicated_linux_runner": false,
+    "filesystem_cold": "NOT RUN: OS page cache is not dropped by this script",
+    "label": "release-candidate-local-macos",
+    "machine": "arm64",
+    "physical_memory_bytes": 25769803776,
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "sqlite_library_version": "3.53.4"
+  },
+  "fixture": {
+    "batch_size": 100,
+    "seed": 7,
+    "total_messages": 10000
+  },
+  "fixture_stats": {
+    "generation_s": 1.7128192919772118,
+    "message_bytes_avg": 892.9357,
+    "message_bytes_max": 1657,
+    "reference_fixture": true,
+    "store_bytes_after_generation": 45603104
+  },
+  "process_cold": {
+    "first_search_top8_ms": {
+      "p50": 83.06491700932384,
+      "p95": 112.605334026739,
+      "trials": 20
+    },
+    "import_ms": {
+      "p50": 27.74154208600521,
+      "p95": 34.97175010852516,
+      "trials": 20
+    },
+    "peak_rss_bytes_max": 34455552,
+    "store_open_ms": {
+      "p50": 1.4296669978648424,
+      "p95": 2.3671251256018877,
+      "trials": 20
+    }
+  },
+  "resources": {
+    "peak_rss_bytes": 69926912
+  },
+  "results": {
+    "batch_ingest_100_ms": {
+      "p50": 11.76845794543624,
+      "p95": 24.226417066529393,
+      "pass": true,
+      "threshold_p95_ms": 500,
+      "trials": 100
+    },
+    "lexical_search_top8_ms": {
+      "p50": 43.99645794183016,
+      "p95": 58.77049989067018,
+      "pass": true,
+      "threshold_p95_ms": 100,
+      "trials": 1000
+    },
+    "store_open_ms": {
+      "p50": 0.898666912689805,
+      "p95": 1.0424170177429914,
+      "pass": true,
+      "threshold_p95_ms": 2000,
+      "trials": 20
+    }
+  }
+}

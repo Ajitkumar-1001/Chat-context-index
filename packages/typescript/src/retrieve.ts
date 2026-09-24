@@ -4,7 +4,7 @@
  */
 
 import { VersionConflict } from "./errors.js";
-import { Diagnostic, search } from "./search.js";
+import { Diagnostic, linkedCorrections, search } from "./search.js";
 import { HistoryStore } from "./store.js";
 import { BoundedProvider, CallBudget } from "./provider.js";
 import { renderEvidenceContext } from "./contextAssembly.js";
@@ -130,20 +130,22 @@ export async function retrieve(
   const deadlineAtMs = Date.now() + (options.deadlineS ?? store.config.requestDeadlineRetrieveS) * 1000;
   const budget = options.budget ?? new CallBudget(store.config.providerAttemptLimitRetrieve);
 
-  const [snapshot, searchResult, treeExists] = await store.withLock(async () => {
+  const [snapshot, searchResult, corrections, treeExists] = await store.withLock(async () => {
     const snap = await captureSnapshot(store);
     const sr = await search(store, query, limit);
+    const linked = await linkedCorrections(store, sr.candidates, query, snap.snapshotMaxSeq, limit);
     const tree = await hasTree(store);
-    return [snap, sr, tree] as const;
+    return [snap, sr, linked, tree] as const;
   });
 
   let indexDegraded = !treeExists;
   let actualMode = "lexical";
 
   let diagnostics = [...searchResult.diagnostics];
-  let candidates = [...searchResult.candidates];
+  let candidates = [...searchResult.candidates, ...corrections.candidates];
+  const correctionKeys = new Set(corrections.candidates.map(c => JSON.stringify([c.messageId, c.sourcePointer])));
   let selectedChunks: string[] = [];
-  let limited = candidates.length >= limit;
+  let limited = searchResult.candidates.length >= limit || corrections.limited;
   if (mode !== "lexical" && options.provider && treeExists && query.trim()) {
     const tree = await navigateTree(store, query, snapshot, options.provider, budget, deadlineAtMs, limit);
     candidates = [...tree.candidates, ...candidates];
@@ -162,16 +164,22 @@ export async function retrieve(
     throw new VersionConflict("history was cleared between snapshot capture and result emission");
   }
   if (selectedChunks.length && current.indexRevision !== snapshot.indexRevision) {
-    candidates = [...searchResult.candidates]; selectedChunks = []; actualMode = "lexical";
+    candidates = [...searchResult.candidates, ...corrections.candidates]; selectedChunks = []; actualMode = "lexical";
     indexDegraded = true;
     diagnostics.push({ code: "tree_revision_changed", stage: "retrieve", retryable: false });
   }
   const unique = new Map<string, typeof candidates[number]>();
   const terms = queryTerms(query);
-  candidates = candidates.map(candidate => ({ candidate, score: relevance(candidate.excerpt, terms) }))
-    .sort((a, b) => b.score - a.score || b.candidate.seq - a.candidate.seq).map(({ candidate }) => candidate);
-  for (const c of candidates) if (!unique.has(`${c.messageId}:${c.sourcePointer}`)) unique.set(`${c.messageId}:${c.sourcePointer}`, c);
-  const evidence: Evidence[] = [...unique.values()].map((c, i) => ({
+  candidates = candidates.map(candidate => ({ candidate, score: relevance(candidate.excerpt, terms),
+    correction: correctionKeys.has(JSON.stringify([candidate.messageId, candidate.sourcePointer])) }))
+    .sort((a, b) => Number(b.correction) - Number(a.correction) || b.score - a.score || b.candidate.seq - a.candidate.seq)
+    .map(({ candidate }) => candidate);
+  for (const c of candidates) {
+    const key = JSON.stringify([c.messageId, c.sourcePointer]);
+    if (!unique.has(key)) unique.set(key, c);
+  }
+  limited ||= unique.size > limit;
+  const evidence: Evidence[] = [...unique.values()].slice(0, limit).map((c, i) => ({
     evidenceId: `ev_${i + 1}`,
     messageId: c.messageId,
     seq: c.seq,

@@ -38,6 +38,14 @@ class Router:
 
 async def main():
     phase, path = sys.argv[1:]
+    if phase == "default":
+        async with await HistoryStore.open(path) as store:
+            assert store.config.cache_backend == "sqlite"
+            await ingest(store, store.history_id, [InputMessage(role="user", content="Target is Oslo.")],
+                         "default-check", "initial")
+            assert (await retrieve(store, "Oslo", mode="lexical")).evidence
+            assert "redis" not in sys.modules and "openai" not in sys.modules
+        return
     async with await HistoryStore.open(path, config={
         "cache_backend": "none", "tree_max_children": 2, "target_chunk_size_scalars": 1,
     }) as store:

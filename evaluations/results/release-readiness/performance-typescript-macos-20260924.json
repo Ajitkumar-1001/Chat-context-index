@@ -1,0 +1,112 @@
+{
+  "fixture": {
+    "total_messages": 10000,
+    "seed": 7,
+    "batch_size": 100,
+    "queries": 1000,
+    "sha256": "8a88a11bce715e54fbf78333089ffb7889e84adad7d213040782a79576c65f61"
+  },
+  "environment": {
+    "label": "release-candidate-local-macos",
+    "platform": "darwin",
+    "machine": "arm64",
+    "node": "v22.23.1",
+    "package_path": "/private/tmp/cci-ts-bench-20260924/node_modules/chat-context-index/dist/index.js",
+    "artifact": "9d8c712d610f9f47efd22037e8bfbc9f22164f82068748f36035b30f79376ccf",
+    "dedicated_linux_runner": false,
+    "filesystem_cold": "NOT RUN: OS page cache is not dropped by this script"
+  },
+  "fixture_stats": {
+    "message_bytes_avg": 892.9357,
+    "message_bytes_max": 1657,
+    "generation_s": 0.9975027500000001,
+    "store_bytes_after_generation": 45603104
+  },
+  "results": {
+    "store_open_ms": {
+      "p50": 25.551500000001397,
+      "p95": 32.87529199999699,
+      "trials": 20,
+      "threshold_p95_ms": 2000,
+      "pass": true
+    },
+    "batch_ingest_100_ms": {
+      "p50": 8.277874999999995,
+      "p95": 15.524667000000022,
+      "trials": 100,
+      "threshold_p95_ms": 500,
+      "pass": true
+    },
+    "lexical_search_top8_ms": {
+      "p50": 37.87079100000119,
+      "p95": 51.005583000001934,
+      "trials": 1000,
+      "errors": 0,
+      "throughput_per_s": 24.85676954574943,
+      "threshold_p95_ms": 100,
+      "pass": true
+    }
+  },
+  "concurrency": {
+    "search_top8_ms": {
+      "1": {
+        "p50": 37.87079100000119,
+        "p95": 51.005583000001934,
+        "trials": 1000,
+        "errors": 0,
+        "throughput_per_s": 24.85676954574943
+      },
+      "4": {
+        "p50": 101.63270799999736,
+        "p95": 155.85458300000028,
+        "trials": 1000,
+        "errors": 0,
+        "throughput_per_s": 26.42171709256878
+      },
+      "16": {
+        "p50": 322.27449999999953,
+        "p95": 597.0281670000113,
+        "trials": 1000,
+        "errors": 0,
+        "throughput_per_s": 26.029625451409682
+      }
+    },
+    "ingest_100_ms": {
+      "4": {
+        "p50": 23.52499999999418,
+        "p95": 43.21695799998997,
+        "trials": 32,
+        "errors": 0,
+        "throughput_messages_per_s": 9969.8567611986
+      },
+      "16": {
+        "p50": 85.647959000009,
+        "p95": 144.64949999999953,
+        "trials": 32,
+        "errors": 0,
+        "throughput_messages_per_s": 10163.902197495383
+      }
+    }
+  },
+  "resources": {
+    "max_rss_kib": 187872
+  },
+  "process_cold": {
+    "import_ms": {
+      "p50": 15.835874999999998,
+      "p95": 19.294958999999995,
+      "trials": 20
+    },
+    "store_open_ms": {
+      "p50": 29.948458999999993,
+      "p95": 32.224208999999995,
+      "trials": 20
+    },
+    "first_search_top8_ms": {
+      "p50": 76.42775,
+      "p95": 98.997208,
+      "trials": 20
+    },
+    "max_rss_kib": 91424
+  }
+}

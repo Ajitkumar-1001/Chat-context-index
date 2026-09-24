@@ -23,6 +23,9 @@
 > [!NOTE]
 > **Pre-release.** Evidence selection is fixed in Python and TypeScript and passes development regressions, clean package installs, and local Linux checks. The rebuilt wheel's live smoke was interrupted by HTTP 429; held-out quality and cost savings remain unverified for this build. [Fix and verification](evaluations/evidence-selection/README.md).
 
+Release validation now includes bounded native answer review, source-distribution installation checks,
+and a configured runtime/platform matrix. [Implementation progress and remaining gates](docs/release-status.md).
+
 ## Overview
 
 **ContIndex (`chat-context-index`, imported as `cci` in Python) gives an existing RAG chat or agent loop persistent conversation memory.** It saves original messages in SQLite, indexes them in a summary hierarchy, and prepares recent context plus retrieved older evidence for the host's model.
@@ -107,6 +110,31 @@ the package's `Provider` contract. See [configuration and limits](evaluations/LI
 have offline routing tests; an earlier Python wheel passed the Gemini development smoke. The rebuilt
 wheel's smoke encountered HTTP 429. Other providers have not passed a live run.
 
+### Cache eligible model work
+
+Python can memoize repeated indexing and tree-navigation requests. Local SQLite is the default;
+Redis is optional and uses a local SQLite fallback. The authoritative conversation stays in the
+history database. The host passes its provider adapter explicitly:
+
+```python
+from cci import HistoryStore
+from cci.index import index
+from cci.provider import MemoizedProvider
+from cci.stats import stats
+
+async def index_with_cache(my_adapter):
+    async with await HistoryStore.open("memory.sqlite", config={"cache_backend": "sqlite"}) as memory:
+        provider = MemoizedProvider(my_adapter, memory.config, cache=memory.cache,
+                                    usage_log=memory.usage_log)
+        await index(memory, provider=provider)
+        counters = await stats(memory)
+        return counters.memo_hits, counters.redis_errors, counters.sqlite_fallback_hits
+```
+
+See the [local-cache](docs/quickstart-no-redis.md) and [Redis](docs/quickstart-redis.md)
+examples. Answer synthesis is never cached. The TypeScript runtime currently has no Redis
+memoization backend.
+
 ## Measured example
 
 The earlier [real-model comparison](evaluations/held_out/reports/README.md) used the previous Python wheel
@@ -177,16 +205,21 @@ flowchart LR
 
 4. **Prepare the next turn.** Original evidence is ranked by distinct query-term matches before applying retrieval and context limits; newer messages break ties. Lexical matching tolerates unmatched question words. Long source fields use a matching window of their original text. The context API reserves recent messages, adds ranked evidence, deduplicates source fields, and restores conversation order. Labels and escaped delimiters count toward the budget. This selection adds no model calls. The host supplies this historical data alongside its document RAG results, trusted instructions, and new question. Optional `ask()` performs retrieval and cited synthesis, but does not include the context API's recent-message reserve.
 
-The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatIndex)'s summary-to-source approach, using an independently implemented chronological grouping algorithm. It does not reproduce upstream's topic-boundary detection. Python's optional memoization remains separate from authoritative history.
+The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatIndex)'s summary-to-source approach, using an independently implemented chronological grouping algorithm. It does not reproduce upstream's topic-boundary detection. Python's optional memoization remains separate from authoritative history. See [upstream attribution](UPSTREAM.md).
 
 ## Current boundaries
 
 - The supported topology is one owning application process per history on durable local storage. A serverless or distributed deployment needs a separate storage design.
-- Local ranking depends on shared words and can miss paraphrases. Development regressions cover evidence lost during selection, but the new build still needs held-out validation. Answer quality and automatic conflict resolution remain unverified.
+- Local ranking uses light English inflections and can miss paraphrases. A later correction is
+  prioritized only when it has an explicit revision cue and repeats a source-specific anchor;
+  this lexical heuristic can miss implicit changes or link an unrelated revision. Both original
+  statements remain separate cited evidence. Development regressions cover evidence lost during
+  selection, but the new build still needs held-out validation. Answer quality and automatic
+  conflict resolution remain unverified.
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- The local Linux CI reproduction passes 190 Python tests, 21 native TypeScript tests, and fresh installed-package memory checks. Hosted CI, dedicated release performance checks, and the full real-model quality gate remain open. [Linux evidence](evaluations/results/linux-evidence-selection/README.md).
+- The current macOS local run passes 224 Python tests, 21 native TypeScript tests, and nine fresh installed-package writer/reader checks. Hosted CI, dedicated Linux performance, and the real-model quality gate remain open. [Release status](docs/release-status.md).
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 

@@ -20,11 +20,12 @@ import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "python", "src"))
 
-from cci.cache import CachedValue, CacheScope, NoneCache
+from cci.cache import CachedValue, NoneCache
 from cci.index import index
 from cci.ingest import ingest
 from cci.models import InputMessage
-from cci.provider import MemoizedProvider, FakeProvider, ProviderResponse
+from cci.provider import FakeProvider, MemoizedProvider, ProviderResponse
+from cci.stats import stats
 from cci.store import HistoryStore
 
 
@@ -146,6 +147,43 @@ def test_none_cache_backend_never_hits():
             assert fake.call_count == 2, "cache_backend='none' never caches"
 
             await store.aclose()
+
+    asyncio.run(scenario())
+
+
+def test_redis_errors_and_sqlite_fallback_are_counted_without_content():
+    async def scenario() -> None:
+        with tempfile.TemporaryDirectory() as d:
+            store = await HistoryStore.open(os.path.join(d, "cache5.db"), config={
+                "cache_backend": "redis", "application_namespace": "cache-metrics",
+                "redis_url": "redis://127.0.0.1:6379", "redis_circuit_breaker_failures": 1,
+            })
+            try:
+                value = CachedValue(
+                    cache_format_version=2, scope_digest="scope", request_digest="request",
+                    operation_version=1, schema_version=1, created_at=90,
+                    absolute_expiry=200, payload={"text": "private payload"},
+                )
+                await store.cache._fallback.set("key", value)
+                await store.cache._client.aclose()
+
+                class _BrokenRedis:
+                    async def get(self, key: str):
+                        raise ConnectionError("private connection detail")
+
+                    async def aclose(self) -> None:
+                        return None
+
+                store.cache._client = _BrokenRedis()
+                assert await store.cache.get("key", now=100) == value
+                assert await store.cache.get("key", now=101) == value
+                result = await stats(store)
+                assert (result.redis_errors, result.sqlite_fallback_lookups,
+                        result.sqlite_fallback_hits) == (1, 2, 2)
+                assert "private payload" not in repr(result)
+                assert "private connection detail" not in repr(result)
+            finally:
+                await store.aclose()
 
     asyncio.run(scenario())
 

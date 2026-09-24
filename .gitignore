@@ -1,7 +1,3 @@
-# Node.js
-node_modules/
-*.tgz
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -12,7 +8,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-*.whl
 build/
 develop-eggs/
 dist/
@@ -154,8 +149,6 @@ activemq-data/
 
 # Environments
 .env
-.env.local
-.env.live-smoke
 .envrc
 .venv
 env/
@@ -227,6 +220,32 @@ vault-context/
 .claude/
 .specify/
 
-# Ignore Markdown documents except README.md (case-insensitive).
-*.[mM][dD]
-![rR][eE][aA][dD][mM][eE].[mM][dD]
+# Keep public documentation; local product strategy stays private.
+docs/project-brief.md
+docs/release-readiness/
+spec/**/*.md
+benchmarks/T083-macos-arm64-20260923/
+
+# Publish validation results, but keep provider allocations and release planning local.
+evaluations/results/release-readiness/*
+!evaluations/results/release-readiness/package-memory-20260924.json
+!evaluations/results/release-readiness/performance-macos-20260924.json
+!evaluations/results/release-readiness/performance-typescript-macos-20260924.json
+!evaluations/results/release-readiness/dev-recall-lexical-20260924.json
+!evaluations/results/release-readiness/dev-recall-tree-20260924.json
+!evaluations/results/release-readiness/preflight-20260924.json
+
+# Installed dependencies, release archives, and local credentials/state.
+node_modules/
+*.tgz
+*.whl
+*.tar.gz
+.env*
+!.env.example
+.npmrc
+*.sqlite3
+*.sqlite3-*
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
