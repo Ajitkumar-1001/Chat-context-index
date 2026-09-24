@@ -5,7 +5,8 @@
  */
 
 import { createHash } from "node:crypto";
-import { codePointLength, sourcePointerForOffset } from "./models.js";
+import { codePointLength } from "./models.js";
+import { excerptForQuery, queryTerms, relevance } from "./relevance.js";
 import { HistoryStore } from "./store.js";
 
 const DEFAULT_LIMIT = 20;
@@ -29,60 +30,38 @@ export interface SearchResult {
   diagnostics: Diagnostic[];
 }
 
-/** Tokenizes on whitespace, double-quotes each token (escaping internal `"`), joins with
- * spaces — turns FTS5 syntax characters into literal token content, matching search.py exactly. */
-function sanitizeFtsQuery(query: string): string {
-  const tokens = query.split(/\s+/).filter(Boolean);
-  const quoted = tokens.map((tok) => `"${tok.replace(/"/g, '""')}"`).filter((t) => t !== '""');
-  return quoted.join(" ");
-}
-
-/** Codepoint-safe excerpt window, matching search.py's `_excerpt_for` exactly (Python's `str`
- * indexing is already codepoint-based; here we operate on an `Array.from` codepoint array to
- * get the same semantics). Returns [excerpt, codepointOffset]. */
-function excerptFor(textProjection: string, firstToken: string, window = 200): [string, number] {
-  const chars = Array.from(textProjection);
-  const lowerJoined = chars.map((c) => c.toLowerCase()).join("");
-  const utf16Offset = lowerJoined.indexOf(firstToken.toLowerCase());
-  const idx = utf16Offset < 0 ? 0 : Array.from(lowerJoined.slice(0, utf16Offset)).length;
-  const start = Math.max(0, idx - Math.floor(window / 2));
-  const end = Math.min(chars.length, idx + Math.floor(window / 2));
-  return [chars.slice(start, end).join(""), start];
-}
-
 export async function search(store: HistoryStore, query: string, limit = DEFAULT_LIMIT): Promise<SearchResult> {
-  const sanitized = sanitizeFtsQuery(query);
-  if (!sanitized) {
+  if (!Number.isInteger(limit) || limit < 1 || limit > 5000) throw new RangeError("require 1 <= search limit <= 5000");
+  const terms = queryTerms(query);
+  if (!terms.length) {
     return { candidates: [], diagnostics: [{ code: "empty_or_nonsearchable_query", stage: "search", retryable: false }] };
   }
 
+  const matches = terms.map(() => "SELECT message_id FROM message_fts WHERE history_id = ? AND message_fts MATCH ?").join(" UNION ALL ");
+  const parameters: (string | number)[] = terms.flatMap(term => [store.historyId, `"${term.replace(/"/g, '""')}"`]);
+  parameters.push(limit);
   const rows = await store.connection.all<{
     message_id: string;
     seq: number;
     original_payload: string;
     text_projection: string;
   }>(
-    "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM message_fts f " +
-      "JOIN messages m ON m.message_id = f.message_id " +
-      "WHERE f.history_id = ? AND message_fts MATCH ? ORDER BY m.seq LIMIT ?",
-    [store.historyId, sanitized, limit],
+    "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM messages m " +
+      "JOIN (SELECT message_id, count(*) AS matches FROM (" + matches + ") " +
+      "GROUP BY message_id) ranked ON ranked.message_id = m.message_id " +
+      "ORDER BY ranked.matches DESC, m.seq DESC LIMIT ?", parameters,
   );
 
-  const tokens = query.split(/\s+/).filter(Boolean);
-  const firstToken = tokens.length > 0 ? tokens[0] : "";
-
-  const candidates: LexicalCandidate[] = rows.map((row) => {
+  const candidates: LexicalCandidate[] = rows.flatMap((row) => {
     const payload = JSON.parse(row.original_payload);
-    let [excerpt, offset] = excerptFor(row.text_projection, firstToken);
-    let sourcePointer = sourcePointerForOffset(payload.content, offset);
-    if (Array.isArray(payload.content)) {
-      const lower = row.text_projection.toLowerCase();
-      const match = Math.max(0, lower.indexOf(firstToken.toLowerCase()));
-      sourcePointer = sourcePointerForOffset(payload.content, Array.from(lower.slice(0, match)).length);
-      if (sourcePointer.endsWith("/text")) [excerpt] = excerptFor(payload.content[Number(sourcePointer.split("/")[2])].text, firstToken);
-    }
+    const parts: [string, string][] = typeof payload.content === "string" ? [["/content", payload.content]] :
+      Array.isArray(payload.content) ? payload.content.flatMap((b: { type?: string; text?: unknown }, i: number) =>
+        b && b.type === "text" && typeof b.text === "string" ? [[`/content/${i}/text`, b.text] as [string, string]] : []) : [];
+    if (!parts.length) return [];
+    parts.sort((a, b) => relevance(b[1], terms) - relevance(a[1], terms));
+    const [sourcePointer, text] = parts[0], excerpt = excerptForQuery(text, terms, 200);
     const contentHash = createHash("sha256").update(row.text_projection, "utf-8").digest("hex");
-    return { messageId: row.message_id, seq: row.seq, sourcePointer, excerpt, contentHash };
+    return [{ messageId: row.message_id, seq: row.seq, sourcePointer, excerpt, contentHash }];
   });
 
   return { candidates, diagnostics: [] };

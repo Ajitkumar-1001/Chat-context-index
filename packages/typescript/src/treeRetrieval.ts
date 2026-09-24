@@ -6,6 +6,7 @@ import { BoundedProvider, CallBudget } from "./provider.js";
 import { Snapshot, captureSnapshot } from "./retrieve.js";
 import { Diagnostic, LexicalCandidate } from "./search.js";
 import { HistoryStore } from "./store.js";
+import { excerptForQuery, queryTerms } from "./relevance.js";
 
 export async function navigateTree(store: HistoryStore, query: string, snapshot: Snapshot,
   provider: BoundedProvider, budget: CallBudget, deadlineAtMs: number, limit: number): Promise<{
@@ -15,6 +16,7 @@ export async function navigateTree(store: HistoryStore, query: string, snapshot:
   const selected: string[] = [];
   const candidates: LexicalCandidate[] = [];
   let steps = 0, limited = false;
+  const terms = queryTerms(query);
   const fallback = (code: string) => ({ candidates: [], selected: [], diagnostics: [{ code, stage: "tree_navigation", retryable: false }], limited: true });
   const unchanged = (current: Snapshot) => current.indexRevision === snapshot.indexRevision && current.cacheGeneration === snapshot.cacheGeneration;
   while (queue.length && selected.length < limit) {
@@ -75,7 +77,7 @@ export async function navigateTree(store: HistoryStore, query: string, snapshot:
               Array.isArray(content) ? content.flatMap((b, i) => b && b.type === "text" && typeof b.text === "string" ? [[`/content/${i}/text`, b.text] as [string, string]] : []) : [];
             for (const [pointer, text] of parts) {
               if (!text) continue;
-              const excerpt = Array.from(text).slice(0, Math.floor(store.config.maxEvidenceTextScalars / Math.max(1, limit))).join("");
+              const excerpt = excerptForQuery(text, terms, Math.max(1, Math.floor(store.config.maxEvidenceTextScalars / limit)));
               limited ||= Array.from(excerpt).length < Array.from(text).length;
               candidates.push({ messageId: message.messageId, seq: message.seq, sourcePointer: pointer, excerpt,
                 contentHash: createHash("sha256").update(message.textProjection ?? "", "utf8").digest("hex") });

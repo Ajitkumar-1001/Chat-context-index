@@ -65,7 +65,7 @@ jobs:
           pytest ../../tests/conformance ../../tests/memory ../../tests/examples ../../tests/evaluations -v
         working-directory: packages/python
       - name: Run native TypeScript memory suite
-        run: node --test tests/memory/tree_memory.test.mjs
+        run: node --test tests/memory/*.test.mjs
 
   clean-install:
     runs-on: ubuntu-latest

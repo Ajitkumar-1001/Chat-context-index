@@ -1,5 +1,22 @@
 # Conversation memory development evaluation
 
+## Evidence-selection fix (September 23, 2026)
+
+The current Python and TypeScript implementations rank original evidence before applying limits,
+keep matching spans when shortening text, and tolerate unmatched words in lexical questions.
+The unchanged brand fixture now recovers 7/8 required sources with lexical retrieval and 8/8
+with recent plus lexical memory, compared with 4/8 and 7/8 previously. No model was called.
+The installed wheel also retains sequence 13 in the independent context-selection probe.
+
+[The fix report](evidence-selection/README.md) links the new development results, shared regression
+fixture, artifact hashes, and Linux verification: 190 Python tests, 21 TypeScript tests, real Redis,
+fresh package interoperability, and reference performance thresholds all pass locally.
+The new wheel's live smoke stopped on HTTP 429 after one successful indexing call (76 input and
+31 output tokens); the failed call has unknown usage. Held-out quality and total cost for the new
+implementation remain unverified. Existing reports below describe the earlier implementation.
+
+## Earlier evaluation evidence
+
 For the installed-wheel development smoke test and configurable provider/model selection, see
 [live-model setup](LIVE_SMOKE.md). Both live evaluators support presets and custom Chat Completions endpoints.
 Its [current report](results/live-smoke.json) is `PASS` with `gemini-3.5-flash-lite`: the installed wheel

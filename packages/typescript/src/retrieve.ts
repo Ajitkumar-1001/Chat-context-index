@@ -9,6 +9,7 @@ import { HistoryStore } from "./store.js";
 import { BoundedProvider, CallBudget } from "./provider.js";
 import { renderEvidenceContext } from "./contextAssembly.js";
 import { navigateTree } from "./treeRetrieval.js";
+import { queryTerms, relevance } from "./relevance.js";
 
 export const CONTRACT_VERSION = 1;
 
@@ -166,6 +167,9 @@ export async function retrieve(
     diagnostics.push({ code: "tree_revision_changed", stage: "retrieve", retryable: false });
   }
   const unique = new Map<string, typeof candidates[number]>();
+  const terms = queryTerms(query);
+  candidates = candidates.map(candidate => ({ candidate, score: relevance(candidate.excerpt, terms) }))
+    .sort((a, b) => b.score - a.score || b.candidate.seq - a.candidate.seq).map(({ candidate }) => candidate);
   for (const c of candidates) if (!unique.has(`${c.messageId}:${c.sourcePointer}`)) unique.set(`${c.messageId}:${c.sourcePointer}`, c);
   const evidence: Evidence[] = [...unique.values()].map((c, i) => ({
     evidenceId: `ev_${i + 1}`,

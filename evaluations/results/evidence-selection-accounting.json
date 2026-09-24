@@ -1,0 +1,34 @@
+{
+  "timestamp_utc": "2026-09-24T00:27:47.937577+00:00",
+  "scope": "Prior comparison ledger plus the new fixed-wheel smoke; no double-counting of carried calls. Does not include unrelated historical smoke runs. No new cost-savings claim.",
+  "inputs": {
+    "evaluations/held_out/accounting-integrity.json": "0d1e24f72e3fa6eff2b62bbcf40892bca204781fdce1766e61a681ad1c9db3db",
+    "evaluations/results/live-smoke-evidence-selection.json": "2a88515f82678cbed5a7c2051f0e5e0146cc698d12ec25c928e9700809f59a37"
+  },
+  "new_smoke": {
+    "calls": 2,
+    "input_tokens_observed": 76,
+    "output_tokens_observed": 31,
+    "calls_with_unknown_usage": 1,
+    "reserved_tokens": 2023,
+    "reserved_usd": 0.0012383,
+    "standard_price_estimate_observed_usd": 0.0001003
+  },
+  "cumulative": {
+    "calls": 496,
+    "input_tokens_observed": 2537344,
+    "output_tokens_observed": 15650,
+    "calls_with_unknown_usage": 4,
+    "reserved_tokens": 2577676,
+    "reserved_usd": 0.8150544,
+    "standard_price_estimate_observed_usd": 0.8003282,
+    "within_original_allowance": true
+  },
+  "reservation_rule": "The smoke records input Unicode-scalar counts, not bytes. For missing input usage conservatively reserve four UTF-8 bytes per scalar plus 512 tokens, and the 256-token output cap. This is a client-side bound, not a bill.",
+  "pricing": "Use the unchanged comparison plan rates: USD 0.30/million input and 2.50/million output tokens.",
+  "allowance": {
+    "calls": 1200,
+    "reserved_tokens": 6000000,
+    "estimated_usd": 3
+  }
+}

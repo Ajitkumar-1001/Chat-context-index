@@ -21,7 +21,7 @@
 </div>
 
 > [!NOTE]
-> **Pre-release.** Installed memory checks and the local Linux test suite pass. Two real-model held-out trials expose a source-selection gap; provider HTTP 429 errors prevented completion of the three-trial evaluation. Cost savings and registry publication remain unverified. [Measured results](evaluations/held_out/reports/README.md).
+> **Pre-release.** Evidence selection is fixed in Python and TypeScript and passes development regressions, clean package installs, and local Linux checks. The rebuilt wheel's live smoke was interrupted by HTTP 429; held-out quality and cost savings remain unverified for this build. [Fix and verification](evaluations/evidence-selection/README.md).
 
 ## Overview
 
@@ -104,12 +104,12 @@ CCI_API_KEY=your-provider-key
 Presets cover OpenAI, Gemini, Anthropic, Groq, OpenRouter, and local Ollama through their Chat Completions
 compatibility endpoints. Set `CCI_BASE_URL` for another compatible service. Other native APIs can implement
 the package's `Provider` contract. See [configuration and limits](evaluations/LIVE_SMOKE.md). All presets
-have offline routing tests; Gemini also passes the installed-wheel development smoke test. Other providers
-have not passed a live run.
+have offline routing tests; an earlier Python wheel passed the Gemini development smoke. The rebuilt
+wheel's smoke encountered HTTP 429. Other providers have not passed a live run.
 
 ## Measured example
 
-The [real-model comparison](evaluations/held_out/reports/README.md) uses the installed Python wheel
+The earlier [real-model comparison](evaluations/held_out/reports/README.md) used the previous Python wheel
 and `gemini-3.5-flash-lite`. In each of two completed answer-generation trials:
 
 | Strategy | Required original evidence recovered, out of 32 answerable cases |
@@ -120,18 +120,23 @@ and `gemini-3.5-flash-lite`. In each of two completed answer-generation trials:
 
 All three strategies abstained on the eight absent-answer cases in each completed trial.
 The third trial and answer review remain incomplete after repeated HTTP 429 responses.
-Across all attempts, **2,537,268 input tokens and 15,619 output tokens** were observed;
+Across those comparison attempts, **2,537,268 input tokens and 15,619 output tokens** were observed;
 three failed calls have unknown usage. **These results do not support a lower-cost claim.**
-A separate development probe reproduces loss of a needed message during context assembly,
-even when tree navigation finds the correct chunk. Source selection needs improvement before release.
+A separate development probe reproduced loss of a needed message during context assembly,
+even when tree navigation found the correct chunk. The new implementation retains that source in
+[the installed-wheel probe](evaluations/results/context-selection-fixed-installed.json).
+These historical held-out scores must be rerun against the fixed implementation before release.
 
-The [installed-wheel live smoke](evaluations/results/live-smoke.json) uses `gemini-3.5-flash-lite`
+The earlier [installed-wheel live smoke](evaluations/results/live-smoke.json) used `gemini-3.5-flash-lite`
 with four synthetic messages. After closing and reopening SQLite, tree navigation retrieves the original
 “The deployment target is Oslo.” for “Where should the service launch?”; lexical search finds no evidence.
 The successful run records **1,047 input tokens and 288 output tokens** across six indexing and two
 navigation calls. Indexing unchanged history makes zero calls. This verifies one development fixture;
 it does not measure general recall, answer quality, or cost savings. Earlier failed attempts are preserved
 in the [run history](evaluations/LIVE_SMOKE.md#current-environment), including a timeout with unknown usage.
+The [new wheel's smoke](evaluations/results/live-smoke-evidence-selection.json) stopped on HTTP 429
+during indexing: one successful call recorded 76 input and 31 output tokens, and one rejected call
+has unknown usage. It did not reach retrieval.
 
 The [tree dry run](evaluations/results/tree-memory.json) uses 128 synthetic messages and a deterministic provider double. Full-history evidence contains **207,260 characters**; selected memory contains **4,868**. Navigation adds **19,492 input characters across four calls**. Initial indexing takes **171 calls**; an unchanged rerun takes zero. These are reproducible mechanics and character counts, **not token savings, dollar savings, or semantic recall scores**. [Evaluation script](evaluations/tree_memory.py).
 
@@ -140,12 +145,12 @@ The [development evaluation](evaluations/brand_memory.py) uses 23 synthetic mess
 | Approach | Required source evidence found, across eight answerable cases |
 | :--- | :---: |
 | Recent history only | 6 / 8 |
-| Current lexical retrieval | 4 / 8 |
-| Recent history plus lexical retrieval | 7 / 8 |
+| Current lexical retrieval | 7 / 8 |
+| Recent history plus lexical retrieval | 8 / 8 |
 
-The combined approach recovered older facts and a recent correction, but missed a timezone preference that recent history alone retained. These are small, hand-authored development cases. They establish neither general retrieval accuracy nor answer correctness. Two additional cases check behavior without supporting evidence. No model was called.
+Lexical retrieval improved from 4/8 to 7/8; combined memory improved from 7/8 to 8/8 on the unchanged development fixture. The timezone preference now survives selection. These are small, hand-authored development cases. They establish neither general retrieval accuracy nor answer correctness. Two additional cases check behavior without supporting evidence. No model was called.
 
-The [complete report](evaluations/results/brand-memory.json) includes per-case results, source fingerprints, environment versions, and storage checks. Five example boundary tests and seven existing persistence/ingestion tests passed locally.
+The [current report](evaluations/results/brand-memory-evidence-selection.json) includes per-case results, source fingerprints, environment versions, and storage checks. The [earlier report](evaluations/results/brand-memory.json) is preserved for comparison.
 
 ## How it works
 
@@ -170,18 +175,18 @@ flowchart LR
 
 3. **Retrieve within a snapshot.** With a supplied provider, `tree` and `auto` navigate branch summaries, validate selected IDs, and load original source fields. Navigation steps and attempts, including retries, are capped. Lexical search remains available without a model and as a fallback. Index changes discard affected tree selections; a history clear invalidates the request.
 
-4. **Prepare the next turn.** The context API reserves recent messages, adds retrieved source evidence, deduplicates source fields, and restores conversation order. Labels and escaped delimiters count toward the budget. The host supplies this historical data alongside its document RAG results, trusted instructions, and new question. Optional `ask()` performs retrieval and cited synthesis, but does not include the context API's recent-message reserve.
+4. **Prepare the next turn.** Original evidence is ranked by distinct query-term matches before applying retrieval and context limits; newer messages break ties. Lexical matching tolerates unmatched question words. Long source fields use a matching window of their original text. The context API reserves recent messages, adds ranked evidence, deduplicates source fields, and restores conversation order. Labels and escaped delimiters count toward the budget. This selection adds no model calls. The host supplies this historical data alongside its document RAG results, trusted instructions, and new question. Optional `ask()` performs retrieval and cited synthesis, but does not include the context API's recent-message reserve.
 
 The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatIndex)'s summary-to-source approach, using an independently implemented chronological grouping algorithm. It does not reproduce upstream's topic-boundary detection. Python's optional memoization remains separate from authoritative history.
 
 ## Current boundaries
 
 - The supported topology is one owning application process per history on durable local storage. A serverless or distributed deployment needs a separate storage design.
-- Literal keyword retrieval can miss natural-language questions. Default context selection can drop needed messages from a retrieved chunk; the held-out recall threshold currently fails. Answer quality and automatic conflict resolution remain unverified.
+- Local ranking depends on shared words and can miss paraphrases. Development regressions cover evidence lost during selection, but the new build still needs held-out validation. Answer quality and automatic conflict resolution remain unverified.
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- The local Linux CI reproduction passes 165 Python tests, 8 native TypeScript tests, and fresh installed-package memory checks. Hosted CI, dedicated release performance checks, and the full real-model quality gate remain open. [Linux evidence](evaluations/results/linux-release/README.md).
+- The local Linux CI reproduction passes 190 Python tests, 21 native TypeScript tests, and fresh installed-package memory checks. Hosted CI, dedicated release performance checks, and the full real-model quality gate remain open. [Linux evidence](evaluations/results/linux-evidence-selection/README.md).
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 

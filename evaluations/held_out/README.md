@@ -70,10 +70,15 @@ limits prevented completion. The per-request package limits alone are not a doll
 
 ## Budgeted memory comparison
 
-**Current outcome:** [INCOMPLETE; tree recall FAIL](reports/README.md). In each of two completed
+**Previous implementation:** [INCOMPLETE; tree recall FAIL](reports/README.md). In each of two completed
 answer-generation trials, full history recovered 32/32 expected sources, tree memory 1/32, and
 recent/lexical memory 0/32. The third trial and answer review are incomplete. No lower-cost claim
 is supported. The report includes observed tokens, unknown usage, source excerpts, and all attempts.
+
+The subsequent [evidence-selection fix](../evidence-selection/README.md) was developed against
+separate visible fixtures. It preserves this fixture, evaluator, thresholds, and prior reports.
+Its installed-wheel development smoke was also interrupted by HTTP 429, before retrieval.
+There is no new held-out score for the fixed runtime yet.
 
 The [frozen comparison plan](comparison-plan-v2.json) extends this harness with three strategies:
 all original text, recent plus lexical memory, and `prepare_context(mode="tree")` with recent memory.

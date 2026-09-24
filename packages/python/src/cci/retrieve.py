@@ -24,6 +24,7 @@ from .context_assembly import EvidenceBlock, render_evidence_context
 from .errors import VersionConflict
 from .io_worker import fetchone
 from .provider import CallBudget, MemoizedProvider
+from .relevance import query_terms, relevance
 from .search import Diagnostic, LexicalCandidate, search
 from .store import HistoryStore
 
@@ -195,6 +196,8 @@ async def retrieve(
         diagnostics.append(Diagnostic("tree_revision_changed", "retrieve"))
 
     unique: dict[tuple[str, str], LexicalCandidate] = {}
+    terms = query_terms(query)
+    candidates.sort(key=lambda candidate: (-relevance(candidate.excerpt, terms), -candidate.seq))
     for candidate in candidates:
         unique.setdefault((candidate.message_id, candidate.source_pointer), candidate)
     evidence = [

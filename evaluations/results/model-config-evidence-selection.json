@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "evaluation": "development_fixture_live_smoke",
+  "timestamp_utc": "2026-09-24T00:21:17.522689+00:00",
+  "runner_sha256": "2c742527621e5adf1c4b9b8201779791b742f8298b1fe96341db003b90eb2f8c",
+  "limits": {
+    "max_calls": 10,
+    "max_completion_tokens": 256,
+    "max_input_chars_per_call": 8000,
+    "call_timeout_s": 20,
+    "run_timeout_s": 180
+  },
+  "sdk_retries": 0,
+  "package_attempts_per_operation": 1,
+  "status": "NOT_RUN",
+  "checks": {},
+  "scope": "One synthetic development query; no held-out quality, answer generation, or cost claim.",
+  "package": {
+    "version": "0.1.0",
+    "import_path": "/private/tmp/cont-index-evidence-selection-20260923/venv/lib/python3.12/site-packages/cci/__init__.py",
+    "python": "3.12.11",
+    "executable": "/private/tmp/cont-index-evidence-selection-20260923/venv/bin/python",
+    "isolated_python": true,
+    "wheel_sha256": "81c35955507719b919bd04341d85a6ea863c3976a6278068adcbd7540b3f7254",
+    "installed_sources_match_wheel": true,
+    "openai_version": "2.45.0"
+  },
+  "fixture_sha256": "19674ad028c831bcee035071a21abbd1d2846d6274f66712398382e47db596b5",
+  "provider": "gemini",
+  "requested_model": "gemini-3.5-flash-lite",
+  "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+  "protocol": "openai_chat_completions",
+  "token_limit_field": "max_tokens",
+  "response_format": "json_object",
+  "reason": "configuration_verified_without_model_calls",
+  "calls": [],
+  "usage": {
+    "attempts": 0,
+    "input_tokens_observed": 0,
+    "output_tokens_observed": 0,
+    "usage_unknown": false,
+    "by_operation": {}
+  }
+}

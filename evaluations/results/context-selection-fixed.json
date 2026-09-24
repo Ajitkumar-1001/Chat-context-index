@@ -1,0 +1,344 @@
+{
+  "scope": "Invented messages; deterministic leaf selection; zero real-model calls.",
+  "runner_sha256": "3659e1127d984d964eeb745ebdab73949a234afdc7a73268b48d13550e36d5b5",
+  "runtime_package": "/Users/ajit/dev/cont-index/packages/python/src/cci/__init__.py",
+  "message_count": 28,
+  "expected_seq": 13,
+  "expected_original": "Decision: the release codename is AZURE-MOTH.",
+  "query": "Which release codename was chosen?",
+  "index_status": "complete",
+  "tree_mode": "tree",
+  "raw_retrieval_contains_required_source": true,
+  "prepared_context_contains_required_source": true,
+  "prepared_source_sequences": [
+    13,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28
+  ],
+  "prepared_context": {
+    "text": "<<<CCI_EVIDENCE id=m_01M38BYR5P52DBW1CKSS0YGM7V source=/content\nDecision: the release codename is AZURE-MOTH.\nCCI_EVIDENCE_END>>>\n<<<CCI_EVIDENCE id=m_01M38BYR5Q64PFQECFMMGED4ZF source=/content\nRoutine progress note number 21.\nCCI_EVIDENCE_END>>>\n<<<CCI_EVIDENCE id=m_01M38BYR5QF542KF3X9CBDXEN1 source=/content\nRoutine progress note number 22.\nCCI_EVIDENCE_END>>>\n<<<CCI_EVIDENCE id=m_01M38BYR5QB0NVX4NYEHK2HCGF source=/content\nRoutine progress note number 23.\nCCI_EVIDENCE_END>>>\n<<<CCI_EVIDENCE id=m_01M38BYR5Q9D14FWB9ZKARW6VH source=/content\nRoutine progress note number 24.\nCCI_EVIDENCE_END>>>\n<<<CCI_EVIDENCE id=m_01M38BYR5QSHMG879WFC2MDYHH source=/content\nRoutine progress note number 25.\nCCI_EVIDENCE_END>>>\n<<<CCI_EVIDENCE id=m_01M38BYR5QEREJC1424YME2YQG source=/content\nRoutine progress note number 26.\nCCI_EVIDENCE_END>>>\n<<<CCI_EVIDENCE id=m_01M38BYR5Q2GJ4ZG7FGJ5CZDAC source=/content\nRoutine progress note number 27.\nCCI_EVIDENCE_END>>>",
+    "items": [
+      {
+        "message_id": "m_01M38BYR5P52DBW1CKSS0YGM7V",
+        "seq": 13,
+        "source_pointer": "/content",
+        "excerpt": "Decision: the release codename is AZURE-MOTH."
+      },
+      {
+        "message_id": "m_01M38BYR5Q64PFQECFMMGED4ZF",
+        "seq": 22,
+        "source_pointer": "/content",
+        "excerpt": "Routine progress note number 21."
+      },
+      {
+        "message_id": "m_01M38BYR5QF542KF3X9CBDXEN1",
+        "seq": 23,
+        "source_pointer": "/content",
+        "excerpt": "Routine progress note number 22."
+      },
+      {
+        "message_id": "m_01M38BYR5QB0NVX4NYEHK2HCGF",
+        "seq": 24,
+        "source_pointer": "/content",
+        "excerpt": "Routine progress note number 23."
+      },
+      {
+        "message_id": "m_01M38BYR5Q9D14FWB9ZKARW6VH",
+        "seq": 25,
+        "source_pointer": "/content",
+        "excerpt": "Routine progress note number 24."
+      },
+      {
+        "message_id": "m_01M38BYR5QSHMG879WFC2MDYHH",
+        "seq": 26,
+        "source_pointer": "/content",
+        "excerpt": "Routine progress note number 25."
+      },
+      {
+        "message_id": "m_01M38BYR5QEREJC1424YME2YQG",
+        "seq": 27,
+        "source_pointer": "/content",
+        "excerpt": "Routine progress note number 26."
+      },
+      {
+        "message_id": "m_01M38BYR5Q2GJ4ZG7FGJ5CZDAC",
+        "seq": 28,
+        "source_pointer": "/content",
+        "excerpt": "Routine progress note number 27."
+      }
+    ],
+    "omitted_candidates": 20,
+    "truncated_excerpts": 0,
+    "token_count": null,
+    "retrieval": {
+      "contract_version": 1,
+      "history_id": "t_01M38BYR5HWGTVGDV6FYC047FE",
+      "status": "ok",
+      "snapshot": {
+        "history_revision": 1,
+        "index_revision": 1,
+        "snapshot_max_seq": 28,
+        "cache_generation": 0
+      },
+      "evidence": [
+        {
+          "evidence_id": "ev_28",
+          "message_id": "m_01M38BYR5MXVT8VY3QE42DRAF4",
+          "seq": 1,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 0.",
+          "content_hash": "46d9c8caf3a78303dc335086f9e83064f0e8d0f612f70ca19b5364b76b7122d6"
+        },
+        {
+          "evidence_id": "ev_27",
+          "message_id": "m_01M38BYR5MBJSANWXN2GGGWWX5",
+          "seq": 2,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 1.",
+          "content_hash": "34f43eb244dd9d4d54af84984d8a7422f60e28187e0f90139f71401216085704"
+        },
+        {
+          "evidence_id": "ev_26",
+          "message_id": "m_01M38BYR5MQXZD8V6RQGV1PPBN",
+          "seq": 3,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 2.",
+          "content_hash": "25aaef90973b560d7a120a14de201a7cdc6bf720b645ba9c390904ae92570761"
+        },
+        {
+          "evidence_id": "ev_25",
+          "message_id": "m_01M38BYR5MB0XZ4A1DPX316RDT",
+          "seq": 4,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 3.",
+          "content_hash": "0bf8ecf4fb04a659b2b4dfb29651aa4debbbc44de80643e114f08bdac56c4423"
+        },
+        {
+          "evidence_id": "ev_24",
+          "message_id": "m_01M38BYR5NST5HW75SC3Z987PV",
+          "seq": 5,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 4.",
+          "content_hash": "9db936108eb1ef4a9622f419c3013b51ea735c931583eb98b49d41cf41d8ea9e"
+        },
+        {
+          "evidence_id": "ev_23",
+          "message_id": "m_01M38BYR5NT3147JSE1VSC9BJG",
+          "seq": 6,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 5.",
+          "content_hash": "0255102923b635dbfa232b0d328ec5283fc74d8c6e3460814be0ff2dde6412bf"
+        },
+        {
+          "evidence_id": "ev_22",
+          "message_id": "m_01M38BYR5N5MTVH0HA5A9J8FBD",
+          "seq": 7,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 6.",
+          "content_hash": "35097249d62a26f1a043dd044de39c141d2c4a2d01e0700e025601ba91b1f6f6"
+        },
+        {
+          "evidence_id": "ev_21",
+          "message_id": "m_01M38BYR5NSWAFQQ11C53W6G4D",
+          "seq": 8,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 7.",
+          "content_hash": "3ba98c7af5bc2a8d9e2744ea0635a20c74c0a9febca709f544c82343b19013b8"
+        },
+        {
+          "evidence_id": "ev_20",
+          "message_id": "m_01M38BYR5NE0CVZ8B1NSFNM1WH",
+          "seq": 9,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 8.",
+          "content_hash": "3c3cdcfa665f044880882e949585cf2f357b9a5ee15a2a75a4d446b8739f5117"
+        },
+        {
+          "evidence_id": "ev_19",
+          "message_id": "m_01M38BYR5NPWSGGPSSZ7FTHH2E",
+          "seq": 10,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 9.",
+          "content_hash": "ce23438ad428b56f40242b27ef0fb721e459a75e4c8763df78045a1e829ce4fa"
+        },
+        {
+          "evidence_id": "ev_18",
+          "message_id": "m_01M38BYR5NASYXPF84C9SHR829",
+          "seq": 11,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 10.",
+          "content_hash": "86a1ed4c07f47ed3c57d9fe89ef906513f13fbed09ffe2c600599ea5794de1e0"
+        },
+        {
+          "evidence_id": "ev_17",
+          "message_id": "m_01M38BYR5NVTMH8ESG5AFJ4X1A",
+          "seq": 12,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 11.",
+          "content_hash": "6bb1f565ef2c154897932141b0ae39b7fb31ec9fb029b8a461b13e5c77a3cb8f"
+        },
+        {
+          "evidence_id": "ev_1",
+          "message_id": "m_01M38BYR5P52DBW1CKSS0YGM7V",
+          "seq": 13,
+          "source_pointer": "/content",
+          "excerpt": "Decision: the release codename is AZURE-MOTH.",
+          "content_hash": "dda7bca4362400ef1bf349a0e2935baa7a7cd51937a17cf65d57231c6d4cde10"
+        },
+        {
+          "evidence_id": "ev_16",
+          "message_id": "m_01M38BYR5PF18FMM74SQBJD0S4",
+          "seq": 14,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 13.",
+          "content_hash": "361f738e3ef7483cb54d95c2fba1a59fc5da45801c2fc397d2f5d5bd00f6fbfd"
+        },
+        {
+          "evidence_id": "ev_15",
+          "message_id": "m_01M38BYR5PD5MTG33EV6ANT28D",
+          "seq": 15,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 14.",
+          "content_hash": "25e10d420f7888338739f16c9b5cb871f3c7c1e19feb9d449dab94dc26ef92d8"
+        },
+        {
+          "evidence_id": "ev_14",
+          "message_id": "m_01M38BYR5PSY680TSN1AWQ5GT7",
+          "seq": 16,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 15.",
+          "content_hash": "4914af2de1b98f34f38e187e2285d1e46ee37e0e55e82558153ad0b1e06efb1b"
+        },
+        {
+          "evidence_id": "ev_13",
+          "message_id": "m_01M38BYR5PN7PDJWGATBKHZV23",
+          "seq": 17,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 16.",
+          "content_hash": "8620935af561d305522736854e759f57e7c72466761246ba13d5e670ca8e23b2"
+        },
+        {
+          "evidence_id": "ev_12",
+          "message_id": "m_01M38BYR5P9YF70H1MTGC4VTY1",
+          "seq": 18,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 17.",
+          "content_hash": "85e5abab7e2e3b746e199a63d867f2211177dacba6e92617b5be404e830a24d5"
+        },
+        {
+          "evidence_id": "ev_11",
+          "message_id": "m_01M38BYR5P9KM855YC8KMJP4BE",
+          "seq": 19,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 18.",
+          "content_hash": "b889b993c60ceee8176166c4d583bb0f714c8cd4007630a84241f3ecfb99bec4"
+        },
+        {
+          "evidence_id": "ev_10",
+          "message_id": "m_01M38BYR5PN6RSDCNSTT8FFYV7",
+          "seq": 20,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 19.",
+          "content_hash": "0d4539461f875fd448d6bc679e585a98c6416575da0855bf68722f4a68b23b11"
+        },
+        {
+          "evidence_id": "ev_9",
+          "message_id": "m_01M38BYR5P9D9EDSTQ1PSQGV6T",
+          "seq": 21,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 20.",
+          "content_hash": "3b8661b8d7c7858046a67ad2268f774c3031e5f98feb785b1350ce55491ffa53"
+        },
+        {
+          "evidence_id": "ev_8",
+          "message_id": "m_01M38BYR5Q64PFQECFMMGED4ZF",
+          "seq": 22,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 21.",
+          "content_hash": "30154f5ff798c5ec7e9f7fe90bad4e3f4ddc918cb75f8b974bea4dc5688f54ff"
+        },
+        {
+          "evidence_id": "ev_7",
+          "message_id": "m_01M38BYR5QF542KF3X9CBDXEN1",
+          "seq": 23,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 22.",
+          "content_hash": "a7017853e54f8174d703ce65859b1d4540448bf4eca2bb6d2199bafa92d80418"
+        },
+        {
+          "evidence_id": "ev_6",
+          "message_id": "m_01M38BYR5QB0NVX4NYEHK2HCGF",
+          "seq": 24,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 23.",
+          "content_hash": "599472ca609e00ebdf258d88ca63627d1cd848facf4279610a158c96ac8d5a99"
+        },
+        {
+          "evidence_id": "ev_5",
+          "message_id": "m_01M38BYR5Q9D14FWB9ZKARW6VH",
+          "seq": 25,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 24.",
+          "content_hash": "200c4e757a2e6e341c32dff30c0633757e3a76e28f83d48787fa4837556e3f76"
+        },
+        {
+          "evidence_id": "ev_4",
+          "message_id": "m_01M38BYR5QSHMG879WFC2MDYHH",
+          "seq": 26,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 25.",
+          "content_hash": "3adf549cd275663043c0ceb8c475f62b8f7aeb52f0abbd6505c8f2537e81959a"
+        },
+        {
+          "evidence_id": "ev_3",
+          "message_id": "m_01M38BYR5QEREJC1424YME2YQG",
+          "seq": 27,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 26.",
+          "content_hash": "31800cd25c1c133584841ced5c1c8302f22dc2fb889abbb16227df1083490dc1"
+        },
+        {
+          "evidence_id": "ev_2",
+          "message_id": "m_01M38BYR5Q2GJ4ZG7FGJ5CZDAC",
+          "seq": 28,
+          "source_pointer": "/content",
+          "excerpt": "Routine progress note number 27.",
+          "content_hash": "b60508f9a86963570d39180df4d384a23f60d8088fb3aac38f06414263087601"
+        }
+      ],
+      "routing": {
+        "requested_mode": "tree",
+        "actual_mode": "tree",
+        "candidate_count": 28,
+        "selected_chunk_ids": [
+          "c_01M38BYR5SWYVZAKSBS9JT1TQ3"
+        ]
+      },
+      "coverage": {
+        "coverage_limited": false,
+        "index_degraded": false,
+        "omitted_excerpt_count": 0
+      },
+      "diagnostics": [],
+      "usage": {
+        "current_provider_calls": 1,
+        "retries": 0,
+        "usage_unknown": true,
+        "memo_hits": 0,
+        "memo_misses": 0,
+        "memo_errors": 0,
+        "stage_ms": {},
+        "input_tokens": null,
+        "output_tokens": null
+      }
+    }
+  },
+  "keyword_search_candidates": 1,
+  "natural_question_search_candidates": 1,
+  "interpretation": "A selected leaf can contain the needed source while bounded context omits it. This probes a mechanism, not the cause of every held-out miss."
+}

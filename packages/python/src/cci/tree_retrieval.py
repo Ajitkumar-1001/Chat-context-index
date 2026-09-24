@@ -10,6 +10,7 @@ from .context_assembly import EvidenceBlock, render_evidence_context
 from .errors import BudgetExceeded, ProviderError, ProviderTimeout
 from .io_worker import fetchall
 from .provider import ProviderRequest
+from .relevance import excerpt_for_query, query_terms
 from .search import Diagnostic, LexicalCandidate
 
 
@@ -25,6 +26,7 @@ async def navigate_tree(store, query, snapshot, provider, budget, deadline_at, l
         store.config.application_namespace, store.store_instance_id, store.history_id,
         snapshot.cache_generation,
     )
+    terms = query_terms(query)
 
     def fallback(code):
         return [], [], [Diagnostic(code, "tree_navigation")], True
@@ -121,7 +123,9 @@ async def navigate_tree(store, query, snapshot, provider, budget, deadline_at, l
                         for pointer, text in parts:
                             if not text:
                                 continue
-                            excerpt = text[:store.config.max_evidence_text_scalars // max(1, limit)]
+                            excerpt = excerpt_for_query(
+                                text, terms, max(1, store.config.max_evidence_text_scalars // limit),
+                            )
                             limited |= len(excerpt) < len(text)
                             candidates.append(LexicalCandidate(
                                 message.message_id, message.seq, pointer, excerpt,

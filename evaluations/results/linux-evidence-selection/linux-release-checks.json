@@ -1,0 +1,98 @@
+{
+  "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+  "python": "3.12.14",
+  "scope": "Local Linux arm64 Docker reproduction of CI commands; not GitHub CI or a dedicated performance runner.",
+  "source_hashes": {
+    "python": "8bc076a88a6218358a2c829b6a5c0d59073f4b6daa559e01ee8f5fad874b56c5",
+    "typescript": "3dccbbce528339e9107ff3d51fa834cd0ac430c103a49422f1c8e0c6804455ff"
+  },
+  "checks": [
+    {
+      "command": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "--config",
+        "packages/python/pyproject.toml",
+        "packages/python/src"
+      ],
+      "exit_code": 0,
+      "log": "check-1.log"
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "packages/python/pyproject.toml",
+        "packages/python/src/cci",
+        "--ignore-missing-imports"
+      ],
+      "exit_code": 0,
+      "log": "check-2.log"
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "packages/typescript",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": "check-3.log"
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "tests/conformance",
+        "tests/memory",
+        "tests/examples",
+        "tests/evaluations",
+        "-q",
+        "--junitxml=/out/tests.xml"
+      ],
+      "exit_code": 0,
+      "log": "check-4.log"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "tests/memory/tree_memory.test.mjs",
+        "tests/memory/evidence_selection.test.mjs"
+      ],
+      "exit_code": 0,
+      "log": "check-5.log"
+    },
+    {
+      "command": [
+        "python",
+        "tests/packaging/verify_packages.py",
+        "--report",
+        "/out/package-memory.json",
+        "--artifacts-out",
+        "/out/artifacts"
+      ],
+      "exit_code": 0,
+      "log": "check-6.log"
+    },
+    {
+      "command": [
+        "python",
+        "benchmarks/reference_fixture_benchmark.py",
+        "--out",
+        "/out/performance.json",
+        "--label",
+        "evidence-selection Linux container; shared host"
+      ],
+      "exit_code": 0,
+      "log": "check-7.log"
+    }
+  ],
+  "status": "PASS"
+}

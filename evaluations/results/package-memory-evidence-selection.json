@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-09-24T00:17:16.264633+00:00",
+  "method": "Fresh wheel/npm installs outside checkout; separate seed/read processes; deterministic provider",
+  "python": "3.12.11",
+  "node": "v22.23.1",
+  "platform": "macOS-26.2-arm64-arm-64bit",
+  "typescript_consumer_typecheck": "PASS",
+  "package_documentation_and_license": "PASS",
+  "source_sha256": {
+    "python": "8bc076a88a6218358a2c829b6a5c0d59073f4b6daa559e01ee8f5fad874b56c5",
+    "typescript": "3dccbbce528339e9107ff3d51fa834cd0ac430c103a49422f1c8e0c6804455ff"
+  },
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "81c35955507719b919bd04341d85a6ea863c3976a6278068adcbd7540b3f7254"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "ed53f730f5cdc40920347c802189736108e4d1b10b452de504c91a27fd324053"
+    }
+  ],
+  "checks": [
+    {
+      "writer": "python",
+      "reader": "python",
+      "status": "PASS",
+      "package_path": "/private/var/folders/fk/nwkgvkjn4mb_fm93n1pqvpvw0000gn/T/cci-installed-memory-pngpi7_4/python-consumer/venv/lib/python3.12/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python",
+      "reader": "typescript",
+      "status": "PASS",
+      "package_path": "/private/var/folders/fk/nwkgvkjn4mb_fm93n1pqvpvw0000gn/T/cci-installed-memory-pngpi7_4/node-consumer/node_modules/chat-context-index/dist/index.js",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "python",
+      "status": "PASS",
+      "package_path": "/private/var/folders/fk/nwkgvkjn4mb_fm93n1pqvpvw0000gn/T/cci-installed-memory-pngpi7_4/python-consumer/venv/lib/python3.12/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "typescript",
+      "status": "PASS",
+      "package_path": "/private/var/folders/fk/nwkgvkjn4mb_fm93n1pqvpvw0000gn/T/cci-installed-memory-pngpi7_4/node-consumer/node_modules/chat-context-index/dist/index.js",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    }
+  ],
+  "not_measured": [
+    "real-model retrieval quality",
+    "answer correctness",
+    "model tokens or cost"
+  ]
+}

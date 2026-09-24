@@ -13,6 +13,7 @@ from cci.context_assembly import EvidenceBlock, render_evidence_context
 from cci.errors import VersionConflict
 from cci.models import Message
 from cci.provider import MemoizedProvider
+from cci.relevance import excerpt_for_query, query_terms, relevance
 from cci.retrieve import RetrievalResult, retrieve
 from cci.stats import stats
 from cci.store import HistoryStore
@@ -68,6 +69,7 @@ def pack_context(
     excerpt_chars: int = 200,
     max_tokens: int | None = None,
     token_counter: Callable[[str], int] | None = None,
+    query: str = "",
 ) -> Context:
     """Select in caller priority order, render in conversation order, and count omissions.
 
@@ -85,10 +87,11 @@ def pack_context(
         unique.setdefault((item.message_id, item.source_pointer), item)
     selected: list[ContextItem] = []
     truncated = 0
+    terms = query_terms(query)
     for item in unique.values():
         if len(selected) >= max_messages:
             break
-        excerpt = item.excerpt[:excerpt_chars]
+        excerpt = excerpt_for_query(item.excerpt, terms, excerpt_chars)
         bounded = ContextItem(item.message_id, item.seq, item.source_pointer, excerpt)
         text = _render(selected + [bounded])
         if len(text) > max_chars or (
@@ -147,12 +150,14 @@ async def prepare_context(
     ) if recent_messages else []
     # Newest first for selection priority; pack_context restores chronological display order.
     candidates = [item for message in reversed(recent) for item in message_items(message)]
+    terms = query_terms(query)
     candidates.extend(
         ContextItem(e.message_id, e.seq, e.source_pointer, e.excerpt)
-        for e in result.evidence
+        for e in sorted(result.evidence, key=lambda e: (-relevance(e.excerpt, terms), -e.seq))
     )
     context = pack_context(candidates, max_messages=max_messages, max_chars=max_chars,
-                           excerpt_chars=excerpt_chars, max_tokens=max_tokens, token_counter=token_counter)
+                           excerpt_chars=excerpt_chars, max_tokens=max_tokens, token_counter=token_counter,
+                           query=query)
     if (await stats(store)).cache_generation != result.snapshot.cache_generation:
         raise VersionConflict("history was cleared while preparing conversation context")
     return replace(context, retrieval=result)

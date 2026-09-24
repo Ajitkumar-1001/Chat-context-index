@@ -5,6 +5,7 @@ import { BoundedProvider } from "./provider.js";
 import { RetrievalResult, retrieve, currentCacheGeneration } from "./retrieve.js";
 import { Message } from "./models.js";
 import { HistoryStore } from "./store.js";
+import { excerptForQuery, queryTerms, relevance } from "./relevance.js";
 
 export interface ContextItem {
   messageId: string; seq: number; sourcePointer: string; excerpt: string;
@@ -14,6 +15,7 @@ export interface Context {
   tokenCount: number | null; retrieval?: RetrievalResult;
 }
 export interface ContextOptions {
+  query?: string;
   recentMessages?: number; maxMessages?: number; maxChars?: number; excerptChars?: number;
   mode?: "auto" | "tree" | "lexical"; provider?: BoundedProvider;
   maxTokens?: number; tokenCounter?: (text: string) => number;
@@ -48,10 +50,11 @@ export function packContext(candidates: ContextItem[], options: ContextOptions =
     if (!unique.has(key)) unique.set(key, item);
   }
   const selected: ContextItem[] = [];
+  const terms = queryTerms(options.query ?? "");
   let truncated = 0;
   for (const item of unique.values()) {
     if (selected.length >= maxMessages) break;
-    const excerpt = Array.from(item.excerpt).slice(0, excerptChars).join("");
+    const excerpt = excerptForQuery(item.excerpt, terms, excerptChars);
     const bounded = { ...item, excerpt };
     const text = render([...selected, bounded]);
     if (Array.from(text).length > maxChars || (options.tokenCounter && options.tokenCounter(text) > options.maxTokens!)) continue;
@@ -74,8 +77,11 @@ export async function prepareContext(store: HistoryStore, query: string, options
   const end = result.snapshot.snapshotMaxSeq;
   const recent = recentMessages ? await store.getMessages(Math.max(1, end - recentMessages + 1), end, recentMessages) : [];
   const candidates = recent.reverse().flatMap(messageItems);
-  candidates.push(...result.evidence.map(e => ({ messageId: e.messageId, seq: e.seq, sourcePointer: e.sourcePointer, excerpt: e.excerpt })));
-  const context = packContext(candidates, options);
+  const terms = queryTerms(query);
+  const ranked = result.evidence.map(candidate => ({ candidate, score: relevance(candidate.excerpt, terms) }))
+    .sort((a, b) => b.score - a.score || b.candidate.seq - a.candidate.seq).map(({ candidate }) => candidate);
+  candidates.push(...ranked.map(e => ({ messageId: e.messageId, seq: e.seq, sourcePointer: e.sourcePointer, excerpt: e.excerpt })));
+  const context = packContext(candidates, { ...options, query });
   if (await currentCacheGeneration(store) !== result.snapshot.cacheGeneration) throw new VersionConflict("history was cleared while preparing conversation context");
   return { ...context, retrieval: result };
 }
