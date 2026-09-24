@@ -12,8 +12,9 @@
 
 ## Platform
 
-Linux x64 and macOS arm64 are the targeted platforms; the current source still needs its hosted
-compatibility matrix. One owning application process per history uses embedded local storage.
+Linux x64 and macOS arm64 are the targeted platforms. All 16 hosted compatibility combinations
+passed for the 0.1.0 candidate; see the [CI evidence](../evaluations/results/release-readiness/hosted-ci-20260924.json).
+One owning application process per history uses embedded local storage.
 Cross-runtime access to the same
 store file is **sequential, not concurrent**: close in one runtime before opening in the other
 (single-writer WAL; see `backup-and-migration.md` for the reopen/backup implications).

@@ -234,6 +234,7 @@ evaluations/results/release-readiness/*
 !evaluations/results/release-readiness/dev-recall-lexical-20260924.json
 !evaluations/results/release-readiness/dev-recall-tree-20260924.json
 !evaluations/results/release-readiness/preflight-20260924.json
+!evaluations/results/release-readiness/hosted-ci-20260924.json
 
 # Installed dependencies, release archives, and local credentials/state.
 node_modules/
