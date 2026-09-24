@@ -1,0 +1,116 @@
+[
+  {
+    "License": "MIT",
+    "Name": "annotated-types",
+    "URL": "https://github.com/annotated-types/annotated-types",
+    "Version": "0.8.0"
+  },
+  {
+    "License": "MIT License",
+    "Name": "anthropic",
+    "URL": "https://github.com/anthropics/anthropic-sdk-python",
+    "Version": "1.8.0"
+  },
+  {
+    "License": "MIT",
+    "Name": "anyio",
+    "URL": "https://anyio.readthedocs.io/en/stable/versionhistory.html",
+    "Version": "4.15.1"
+  },
+  {
+    "License": "any-OSI",
+    "Name": "apsw",
+    "URL": "https://github.com/rogerbinns/apsw",
+    "Version": "3.53.4.0"
+  },
+  {
+    "License": "Apache-2.0",
+    "Name": "chat-context-index",
+    "URL": "UNKNOWN",
+    "Version": "0.1.0"
+  },
+  {
+    "License": "MIT License",
+    "Name": "docstring_parser",
+    "URL": "https://github.com/rr-/docstring_parser",
+    "Version": "0.18.0"
+  },
+  {
+    "License": "MIT License",
+    "Name": "h11",
+    "URL": "https://github.com/python-hyper/h11",
+    "Version": "0.16.0"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "httpcore2",
+    "URL": "https://github.com/pydantic/httpx2",
+    "Version": "2.13.1"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "httpx2",
+    "URL": "https://github.com/pydantic/httpx2",
+    "Version": "2.13.1"
+  },
+  {
+    "License": "BSD-3-Clause",
+    "Name": "idna",
+    "URL": "https://github.com/kjd/idna",
+    "Version": "3.20"
+  },
+  {
+    "License": "MIT",
+    "Name": "jiter",
+    "URL": "https://github.com/pydantic/jiter/",
+    "Version": "0.17.0"
+  },
+  {
+    "License": "Apache-2.0",
+    "Name": "openai",
+    "URL": "https://github.com/openai/openai-python",
+    "Version": "3.19.2"
+  },
+  {
+    "License": "MIT",
+    "Name": "pydantic",
+    "URL": "https://github.com/pydantic/pydantic",
+    "Version": "2.13.5"
+  },
+  {
+    "License": "MIT",
+    "Name": "pydantic_core",
+    "URL": "https://github.com/pydantic",
+    "Version": "2.46.5"
+  },
+  {
+    "License": "MIT",
+    "Name": "redis",
+    "URL": "https://github.com/redis/redis-py",
+    "Version": "8.1.0"
+  },
+  {
+    "License": "Apache Software License; MIT License",
+    "Name": "sniffio",
+    "URL": "https://github.com/python-trio/sniffio",
+    "Version": "1.3.1"
+  },
+  {
+    "License": "MIT",
+    "Name": "truststore",
+    "URL": "https://github.com/sethmlarson/truststore",
+    "Version": "0.10.4"
+  },
+  {
+    "License": "MIT",
+    "Name": "typing-inspection",
+    "URL": "https://github.com/pydantic/typing-inspection",
+    "Version": "0.4.4"
+  },
+  {
+    "License": "PSF-2.0",
+    "Name": "typing_extensions",
+    "URL": "https://github.com/python/typing_extensions",
+    "Version": "4.16.0"
+  }
+]

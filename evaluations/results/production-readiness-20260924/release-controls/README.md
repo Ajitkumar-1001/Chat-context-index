@@ -1,6 +1,6 @@
 # Release controls — September 24, 2026
 
-Local implementation, scans and scoped license/attribution checks pass. Registry identity
+Local and hosted implementation checks, scans and scoped license/attribution checks pass. Registry identity
 and final production approval remain open. No package was published and no release tag was created.
 
 The release workflow consumes the exact archives retained by the designated CI installation job.
@@ -50,6 +50,13 @@ python scripts/release_controls.py licenses --output /tmp/cci-licenses.json
 python tests/packaging/verify_packages.py --report /tmp/cci-package-check.json --artifacts-out /tmp/cci-verified-artifacts
 ```
 
-Hosted CI must exercise these new workflow changes before they count as production evidence.
-Provider evaluation, independent human review/adoption and reference-runner performance remain
-separate release gates. The checks above do not imply those gates passed.
+Hosted CI exercised the updated workflows in
+[run 36043232899](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36043232899)
+on main commit `b3bb918be1edb21bddb735ad92b5a52d59deafb7`: all 21 jobs passed, including
+16 package matrix cells, 266 Python tests, 21 Node tests, and security scans. The downloaded
+archives passed the publication guard without rebuilding or publication. The
+[hosted verification](../hosted-verification.json) retains all 16 package reports and scan
+evidence; [archive hashes](../hosted-artifact-manifest.json) identify this candidate.
+
+Provider evaluation, independent human review/adoption, reference-runner performance, and
+registry setup remain separate release gates. The checks above do not imply those gates passed.

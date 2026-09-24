@@ -1,0 +1,148 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-09-24T18:46:15.375312+00:00",
+  "method": "Fresh wheel/sdist-derived-wheel/npm installs outside checkout; separate seed/read processes; deterministic provider",
+  "python": "3.11.9",
+  "node": "v22.23.2",
+  "platform": "macOS-15.7.9-arm64-arm-64bit",
+  "typescript_consumer_typecheck": "PASS",
+  "machine": "arm64",
+  "ci": {
+    "GITHUB_SHA": "b3bb918be1edb21bddb735ad92b5a52d59deafb7",
+    "GITHUB_RUN_ID": "36043232899",
+    "GITHUB_RUN_ATTEMPT": "1",
+    "GITHUB_REPOSITORY": "Ajitkumar-1001/Chat-context-index",
+    "RUNNER_ARCH": "ARM64"
+  },
+  "sdist_installed_content_matches_wheel": "PASS",
+  "default_cache_without_optional_dependencies_or_credentials": "PASS",
+  "package_documentation_and_license": "PASS",
+  "source_sha256": {
+    "python": "076cdb111de30decb2829267eb88df0572ddfe7e25ba1b49792df8356d2d8653",
+    "typescript": "26e820e79b854b0004201caf08f14cf38b7f1870e0f8e85027a6ced6e6e359a0"
+  },
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "b3eda16aebc9e13116cc68b8418332b3d245c539154c6f836b0f9bf49bfcacc9"
+    },
+    {
+      "filename": "chat_context_index-0.1.0.tar.gz",
+      "sha256": "44872bbb8f2f12d433b384d8a7487826c2c29a90c6af0d90b319780f73c23df8"
+    },
+    {
+      "filename": "wheel-from-sdist/chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0"
+    }
+  ],
+  "checks": [
+    {
+      "writer": "python",
+      "reader": "python",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/python-consumer/venv/lib/python3.11/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/python_sdist-consumer/venv/lib/python3.11/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python",
+      "reader": "typescript",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/node-consumer/node_modules/chat-context-index/dist/index.js",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python_sdist",
+      "reader": "python",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/python-consumer/venv/lib/python3.11/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python_sdist",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/python_sdist-consumer/venv/lib/python3.11/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python_sdist",
+      "reader": "typescript",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/node-consumer/node_modules/chat-context-index/dist/index.js",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "python",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/python-consumer/venv/lib/python3.11/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/python_sdist-consumer/venv/lib/python3.11/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "typescript",
+      "status": "PASS",
+      "package_path": "/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T/cci-installed-memory-r2pwimnx/node-consumer/node_modules/chat-context-index/dist/index.js",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    }
+  ],
+  "not_measured": [
+    "real-model retrieval quality",
+    "answer correctness",
+    "model tokens or cost"
+  ]
+}

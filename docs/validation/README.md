@@ -15,10 +15,10 @@ directory; do not fill the templates with invented results. Preserve failed atte
 timestamps, artifact hashes, submitted programs, and sanitized terminal output.
 Keep credentials and personal contact details out of the evidence directory.
 
-The current runtime is identified by
-[the package report](../../evaluations/results/release-readiness/package-memory-20260924.json).
-Final package hashes must be filled from the rebuilt release manifest: packaging
-metadata is being updated, so previous archive hashes are not final adoption pins.
+The latest verified candidate is identified by
+[the hosted archive manifest](../../evaluations/results/production-readiness-20260924/hosted-artifact-manifest.json).
+Fill each trial's package hashes from the selected, CI-verified release manifest before
+the trial begins; a later candidate requires fresh pins and matching validation.
 Documentation changes after a failed adoption attempt require a new documentation
 fingerprint and another independent attempt of the affected path.
 

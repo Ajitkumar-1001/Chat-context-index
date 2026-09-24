@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "sha": "b3bb918be1edb21bddb735ad92b5a52d59deafb7",
+  "run_id": "36043232899",
+  "version": "0.1.0",
+  "package_report_sha256": "ba6fb51dbd7565a23e91d184ef54daff4a2eb5dbfe6c981e4adf0170fe970af1",
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "b3eda16aebc9e13116cc68b8418332b3d245c539154c6f836b0f9bf49bfcacc9"
+    },
+    {
+      "filename": "chat_context_index-0.1.0.tar.gz",
+      "sha256": "44872bbb8f2f12d433b384d8a7487826c2c29a90c6af0d90b319780f73c23df8"
+    },
+    {
+      "filename": "wheel-from-sdist/chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0"
+    }
+  ],
+  "rebuilt_for_publication": false
+}

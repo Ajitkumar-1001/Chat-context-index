@@ -1,5 +1,5 @@
 {
-  "status": "LOCAL_IMPLEMENTATION_VERIFIED_EXTERNAL_RELEASE_GATES_OPEN",
+  "status": "LOCAL_AND_HOSTED_CONTROLS_VERIFIED_EXTERNAL_RELEASE_GATES_OPEN",
   "checked_at_utc": "2026-09-24T18:25:29.180675+00:00",
   "base_commit": "61f6723762150a48e4ecd4c0e75f02f28890895c",
   "working_tree_changes": true,
@@ -19,7 +19,7 @@
       "report": "tests.xml"
     },
     "ruff": "PASS: scripts/release_controls.py tests/release",
-    "workflow_yaml_parse": "PASS (syntax parse; hosted execution outstanding for these changes)",
+    "workflow_yaml_parse": "PASS; subsequent hosted execution passed (see hosted_validation)",
     "fresh_package_installation": {
       "status": "PASS",
       "writer_reader_combinations": 9,
@@ -109,7 +109,6 @@
   ],
   "current_npm_oidc_requirements": "npm>=11.5.1 and Node>=22.14, supported hosted runner, registry configuration bound to owner/repository/release.yml/environment, matching repository.url; new configurations must explicitly permit direct npm publish when that command is used.",
   "remaining": [
-    "Hosted CI run of these workflow/helper changes",
     "Registry owner sessions and verified PyPI/npm publisher identities",
     "Real-model quality, human review/adoption and dedicated-runner gates maintained by root",
     "Explicit final source/artifact approval; RELEASE_APPROVED_SHA remains unset"
@@ -123,5 +122,18 @@
     "scripts/release_controls.py": "828af4371144a324468f46333fd4fe3cb5b9bfb129a41bba7da01998788cfaa0",
     "tests/release/test_release_controls.py": "3fa211a5f471429077efdfb3222eb788c95ddb084d57fe3d6e854255f280119f",
     "packages/typescript/package.json": "d5a1f6830b2be51ecee1ebdda6e2099c5fcd7bfcbf433d676935faa43dfb694e"
+  },
+  "hosted_validation": {
+    "status": "PASS",
+    "verified_at_utc": "2026-09-24T19:37:22.825936+00:00",
+    "source_sha": "b3bb918be1edb21bddb735ad92b5a52d59deafb7",
+    "run_id": "36043232899",
+    "report": "../hosted-verification.json",
+    "archive_manifest": "../hosted-artifact-manifest.json",
+    "all_jobs": 21,
+    "matrix_cells": 16,
+    "python_tests": 266,
+    "node_tests": 21,
+    "exact_archive_guard": "PASS; no publication"
   }
 }

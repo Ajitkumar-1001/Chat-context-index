@@ -1,0 +1,361 @@
+{
+  "status": "PASS",
+  "verified_at_utc": "2026-09-24T19:37:22.825936+00:00",
+  "source_sha": "b3bb918be1edb21bddb735ad92b5a52d59deafb7",
+  "run_id": "36043232899",
+  "run_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36043232899",
+  "method": "Downloaded completed GitHub Actions reports; checked all 16 expected matrix cells, source/run IDs, runtime/architecture identities, nine distinct writer-reader pairs, original source sequences, matching source/archive hashes and empty security findings. Exact downloaded archives separately passed scripts/release_controls.py artifacts.",
+  "all_ci_jobs": 21,
+  "matrix_cells": 16,
+  "writer_reader_checks_per_cell": 9,
+  "total_writer_reader_checks": 144,
+  "tests": {
+    "python_passed": 266,
+    "node_passed": 21,
+    "node_failed": 0,
+    "conformance_log_sha256": "b36743f8d3310583b26fbcda62ce526e69307b2f4d025c84cb027ffc073e1270",
+    "retained_excerpt": "hosted-evidence/conformance-summary.txt"
+  },
+  "source_sha256": {
+    "python": "076cdb111de30decb2829267eb88df0572ddfe7e25ba1b49792df8356d2d8653",
+    "typescript": "26e820e79b854b0004201caf08f14cf38b7f1870e0f8e85027a6ced6e6e359a0"
+  },
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "b3eda16aebc9e13116cc68b8418332b3d245c539154c6f836b0f9bf49bfcacc9"
+    },
+    {
+      "filename": "chat_context_index-0.1.0.tar.gz",
+      "sha256": "44872bbb8f2f12d433b384d8a7487826c2c29a90c6af0d90b319780f73c23df8"
+    },
+    {
+      "filename": "wheel-from-sdist/chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0"
+    }
+  ],
+  "artifact_guard_manifest": "hosted-artifact-manifest.json",
+  "security": {
+    "history_secret_findings": 0,
+    "artifact_secret_findings": 0,
+    "python_audited_packages": 18,
+    "python_known_vulnerabilities": 0,
+    "npm_known_vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "package_attribution_and_npm_license_declarations": "PASS"
+  },
+  "cells": [
+    {
+      "cell": "packages-macos-15-py3.11-node22",
+      "status": "PASS",
+      "python": "3.11.9",
+      "node": "v22.23.2",
+      "platform": "macOS-15.7.9-arm64-arm-64bit",
+      "machine": "arm64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-macos-15-py3.11-node22/package-memory.json",
+      "sha256": "76acde131ce07b0cf192ee6cae95aaa7a2f3f93990eb0bbb33863b46bb133c83"
+    },
+    {
+      "cell": "packages-macos-15-py3.11-node24",
+      "status": "PASS",
+      "python": "3.11.9",
+      "node": "v24.20.0",
+      "platform": "macOS-15.7.9-arm64-arm-64bit",
+      "machine": "arm64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-macos-15-py3.11-node24/package-memory.json",
+      "sha256": "1ce40a3f822f6d3dc7da45293a785030abe2e6651dc3f6853caf5c194bc767c9"
+    },
+    {
+      "cell": "packages-macos-15-py3.12-node22",
+      "status": "PASS",
+      "python": "3.12.10",
+      "node": "v22.23.2",
+      "platform": "macOS-15.7.9-arm64-arm-64bit",
+      "machine": "arm64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-macos-15-py3.12-node22/package-memory.json",
+      "sha256": "4e2927b86ab7fedea1c7df54c0f02a09e0bc3dc8c42b705a3e605d34f4090e7c"
+    },
+    {
+      "cell": "packages-macos-15-py3.12-node24",
+      "status": "PASS",
+      "python": "3.12.10",
+      "node": "v24.20.0",
+      "platform": "macOS-15.7.9-arm64-arm-64bit",
+      "machine": "arm64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-macos-15-py3.12-node24/package-memory.json",
+      "sha256": "1b23128a3028bb680535ba7eb5ebe23964df8ab98f5fa35c58ef14342c109d0a"
+    },
+    {
+      "cell": "packages-macos-15-py3.13-node22",
+      "status": "PASS",
+      "python": "3.13.15",
+      "node": "v22.23.2",
+      "platform": "macOS-15.7.9-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-macos-15-py3.13-node22/package-memory.json",
+      "sha256": "25380909f00ea867de52c8bbff50920255a78ec01ed0dd8158de8b24c33f4901"
+    },
+    {
+      "cell": "packages-macos-15-py3.13-node24",
+      "status": "PASS",
+      "python": "3.13.15",
+      "node": "v24.20.0",
+      "platform": "macOS-15.7.9-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-macos-15-py3.13-node24/package-memory.json",
+      "sha256": "10cdfdd168af4ed803e1c1da4df0bec0ba493dc24c86ae4f03898bec74e7d223"
+    },
+    {
+      "cell": "packages-macos-15-py3.14-node22",
+      "status": "PASS",
+      "python": "3.14.7",
+      "node": "v22.23.2",
+      "platform": "macOS-15.7.9-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-macos-15-py3.14-node22/package-memory.json",
+      "sha256": "9e091ae10d8c99616f2d940479b270d133b682323686574af821cf23c794f212"
+    },
+    {
+      "cell": "packages-macos-15-py3.14-node24",
+      "status": "PASS",
+      "python": "3.14.7",
+      "node": "v24.20.0",
+      "platform": "macOS-15.7.9-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-macos-15-py3.14-node24/package-memory.json",
+      "sha256": "bd7fb770437958d780ee363833efe78f5fe9b48ae1177d659c70fa83ee89606e"
+    },
+    {
+      "cell": "packages-ubuntu-24.04-py3.11-node22",
+      "status": "PASS",
+      "python": "3.11.16",
+      "node": "v22.23.2",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.11-node22/package-memory.json",
+      "sha256": "92fd20af49b4972e71d37a9f8f16d271d97ebbabbbbefdc359a00a00507c4525"
+    },
+    {
+      "cell": "packages-ubuntu-24.04-py3.11-node24",
+      "status": "PASS",
+      "python": "3.11.16",
+      "node": "v24.21.0",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.11-node24/package-memory.json",
+      "sha256": "236135903f87b630f1ed7889262c233089e7342b37b3db5a0b18ebae71416419"
+    },
+    {
+      "cell": "packages-ubuntu-24.04-py3.12-node22",
+      "status": "PASS",
+      "python": "3.12.14",
+      "node": "v22.23.2",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.12-node22/package-memory.json",
+      "sha256": "ba6fb51dbd7565a23e91d184ef54daff4a2eb5dbfe6c981e4adf0170fe970af1"
+    },
+    {
+      "cell": "packages-ubuntu-24.04-py3.12-node24",
+      "status": "PASS",
+      "python": "3.12.14",
+      "node": "v24.21.0",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.12-node24/package-memory.json",
+      "sha256": "30e9d4d03f78708f91b1e96c81248f4545dc327014837281546e5e6353809938"
+    },
+    {
+      "cell": "packages-ubuntu-24.04-py3.13-node22",
+      "status": "PASS",
+      "python": "3.13.15",
+      "node": "v22.23.2",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.13-node22/package-memory.json",
+      "sha256": "18273aba74b572a03fe52285343b63123bd9182042c2d1b8a3bb894aae8241d3"
+    },
+    {
+      "cell": "packages-ubuntu-24.04-py3.13-node24",
+      "status": "PASS",
+      "python": "3.13.15",
+      "node": "v24.21.0",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.13-node24/package-memory.json",
+      "sha256": "1fe8c8259a471983849ad6b1a75813aa9dd0a6610a392503ef26a867928ca983"
+    },
+    {
+      "cell": "packages-ubuntu-24.04-py3.14-node22",
+      "status": "PASS",
+      "python": "3.14.7",
+      "node": "v22.23.2",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.14-node22/package-memory.json",
+      "sha256": "db91791d545d2deadd8b74fca294d1d27dbfd9a346057cba9a1be84700bbdf8b"
+    },
+    {
+      "cell": "packages-ubuntu-24.04-py3.14-node24",
+      "status": "PASS",
+      "python": "3.14.7",
+      "node": "v24.21.0",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "writer_reader_checks": 9,
+      "source_and_archive_hashes_match": true,
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.14-node24/package-memory.json",
+      "sha256": "87e833c210adaf890ac8f33aa558b51a0897c1279b3d8c6821e462610021526d"
+    }
+  ],
+  "retained_evidence": [
+    {
+      "path": "hosted-evidence/packages-macos-15-py3.11-node22/package-memory.json",
+      "sha256": "76acde131ce07b0cf192ee6cae95aaa7a2f3f93990eb0bbb33863b46bb133c83"
+    },
+    {
+      "path": "hosted-evidence/packages-macos-15-py3.11-node24/package-memory.json",
+      "sha256": "1ce40a3f822f6d3dc7da45293a785030abe2e6651dc3f6853caf5c194bc767c9"
+    },
+    {
+      "path": "hosted-evidence/packages-macos-15-py3.12-node22/package-memory.json",
+      "sha256": "4e2927b86ab7fedea1c7df54c0f02a09e0bc3dc8c42b705a3e605d34f4090e7c"
+    },
+    {
+      "path": "hosted-evidence/packages-macos-15-py3.12-node24/package-memory.json",
+      "sha256": "1b23128a3028bb680535ba7eb5ebe23964df8ab98f5fa35c58ef14342c109d0a"
+    },
+    {
+      "path": "hosted-evidence/packages-macos-15-py3.13-node22/package-memory.json",
+      "sha256": "25380909f00ea867de52c8bbff50920255a78ec01ed0dd8158de8b24c33f4901"
+    },
+    {
+      "path": "hosted-evidence/packages-macos-15-py3.13-node24/package-memory.json",
+      "sha256": "10cdfdd168af4ed803e1c1da4df0bec0ba493dc24c86ae4f03898bec74e7d223"
+    },
+    {
+      "path": "hosted-evidence/packages-macos-15-py3.14-node22/package-memory.json",
+      "sha256": "9e091ae10d8c99616f2d940479b270d133b682323686574af821cf23c794f212"
+    },
+    {
+      "path": "hosted-evidence/packages-macos-15-py3.14-node24/package-memory.json",
+      "sha256": "bd7fb770437958d780ee363833efe78f5fe9b48ae1177d659c70fa83ee89606e"
+    },
+    {
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.11-node22/package-memory.json",
+      "sha256": "92fd20af49b4972e71d37a9f8f16d271d97ebbabbbbefdc359a00a00507c4525"
+    },
+    {
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.11-node24/package-memory.json",
+      "sha256": "236135903f87b630f1ed7889262c233089e7342b37b3db5a0b18ebae71416419"
+    },
+    {
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.12-node22/package-memory.json",
+      "sha256": "ba6fb51dbd7565a23e91d184ef54daff4a2eb5dbfe6c981e4adf0170fe970af1"
+    },
+    {
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.12-node24/package-memory.json",
+      "sha256": "30e9d4d03f78708f91b1e96c81248f4545dc327014837281546e5e6353809938"
+    },
+    {
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.13-node22/package-memory.json",
+      "sha256": "18273aba74b572a03fe52285343b63123bd9182042c2d1b8a3bb894aae8241d3"
+    },
+    {
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.13-node24/package-memory.json",
+      "sha256": "1fe8c8259a471983849ad6b1a75813aa9dd0a6610a392503ef26a867928ca983"
+    },
+    {
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.14-node22/package-memory.json",
+      "sha256": "db91791d545d2deadd8b74fca294d1d27dbfd9a346057cba9a1be84700bbdf8b"
+    },
+    {
+      "path": "hosted-evidence/packages-ubuntu-24.04-py3.14-node24/package-memory.json",
+      "sha256": "87e833c210adaf890ac8f33aa558b51a0897c1279b3d8c6821e462610021526d"
+    },
+    {
+      "path": "hosted-evidence/release-candidate-b3bb918be1edb21bddb735ad92b5a52d59deafb7/reports/artifact-secrets.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "hosted-evidence/release-candidate-b3bb918be1edb21bddb735ad92b5a52d59deafb7/reports/package-memory.json",
+      "sha256": "ba6fb51dbd7565a23e91d184ef54daff4a2eb5dbfe6c981e4adf0170fe970af1"
+    },
+    {
+      "path": "hosted-evidence/security-secrets/gitleaks.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "hosted-evidence/security-dependencies-and-licenses/licenses.json",
+      "sha256": "5ae8c8e322c5f1a07800e4fa5fdab4ebcc6876e398712d6a357b69d2f6c60e26"
+    },
+    {
+      "path": "hosted-evidence/security-dependencies-and-licenses/npm-audit.json",
+      "sha256": "3257cdfa81d71704b47c9d4742060c26b15daa948970d86931ab8e43f82aac54"
+    },
+    {
+      "path": "hosted-evidence/security-dependencies-and-licenses/python-audit.json",
+      "sha256": "d8fd651a055bfdae19bf4e7e2eb8a1879ed7694d1ab52641058adcc7cdf7f600"
+    },
+    {
+      "path": "hosted-evidence/security-dependencies-and-licenses/python-licenses.json",
+      "sha256": "6881a7cd2678498fc82ad703dbc107e1b738e454f8971ce58ff09cced146334d"
+    },
+    {
+      "path": "hosted-evidence/security-dependencies-and-licenses/python-runtime-requirements.txt",
+      "sha256": "bb79c03784d317828fb0d7705e9d329fc1eb51aacfa1d4b8b96dc7a590f10c75"
+    },
+    {
+      "path": "hosted-evidence/conformance-summary.txt",
+      "sha256": "22712e673b6c9616af1f17de47966a0d593a3b8bd668568250a0dd20c89e9369"
+    }
+  ],
+  "does_not_establish": [
+    "Real-provider smoke completion or cost savings",
+    "Dedicated Linux performance thresholds",
+    "Actual human review or developer adoption",
+    "Registry ownership or trusted publisher setup",
+    "Final production release approval"
+  ],
+  "registry_publication_performed": false
+}
