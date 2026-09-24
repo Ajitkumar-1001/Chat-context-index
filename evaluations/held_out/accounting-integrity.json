@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "scope": "Artifact integrity and accounting only; execution remains INCOMPLETE and tree recall fails its gate.",
+  "parent_calls_preserved": 471,
+  "parent_query_results_unchanged": 360,
+  "journal_events": 948,
+  "frozen_source_hashes_match": true,
+  "fixture_and_wheel_hashes_match": true,
+  "all_attempts": {
+    "calls": 494,
+    "input_tokens_observed": 2537268,
+    "output_tokens_observed": 15619,
+    "standard_price_estimate_observed_usd": 0.8002279,
+    "usage_unknown": true,
+    "calls_with_unknown_usage": 3,
+    "reserved_tokens": 2575653,
+    "reserved_usd": 0.8138161,
+    "within_original_allowance": true
+  },
+  "query_results_by_status": {
+    "answered": 89,
+    "abstained": 205,
+    "invalid_citations": 1,
+    "error": 65
+  }
+}

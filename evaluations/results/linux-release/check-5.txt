@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: native hierarchy reuses branches and prepares historical context
+ok 1 - native hierarchy reuses branches and prepares historical context
+  ---
+  duration_ms: 72.584958
+  type: 'test'
+  ...
+# Subtest: invalid model IDs cannot manufacture evidence
+ok 2 - invalid model IDs cannot manufacture evidence
+  ---
+  duration_ms: 57.019167
+  type: 'test'
+  ...
+# Subtest: text budgets count Unicode and rendered evidence labels
+ok 3 - text budgets count Unicode and rendered evidence labels
+  ---
+  duration_ms: 0.367042
+  type: 'test'
+  ...
+# Subtest: clear during navigation rejects stale memory without holding the database lock
+ok 4 - clear during navigation rejects stale memory without holding the database lock
+  ---
+  duration_ms: 58.0725
+  type: 'test'
+  ...
+# Subtest: ask shares the navigation and synthesis attempt budget
+ok 5 - ask shares the navigation and synthesis attempt budget
+  ---
+  duration_ms: 75.598626
+  type: 'test'
+  ...
+# Subtest: structured lexical excerpts stay within the cited source field
+ok 6 - structured lexical excerpts stay within the cited source field
+  ---
+  duration_ms: 67.9655
+  type: 'test'
+  ...
+# Subtest: physical retries cannot exceed the request budget
+ok 7 - physical retries cannot exceed the request budget
+  ---
+  duration_ms: 114.991209
+  type: 'test'
+  ...
+# Subtest: RAG adapter combines host documents with memory and persists the turn
+ok 8 - RAG adapter combines host documents with memory and persists the turn
+  ---
+  duration_ms: 98.58975
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 609.651583

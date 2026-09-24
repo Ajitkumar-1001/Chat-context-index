@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "evaluation": "development_fixture_live_smoke",
-  "timestamp_utc": "2026-09-23T18:17:27.990323+00:00",
+  "timestamp_utc": "2026-09-23T18:53:45.209954+00:00",
   "runner_sha256": "2c742527621e5adf1c4b9b8201779791b742f8298b1fe96341db003b90eb2f8c",
   "limits": {
     "max_calls": 10,
@@ -12,9 +12,62 @@
   },
   "sdk_retries": 0,
   "package_attempts_per_operation": 1,
-  "status": "FAIL",
+  "status": "PASS",
   "checks": {
-    "lexical_evidence_count": 0
+    "lexical_evidence_count": 0,
+    "index": {
+      "committed_coverage": {
+        "start_seq": 1,
+        "end_seq": 4
+      },
+      "pending_coverage": {
+        "start_seq": null,
+        "end_seq": null
+      },
+      "provider_usage": {
+        "current_provider_calls": 6,
+        "retries": 0,
+        "usage_unknown": false,
+        "memo_hits": 0,
+        "memo_misses": 0,
+        "memo_errors": 0,
+        "stage_ms": {},
+        "input_tokens": 641,
+        "output_tokens": 234
+      },
+      "status": "complete"
+    },
+    "unchanged_index_calls": 0,
+    "reopen_preserved_originals": true,
+    "routing": {
+      "requested_mode": "tree",
+      "actual_mode": "tree",
+      "candidate_count": 1,
+      "selected_chunk_ids": [
+        "c_01M37SVQX6TJWVTAGXMYQ3JRT2"
+      ]
+    },
+    "retrieval_usage": {
+      "current_provider_calls": 2,
+      "retries": 0,
+      "usage_unknown": false,
+      "memo_hits": 0,
+      "memo_misses": 0,
+      "memo_errors": 0,
+      "stage_ms": {},
+      "input_tokens": 406,
+      "output_tokens": 54
+    },
+    "evidence": [
+      {
+        "message_id": "m_01M37SVQX4JC2SAZACK922RD08",
+        "seq": 1,
+        "source_pointer": "/content",
+        "excerpt": "The deployment target is Oslo."
+      }
+    ],
+    "context": "<<<CCI_EVIDENCE id=m_01M37SVQX4JC2SAZACK922RD08 source=/content\nThe deployment target is Oslo.\nCCI_EVIDENCE_END>>>",
+    "expected_original_evidence_retrieved": true
   },
   "scope": "One synthetic development query; no held-out quality, answer generation, or cost claim.",
   "package": {
@@ -29,38 +82,134 @@
   },
   "fixture_sha256": "19674ad028c831bcee035071a21abbd1d2846d6274f66712398382e47db596b5",
   "provider": "gemini",
-  "requested_model": "gemini-2.5-flash",
+  "requested_model": "gemini-3.5-flash-lite",
   "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
   "protocol": "openai_chat_completions",
   "token_limit_field": "max_tokens",
   "response_format": "json_object",
-  "error_type": "NotFoundError",
   "calls": [
     {
       "operation": "indexing",
       "input_chars": 293,
-      "status": "error",
-      "input_tokens": null,
-      "output_tokens": null,
-      "resolved_model": null,
-      "finish_reason": null,
-      "error_type": "NotFoundError",
-      "http_status": 404,
+      "status": "ok",
+      "input_tokens": 76,
+      "output_tokens": 32,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null,
       "error_code": null,
-      "elapsed_s": 0.483
+      "elapsed_s": 1.029
+    },
+    {
+      "operation": "indexing",
+      "input_chars": 287,
+      "status": "ok",
+      "input_tokens": 75,
+      "output_tokens": 33,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null,
+      "error_code": null,
+      "elapsed_s": 2.128
+    },
+    {
+      "operation": "indexing",
+      "input_chars": 299,
+      "status": "ok",
+      "input_tokens": 77,
+      "output_tokens": 35,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null,
+      "error_code": null,
+      "elapsed_s": 0.739
+    },
+    {
+      "operation": "indexing",
+      "input_chars": 307,
+      "status": "ok",
+      "input_tokens": 83,
+      "output_tokens": 29,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null,
+      "error_code": null,
+      "elapsed_s": 1.104
+    },
+    {
+      "operation": "indexing",
+      "input_chars": 587,
+      "status": "ok",
+      "input_tokens": 161,
+      "output_tokens": 46,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null,
+      "error_code": null,
+      "elapsed_s": 0.873
+    },
+    {
+      "operation": "indexing",
+      "input_chars": 570,
+      "status": "ok",
+      "input_tokens": 169,
+      "output_tokens": 59,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null,
+      "error_code": null,
+      "elapsed_s": 0.769
+    },
+    {
+      "operation": "tree_navigation",
+      "input_chars": 903,
+      "status": "ok",
+      "input_tokens": 225,
+      "output_tokens": 28,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null,
+      "error_code": null,
+      "elapsed_s": 0.477
+    },
+    {
+      "operation": "tree_navigation",
+      "input_chars": 709,
+      "status": "ok",
+      "input_tokens": 181,
+      "output_tokens": 26,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null,
+      "error_code": null,
+      "elapsed_s": 2.553
     }
   ],
   "usage": {
-    "attempts": 1,
-    "input_tokens_observed": 0,
-    "output_tokens_observed": 0,
-    "usage_unknown": true,
+    "attempts": 8,
+    "input_tokens_observed": 1047,
+    "output_tokens_observed": 288,
+    "usage_unknown": false,
     "by_operation": {
       "indexing": {
-        "attempts": 1,
-        "input_tokens_observed": 0,
-        "output_tokens_observed": 0,
-        "usage_unknown": true
+        "attempts": 6,
+        "input_tokens_observed": 641,
+        "output_tokens_observed": 234,
+        "usage_unknown": false
+      },
+      "tree_navigation": {
+        "attempts": 2,
+        "input_tokens_observed": 406,
+        "output_tokens_observed": 54,
+        "usage_unknown": false
       }
     }
   }

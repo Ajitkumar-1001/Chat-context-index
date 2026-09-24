@@ -1,0 +1,10 @@
+{
+  "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.41",
+  "python": "3.11.14",
+  "cci_path": "/usr/local/lib/python3.11/site-packages/cci/__init__.py",
+  "wheel_sha256": "6bf4412fe38078b3131f796d1541b10c94191aa7bfc64e263f49e38628e56162",
+  "evaluation_tests_exit_code": 0,
+  "benchmark_exit_code": 0,
+  "dedicated_linux_runner": false,
+  "scope": "Python installed-wheel evaluation harness tests and reference benchmark; not the GitHub CI matrix or native TypeScript/Redis tests."
+}

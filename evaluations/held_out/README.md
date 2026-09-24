@@ -63,6 +63,115 @@ correctness gate. Fake runs mark quality gates `NOT RUN`. The older `results.jso
 fake-provider control-flow artifact, not release evidence. Regression tests use a separate tiny
 fixture and never inspect the reserved held-out labels.
 
-Live execution, reviewed quality scores, and comparisons against full-history and recent/lexical
-baselines remain pending. Agree the model and spend limit before running a live evaluation;
-the per-request package limits are not an evaluation-wide dollar cap.
+The native `ask()` release evaluation above still lacks real-provider rubric and citation review.
+The separate memory-integration comparison below now has live measurements and an explicit
+evaluation-wide allowance. Its retrieval results fail the quality threshold, and provider rate
+limits prevented completion. The per-request package limits alone are not a dollar cap.
+
+## Budgeted memory comparison
+
+**Current outcome:** [INCOMPLETE; tree recall FAIL](reports/README.md). In each of two completed
+answer-generation trials, full history recovered 32/32 expected sources, tree memory 1/32, and
+recent/lexical memory 0/32. The third trial and answer review are incomplete. No lower-cost claim
+is supported. The report includes observed tokens, unknown usage, source excerpts, and all attempts.
+
+The [frozen comparison plan](comparison-plan-v2.json) extends this harness with three strategies:
+all original text, recent plus lexical memory, and `prepare_context(mode="tree")` with recent memory.
+All three use the same Gemini model and host answer prompt. This evaluates memory integration;
+the native `ask()` pipeline and its separate release gate remain distinct.
+
+The plan was frozen before inspecting held-out answers. It pins the fixture, installed wheel, and
+evaluator source hashes. It uses all 40 held-out queries, three trials with fresh databases and no
+memoization, and rotates strategy order. Each history first ingests/indexes 80% of its messages,
+then appends/indexes the remaining 20%. Queries run after closing and reopening SQLite. Unchanged
+indexing must make zero calls. Full history must fit without truncation; both bounded strategies
+use the public defaults of four recent messages, eight total items, 4,000 characters, and
+200-character excerpts. Source IDs remain attached to every excerpt.
+Full history uses the same evidence delimiters and source IDs; their prompt overhead is included
+in token accounting. The cost comparison applies to this cited-answer format.
+
+```bash
+/private/tmp/cont-index-live-eval-20260923/venv/bin/python -I evaluations/held_out/run_evaluation.py \
+  --provider gemini --env-file .env.live-smoke \
+  --comparison-plan evaluations/held_out/comparison-plan-v2.json \
+  --wheel dist/release/chat_context_index-0.1.0-py3-none-any.whl --trials 3 \
+  --out evaluations/held_out/comparison-live-v2.json
+```
+
+The initial [v1 attempt](comparison-live-v1.json) stopped after HTTP 429. Its exact evaluator is
+preserved in [the v1 source archive](comparison-v1-sources.zip). A tiny
+[diagnostic request](quota-diagnostic-v1.json) later succeeded. Plan v2 changes only dispatch timing
+and remaining budget allowances; no held-out answers were inspected to tune quality logic.
+
+The runner refuses to overwrite an existing report or call journal. Add `--check-config` and a
+different output path to verify configuration and hashes without requests (exit 2, `NOT_RUN`).
+The full evaluation allowance is 1,200 calls, 1,024 requested output tokens per call, and 6 million
+reserved tokens. After charging the first attempt and diagnostic, v2 allows 1,181 more calls,
+5.9 million reserved tokens, and $2.95. It enforces five seconds between dispatches, two concurrent
+calls, 30 seconds per call, and two hours overall. SDK and package retries are disabled.
+The $3 overall client-side budget reserves UTF-8 input bytes plus overhead and the requested
+output allowance before dispatch, releasing unused reservations only when usage is returned.
+Missing usage retains the reservation. These are client controls, not a provider billing cap.
+
+The cost estimate uses standard paid-tier list prices of $0.30/million input tokens and
+$2.50/million output tokens, verified September 23, 2026 against
+[Google's pricing](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.5-flash-lite).
+It excludes cache discounts and free-tier allowances and is not an invoice. Every model attempt
+is journaled before and after dispatch; failed/cancelled usage stays unknown unless returned.
+Application cost includes initial indexing, updates, navigation, and answer generation.
+Rubric-review cost is reported separately and still counts toward the evaluation-wide budget.
+
+The thresholds are recall ≥85%, reviewed correctness ≥80%, correct abstention on at least 7/8
+absent cases, structurally valid citations at 100%, and reviewed citation support ≥90%, in each
+trial. Errors and unexecuted cases stay in their denominators. Corrections and unsupported
+answers on absent cases are reported separately. A lower-cost claim additionally requires all
+three trials to beat full-history application cost with complete usage and no more than five
+percentage points lower recall or correctness. This is an observed threshold, not a statistical
+non-inferiority test or evidence about real customer conversations.
+
+Labels reach only a separate reviewer after all answers are collected. The reviewer uses the
+same model, so its rubric judgments are not independent human validation. Per-query outputs,
+source excerpts, citation judgments, and failures remain available for audit. The runner and
+scoring are tested on separate invented cases; held-out results must never drive tuning.
+
+### Interruption and continuation
+
+The [v2 attempt](comparison-live-v2.json) stopped at call 471 with HTTP 429, after two complete
+answer-generation trials and part of the third. A [small diagnostic](quota-diagnostic-v2.json)
+subsequently succeeded; it did not identify the quota category. The [v3 continuation plan](comparison-plan-v3.json)
+keeps the frozen comparison functions and completed outputs, and carries all v2 calls into its ledger.
+It targets only 64 queries for which no model request was dispatched, followed by pending reviews.
+The actual rejected query is retained as a failure and is never retried or counted as an abstention.
+
+The continuation uses one concurrent request and ten-second spacing. Its 1,180-call, 5,899,900-token,
+$2.9499 allowance includes the carried v2 calls; v1 and both diagnostics are already deducted.
+Rebuilding the deleted temporary databases is charged to tree application usage. Databases recreated
+for unfinished histories have fresh message IDs; prior completed outputs retain their original IDs.
+After two successful recovery indexing calls, another HTTP 429 stopped execution. No pending query or
+review completed. The combined report and journal contain 474 calls; do not add v2's 471 calls again.
+
+The recorded continuation command was:
+
+```bash
+/private/tmp/cont-index-live-eval-20260923/venv/bin/python -I evaluations/held_out/continue_comparison.py \
+  --from-report evaluations/held_out/comparison-live-v2.json \
+  --plan evaluations/held_out/comparison-plan-v3.json --env-file .env.live-smoke \
+  --wheel dist/release/chat_context_index-0.1.0-py3-none-any.whl \
+  --out evaluations/held_out/comparison-live-v3.json
+```
+
+The existing output is protected from overwrite. Check provider quota/rate limits before
+another live attempt. The exact quota category and reset time were not returned in the recorded
+errors. [Accounting integrity](accounting-integrity.json) confirms 494 total attempts across all
+runs and diagnostics, with three calls of unknown usage, within the original client allowance.
+
+Regenerate the readable report without model calls:
+
+```bash
+python3 evaluations/held_out/report_comparison.py \
+  --report evaluations/held_out/comparison-live-v3.json \
+  --prior evaluations/held_out/comparison-live-v1.json \
+  --prior evaluations/held_out/quota-diagnostic-v1.json \
+  --prior evaluations/held_out/quota-diagnostic-v2.json \
+  --out evaluations/held_out/reports/README.md
+```

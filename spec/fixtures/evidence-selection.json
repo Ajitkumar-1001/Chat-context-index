@@ -1,0 +1,1062 @@
+{
+  "description": "Invented development regressions. No held-out labels or external model calls.",
+  "cases": [
+    {
+      "id": "middle-of-leaf",
+      "query": "Which release codename was chosen?",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Decision: the release codename is AZURE-MOTH."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        }
+      ],
+      "required": [
+        {
+          "seq": 18,
+          "pointer": "/content",
+          "contains": "AZURE-MOTH"
+        }
+      ]
+    },
+    {
+      "id": "correction-after-repeated-matches",
+      "query": "What release codename should we use?",
+      "messages": [
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is COPPER-BIRD."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Correction: the release codename is SILVER-FERN. COPPER-BIRD is retired."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        }
+      ],
+      "required": [
+        {
+          "seq": 27,
+          "pointer": "/content",
+          "contains": "SILVER-FERN"
+        }
+      ]
+    },
+    {
+      "id": "long-structured-unicode-source",
+      "query": "What launch city was chosen?",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Launch preparation notes."
+            },
+            {
+              "type": "image",
+              "url": "ignored"
+            },
+            {
+              "type": "text",
+              "text": "İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 İ 🌍 The launch city is Reykjavík. Use the Iceland office."
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        }
+      ],
+      "required": [
+        {
+          "seq": 17,
+          "pointer": "/content/2/text",
+          "contains": "Reykjavík"
+        }
+      ]
+    },
+    {
+      "id": "rank-before-retrieval-budget",
+      "query": "Which release codename was chosen?",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is AMBER-TIDE."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        }
+      ],
+      "required": [
+        {
+          "seq": 32,
+          "pointer": "/content",
+          "contains": "AMBER-TIDE"
+        }
+      ],
+      "evidence_budget": 700
+    },
+    {
+      "id": "repeated-text-distinct-identities",
+      "query": "Which release codename was chosen?",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "The release codename is IVORY-FINCH."
+        },
+        {
+          "role": "assistant",
+          "content": "The release codename is IVORY-FINCH."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        }
+      ],
+      "required": [
+        {
+          "seq": 15,
+          "pointer": "/content",
+          "contains": "IVORY-FINCH"
+        },
+        {
+          "seq": 16,
+          "pointer": "/content",
+          "contains": "IVORY-FINCH"
+        }
+      ]
+    },
+    {
+      "id": "matching-excerpt-in-recent-message",
+      "query": "Which release codename was chosen?",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        },
+        {
+          "role": "user",
+          "content": "Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. Routine note. The release codename is VIOLET-ELM."
+        },
+        {
+          "role": "user",
+          "content": "Routine maintenance note."
+        }
+      ],
+      "required": [
+        {
+          "seq": 39,
+          "pointer": "/content",
+          "contains": "VIOLET-ELM"
+        }
+      ]
+    }
+  ]
+}

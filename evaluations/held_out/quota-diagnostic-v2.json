@@ -1,0 +1,14 @@
+{
+  "timestamp_utc": "2026-09-23T20:53:35.974777+00:00",
+  "operation": "quota_diagnostic",
+  "provider": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "max_calls": 1,
+  "max_output_tokens": 16,
+  "reserved_input_tokens": 528,
+  "reserved_output_tokens": 16,
+  "input_tokens": 7,
+  "output_tokens": 11,
+  "status": "PASS",
+  "finish_reason": "stop"
+}

@@ -21,11 +21,11 @@
 </div>
 
 > [!NOTE]
-> **Pre-release.** Fresh Python wheels and npm archives pass installed memory checks, including process restarts and reading the same tree across both runtimes. The full local test suite passes. Live-model recall, dollar savings, and registry publication remain pending.
+> **Pre-release.** Installed memory checks and the local Linux test suite pass. Two real-model held-out trials expose a source-selection gap; provider HTTP 429 errors prevented completion of the three-trial evaluation. Cost savings and registry publication remain unverified. [Measured results](evaluations/held_out/reports/README.md).
 
 ## Overview
 
-**ContIndex (`chat-context-index`, imported as `cci` in Python) gives an existing RAG chat or agent loop persistent conversation memory.** It saves original messages in SQLite, indexes them in a summary hierarchy, and prepares recent context plus relevant older evidence for the host's model.
+**ContIndex (`chat-context-index`, imported as `cci` in Python) gives an existing RAG chat or agent loop persistent conversation memory.** It saves original messages in SQLite, indexes them in a summary hierarchy, and prepares recent context plus retrieved older evidence for the host's model.
 
 The host keeps its document retriever, model, and agent framework. ContIndex supplies conversation context through `prepare_context()` in Python and `prepareContext()` in TypeScript. Reopening the same durable history restores its records and tree. Agent execution checkpoints remain the host's responsibility.
 
@@ -88,7 +88,6 @@ asyncio.run(main())
 ```
 
 Use an application-owned path on durable storage to reopen a history later. The [Python](examples/python/rag_chat.py) and [TypeScript](examples/typescript/rag-chat.mjs) adapters connect memory to a host's chat loop. A provider-free call stays lexical; pass an explicit provider and build the index to enable tree navigation.
-<<<<<<< HEAD
 
 ### Choose a model provider
 
@@ -104,12 +103,35 @@ CCI_API_KEY=your-provider-key
 
 Presets cover OpenAI, Gemini, Anthropic, Groq, OpenRouter, and local Ollama through their Chat Completions
 compatibility endpoints. Set `CCI_BASE_URL` for another compatible service. Other native APIs can implement
-the package's `Provider` contract. See [configuration and limits](evaluations/LIVE_SMOKE.md); these presets
-have offline routing tests, and a successful real-model evaluation is still pending.
-=======
->>>>>>> c5efc832ba8bda64aaeccd7a54f0950e8b4f1110
+the package's `Provider` contract. See [configuration and limits](evaluations/LIVE_SMOKE.md). All presets
+have offline routing tests; Gemini also passes the installed-wheel development smoke test. Other providers
+have not passed a live run.
 
 ## Measured example
+
+The [real-model comparison](evaluations/held_out/reports/README.md) uses the installed Python wheel
+and `gemini-3.5-flash-lite`. In each of two completed answer-generation trials:
+
+| Strategy | Required original evidence recovered, out of 32 answerable cases |
+| :--- | :---: |
+| Full conversation history | 32 / 32 |
+| Recent plus lexical memory | 0 / 32 |
+| Tree memory with default context limits | 1 / 32 |
+
+All three strategies abstained on the eight absent-answer cases in each completed trial.
+The third trial and answer review remain incomplete after repeated HTTP 429 responses.
+Across all attempts, **2,537,268 input tokens and 15,619 output tokens** were observed;
+three failed calls have unknown usage. **These results do not support a lower-cost claim.**
+A separate development probe reproduces loss of a needed message during context assembly,
+even when tree navigation finds the correct chunk. Source selection needs improvement before release.
+
+The [installed-wheel live smoke](evaluations/results/live-smoke.json) uses `gemini-3.5-flash-lite`
+with four synthetic messages. After closing and reopening SQLite, tree navigation retrieves the original
+“The deployment target is Oslo.” for “Where should the service launch?”; lexical search finds no evidence.
+The successful run records **1,047 input tokens and 288 output tokens** across six indexing and two
+navigation calls. Indexing unchanged history makes zero calls. This verifies one development fixture;
+it does not measure general recall, answer quality, or cost savings. Earlier failed attempts are preserved
+in the [run history](evaluations/LIVE_SMOKE.md#current-environment), including a timeout with unknown usage.
 
 The [tree dry run](evaluations/results/tree-memory.json) uses 128 synthetic messages and a deterministic provider double. Full-history evidence contains **207,260 characters**; selected memory contains **4,868**. Navigation adds **19,492 input characters across four calls**. Initial indexing takes **171 calls**; an unchanged rerun takes zero. These are reproducible mechanics and character counts, **not token savings, dollar savings, or semantic recall scores**. [Evaluation script](evaluations/tree_memory.py).
 
@@ -155,11 +177,11 @@ The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatInd
 ## Current boundaries
 
 - The supported topology is one owning application process per history on durable local storage. A serverless or distributed deployment needs a separate storage design.
-- Literal keyword retrieval can miss paraphrases; tree recall depends on the routing model and summaries. Live quality and automatic conflict resolution are not established.
+- Literal keyword retrieval can miss natural-language questions. Default context selection can drop needed messages from a retrieved chunk; the held-out recall threshold currently fails. Answer quality and automatic conflict resolution remain unverified.
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- Local verification passes: 106 Python tests, 8 native TypeScript tests, and fresh installed-package memory checks. Linux CI execution and real-model release evaluation remain open.
+- The local Linux CI reproduction passes 165 Python tests, 8 native TypeScript tests, and fresh installed-package memory checks. Hosted CI, dedicated release performance checks, and the full real-model quality gate remain open. [Linux evidence](evaluations/results/linux-release/README.md).
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 

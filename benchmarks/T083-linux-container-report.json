@@ -1,0 +1,38 @@
+{
+  "environment": {
+    "cci_module_path": "/usr/local/lib/python3.11/site-packages/cci/__init__.py",
+    "dedicated_linux_runner": false,
+    "label": "Linux-arm64-Docker-installed-wheel-shared-host",
+    "machine": "aarch64",
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.41",
+    "python_version": "3.11.14 (main, Jan 13 2026, 03:19:31) [GCC 14.2.0]"
+  },
+  "fixture": {
+    "batch_size": 100,
+    "seed": 7,
+    "total_messages": 10000
+  },
+  "results": {
+    "batch_ingest_100_ms": {
+      "p50": 15.922291902825236,
+      "p95": 29.621291905641556,
+      "pass": true,
+      "threshold_p95_ms": 500,
+      "trials": 100
+    },
+    "lexical_search_top8_ms": {
+      "p50": 14.982291031628847,
+      "p95": 16.554166097193956,
+      "pass": true,
+      "threshold_p95_ms": 100,
+      "trials": 50
+    },
+    "store_open_ms": {
+      "p50": 1.0840001050382853,
+      "p95": 1.9515829626470804,
+      "pass": true,
+      "threshold_p95_ms": 2000,
+      "trials": 20
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-09-23T20:25:16.698875+00:00",
+  "method": "Fresh wheel/npm installs outside checkout; separate seed/read processes; deterministic provider",
+  "python": "3.12.14",
+  "node": "v22.23.2",
+  "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+  "typescript_consumer_typecheck": "PASS",
+  "package_documentation_and_license": "PASS",
+  "source_sha256": {
+    "python": "0fa1d7af9bf2008883be5b3a417d773c27b373f907e5187ddb80458667933f67",
+    "typescript": "0bd008d4b989455c2fb73b50311801bb77bc223b88d948e43fe6ebf8e284d3a2"
+  },
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "e220a3d9847e859fb4ebf58bbf746d014e51094f4b318ad53b9f47fbf2a5b7d3"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "a3a8a9bbd09e24efb66629f1826472156466a09bdd3ae39390c6cd8789020b68"
+    }
+  ],
+  "checks": [
+    {
+      "writer": "python",
+      "reader": "python",
+      "status": "PASS",
+      "package_path": "/tmp/cci-installed-memory-il7q79e5/python-consumer/venv/lib/python3.12/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python",
+      "reader": "typescript",
+      "status": "PASS",
+      "package_path": "/tmp/cci-installed-memory-il7q79e5/node-consumer/node_modules/chat-context-index/dist/index.js",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "python",
+      "status": "PASS",
+      "package_path": "/tmp/cci-installed-memory-il7q79e5/python-consumer/venv/lib/python3.12/site-packages/cci/__init__.py",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "typescript",
+      "status": "PASS",
+      "package_path": "/tmp/cci-installed-memory-il7q79e5/node-consumer/node_modules/chat-context-index/dist/index.js",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    }
+  ],
+  "not_measured": [
+    "real-model retrieval quality",
+    "answer correctness",
+    "model tokens or cost"
+  ]
+}

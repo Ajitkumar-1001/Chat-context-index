@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "unchanged_protocol_definitions": {
+    "ANSWER_PROMPT": true,
+    "REVIEW_PROMPT": true,
+    "parse_answer": true,
+    "parse_review": true,
+    "get_context": true,
+    "query_case": true,
+    "review_case": true,
+    "summarize": true,
+    "compare_costs": true,
+    "build_index": true,
+    "append_messages": true
+  },
+  "scope": "AST comparison across v1/v2; only request pacing and quota diagnostics changed in the evaluator; remaining budgets were reduced."
+}

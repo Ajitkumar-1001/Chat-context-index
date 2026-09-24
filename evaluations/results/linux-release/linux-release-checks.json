@@ -1,0 +1,91 @@
+{
+  "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+  "python": "3.12.14",
+  "scope": "Local Linux arm64 Docker reproduction of CI commands; not GitHub CI or a dedicated performance runner.",
+  "source_hashes": {
+    "python": "0fa1d7af9bf2008883be5b3a417d773c27b373f907e5187ddb80458667933f67",
+    "typescript": "0bd008d4b989455c2fb73b50311801bb77bc223b88d948e43fe6ebf8e284d3a2"
+  },
+  "checks": [
+    {
+      "command": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "--config",
+        "packages/python/pyproject.toml",
+        "packages/python/src"
+      ],
+      "exit_code": 0,
+      "log": "check-1.txt"
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "mypy",
+        "--config-file",
+        "packages/python/pyproject.toml",
+        "packages/python/src/cci",
+        "--ignore-missing-imports"
+      ],
+      "exit_code": 0,
+      "log": "check-2.txt"
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "packages/typescript",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "log": "check-3.txt"
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "tests/conformance",
+        "tests/memory",
+        "tests/examples",
+        "tests/evaluations",
+        "-q",
+        "--junitxml=/out/tests.xml"
+      ],
+      "exit_code": 0,
+      "log": "check-4.txt"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "tests/memory/tree_memory.test.mjs"
+      ],
+      "exit_code": 0,
+      "log": "check-5.txt"
+    },
+    {
+      "command": [
+        "python",
+        "tests/packaging/verify_packages.py",
+        "--report",
+        "/out/package-memory.json",
+        "--artifacts-out",
+        "/out/artifacts"
+      ],
+      "exit_code": 0,
+      "log": "check-6.txt"
+    }
+  ],
+  "status": "PASS",
+  "tests": {
+    "python_passed": 165,
+    "typescript_passed": 8,
+    "failures": 0,
+    "skipped": 0
+  }
+}

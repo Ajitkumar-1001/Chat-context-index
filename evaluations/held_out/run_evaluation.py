@@ -273,6 +273,16 @@ def _apply_sc011_gates(trial: dict, *, real_provider: bool = False) -> dict:
 
 async def main_async(args: argparse.Namespace) -> int:
     fixture = _load_fixture()
+    if getattr(args, "comparison_plan", None):
+        spec = importlib.util.spec_from_file_location(
+            "cci_comparison", Path(__file__).with_name("comparison.py"),
+        )
+        if spec is None or spec.loader is None:
+            raise RuntimeError("comparison evaluator unavailable")
+        comparison = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = comparison
+        spec.loader.exec_module(comparison)
+        return await comparison.run(args, _model_helpers(), fixture, _score_evidence_recall)
     client = None
     provider_settings = {}
 
@@ -348,9 +358,16 @@ def main() -> int:
     parser.add_argument("--env-file", default=None, help="Explicit local configuration file")
     parser.add_argument("--trials", type=int, default=3)
     parser.add_argument("--out", default=None)
+    parser.add_argument("--comparison-plan", help="Frozen plan for a budgeted memory/baseline comparison")
+    parser.add_argument("--wheel", help="Installed wheel to verify for a comparison")
+    parser.add_argument("--check-config", action="store_true", help="Validate comparison without model calls")
     args = parser.parse_args()
     if args.trials < 1:
         parser.error("--trials must be positive")
+    if args.comparison_plan and not (args.provider and args.wheel and args.out):
+        parser.error("comparison requires --provider, --wheel, and --out")
+    if args.check_config and not args.comparison_plan:
+        parser.error("--check-config requires --comparison-plan")
     return asyncio.run(main_async(args))
 
 

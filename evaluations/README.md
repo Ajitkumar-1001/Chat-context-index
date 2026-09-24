@@ -2,9 +2,20 @@
 
 For the installed-wheel development smoke test and configurable provider/model selection, see
 [live-model setup](LIVE_SMOKE.md). Both live evaluators support presets and custom Chat Completions endpoints.
-Its [current report](results/live-smoke.json) is `FAIL`: OpenAI rejected the first indexing call
-with HTTP 429 `credit_balance_exhausted`. Configuration is present; live recall and token usage
-remain unverified. The offline checks below do not establish live-model acceptance.
+Its [current report](results/live-smoke.json) is `PASS` with `gemini-3.5-flash-lite`: the installed wheel
+retrieved the expected original evidence after closing and reopening SQLite. The successful run records
+1,047 input tokens and 288 output tokens across eight calls, with no unknown usage. Earlier failed attempts
+remain in the [run history](LIVE_SMOKE.md#current-environment). This is one development query, not held-out
+quality or a cost comparison. The offline checks below remain separate evidence.
+
+The larger [held-out memory comparison](held_out/reports/README.md) is **INCOMPLETE** after repeated
+HTTP 429 responses. In both completed answer-generation trials, full history recovered 32/32
+required original sources, tree memory 1/32, and recent/lexical memory 0/32. Answer review did not run.
+Actual usage and failed-call reservations are recorded; a cost-savings claim is not established.
+The [development probe](results/context-selection-probe.json) independently reproduces loss during
+context selection. [Local Linux checks](results/linux-release/README.md) pass 165 Python tests,
+8 native TypeScript tests, and all four fresh-package writer-reader combinations. The later
+continuation guards bring the offline evaluation suite to 73 passing tests on macOS.
 
 The original evaluation below measures **source-evidence selection**, using synthetic brand conversations and real
 SQLite storage. It makes zero model calls. It is a development probe, not a held-out benchmark,
