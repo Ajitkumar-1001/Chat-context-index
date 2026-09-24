@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "recorded_at_utc": "2026-09-24T21:29:01.646192+00:00",
+  "scope": "Real retained CI archives exercised locally against the new approval guard; fixture approval only, not owner release approval.",
+  "source_sha": "b3bb918be1edb21bddb735ad92b5a52d59deafb7",
+  "ci_run_id": "36043232899",
+  "guard_source_sha256": "c523c420ee57ca65347f0eebc78177fe2cbf5526dd69b46a631733101df3a2b5",
+  "draft_manifest_sha256": "8e30692a1ec62e2a5c4badf710fbae8bb9f6a3f543aea8a84d6497d85d1d116f",
+  "checks": [
+    {
+      "name": "exact reviewed fixture copies identical archives",
+      "status": "PASS",
+      "expected_command_success": true,
+      "observed_exit_code": 0,
+      "rejection": null
+    },
+    {
+      "name": "missing independent approval blocked",
+      "status": "PASS",
+      "expected_command_success": false,
+      "observed_exit_code": 2,
+      "rejection": "--approval"
+    },
+    {
+      "name": "substituted manifest digest blocked",
+      "status": "PASS",
+      "expected_command_success": false,
+      "observed_exit_code": 1,
+      "rejection": "Approval manifest digest mismatch"
+    },
+    {
+      "name": "internally consistent altered candidate blocked",
+      "status": "PASS",
+      "expected_command_success": false,
+      "observed_exit_code": 1,
+      "rejection": "Candidate does not match approved artifacts"
+    }
+  ],
+  "copied_publication_archives": 3,
+  "publication_performed": false,
+  "owner_approval_configured": false,
+  "raw_outputs_location": "/Users/ajit/dev/cont-index/dist/approval-binding-verification-20260924"
+}
