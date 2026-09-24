@@ -222,6 +222,7 @@ vault-context/
 
 # Keep public documentation; local product strategy stays private.
 docs/project-brief.md
+docs/release-execution-plan.md
 docs/release-readiness/
 spec/**/*.md
 TODOS.md
