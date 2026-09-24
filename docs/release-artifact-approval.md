@@ -27,7 +27,7 @@ For the retained September 24 candidate, the recorded source is
 `0.1.0`. Its [recorded hashes](../evaluations/results/production-readiness-20260924/hosted-artifact-manifest.json)
 and [hosted verification](../evaluations/results/production-readiness-20260924/hosted-verification.json)
 provide a concrete review baseline. This historical candidate is **not approved
-for release**; remaining gates are recorded in the [release execution plan](release-execution-plan.md).
+for release**; remaining gates are recorded in the [release status](release-status.md).
 
 With that run's downloaded artifact at the following local path, generate a draft:
 
