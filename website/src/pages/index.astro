@@ -1,6 +1,6 @@
 ---
 import { Code } from 'astro:components';
-// Only committed (git-tracked) evidence files are imported; the page is rebuilt from them.
+
 import hosted from '../../../evaluations/results/release-readiness/hosted-ci-20260924.json';
 import packages from '../../../evaluations/results/release-readiness/package-memory-20260924.json';
 import perfPy from '../../../evaluations/results/release-readiness/performance-macos-20260924.json';
@@ -11,7 +11,7 @@ import recallTree from '../../../evaluations/results/release-readiness/dev-recal
 
 const repo = 'https://github.com/Ajitkumar-1001/Chat-context-index';
 const blob = `${repo}/blob/main`;
-// Gate wording mirrors docs/release-status.md; update both together.
+// Gate wording mirrors release-status; update both together.
 const asOf = 'September 24, 2026 (UTC)';
 
 type Status = 'pass' | 'open' | 'blocked';
