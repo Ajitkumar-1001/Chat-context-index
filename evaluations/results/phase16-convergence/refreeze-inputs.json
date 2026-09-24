@@ -1,0 +1,32 @@
+{
+  "purpose": "T108 hand-off: the values a held-out release plan must pin after T107 (verbatim copies count as evidence). This is not evaluation evidence; no provider call and no held-out run was made.",
+  "package_source_commit": "9a1a6fdab7ed908d7f0759b867335d750592d3df",
+  "wheel": {
+    "file": "chat_context_index-0.1.0-py3-none-any.whl",
+    "build": "cd packages/python && python -m pip wheel --no-deps -w <out> .",
+    "builder": "CPython 3.12, pip 25.1.1, macOS arm64",
+    "reproduced": "two builds produced identical bytes"
+  },
+  "plan_fields": {
+    "fixture": "evaluations/held_out/fixture.json",
+    "fixture_sha256": "94ccf631b82b5f11405bbd2d56db3193baa040f424a7fbf1f57e54bca30344dc",
+    "wheel_sha256": "219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79",
+    "source_hashes": {
+      "evaluations/held_out/comparison.py": "8f2f52f4bd982afd1b502da1ae7a92383bcaa3b5bc031d5c7a506e393c69b8db",
+      "evaluations/held_out/run_evaluation.py": "7853fbc317934d94f268707c1bb60ffb78fd0a4d49563c164fd6f9ead15477aa",
+      "evaluations/live_smoke.py": "2c742527621e5adf1c4b9b8201779791b742f8298b1fe96341db003b90eb2f8c",
+      "evaluations/held_out/release_validation.py": "8eb8feb33e091eb6407cc3f2aacfae8fdde34ed4ec3667615e3e7e612a93c836"
+    }
+  },
+  "fixture_tools_sha256": {
+    "evaluations/held_out/generate_fixture.py": "2ae091967a335e305131d8b5625f7d9a1d1733a8c597827f2973f5f6405d938f",
+    "evaluations/held_out/verify_fixture.py": "9fc40ce61fe4eb793cfd0807c36220e914df43f6ab71b3b29838c7335f8c52e2"
+  },
+  "superseded": {
+    "fixture_sha256": "7ece8e95f37801f6781cad362e74f771288d84d52b018b22613354c4919b65c8",
+    "wheel_sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0",
+    "evaluations/held_out/run_evaluation.py": "281b02cd59411005cfaf438b12667caa75a0895036a070fe8fbade6fdcd21aeb"
+  },
+  "fixture_change": "Histories and _meta are unchanged; each required evidence unit gains verbatim_copy_indexes (28 copies in total: 13 of 60 development units and 4 of 32 held-out units have copies).",
+  "refreeze": "Recheck these values on main after merge. The owner of the local release plans then pins fixture_sha256, wheel_sha256 and source_hashes, re-freezes any outer plan's release_plan_sha256, and only then makes a provider call. T108 stays open until a plan pins them."
+}
