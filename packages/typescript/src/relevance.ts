@@ -19,12 +19,25 @@ function* words(text: string): Generator<[number, number, string]> {
   }
 }
 
+const KEY_MEMO = new Map<string, string>();
+
+/** Generic suffix rules only; spec/fixtures/term-normalization.json pins them. Memoized like relevance.py. */
 function key(word: string): string {
-  if (word === "chosen" || word === "chose") return "choos";
-  if (word === "used" || word === "using") return "use";
+  const cached = KEY_MEMO.get(word);
+  if (cached !== undefined) return cached;
+  if (KEY_MEMO.size >= 65_536) KEY_MEMO.clear();
+  const result = computeKey(word);
+  KEY_MEMO.set(word, result);
+  return result;
+}
+
+function computeKey(word: string): string {
   if (word.length < 4 || !/^[a-z]+$/.test(word)) return word;
-  if (word.length === 4) return word.endsWith("e") ||
-    (word.endsWith("s") && !["ss", "us", "is"].some(suffix => word.endsWith(suffix))) ? word.slice(0, -1) : word;
+  if (word.length === 4) {
+    if (word.endsWith("e") || (word.endsWith("s") && !["ss", "us", "is"].some(suffix => word.endsWith(suffix)))) return word.slice(0, -1);
+    // ponytail: "used" -> "use" also maps "shed" -> "she"; FTS5 porter stemming if collisions matter.
+    return word.endsWith("ed") && !"aeiou".includes(word[1]) ? word.slice(0, -1) : word;
+  }
   let base: string;
   let doubled = false;
   if (word.endsWith("ies")) return word.slice(0, -3) + "y";
@@ -48,8 +61,7 @@ export function ftsTermExpression(term: string): string {
   if (term.length < 3 || !/^[a-z]+$/.test(term)) return `"${term.replace(/"/g, '""')}"`;
   const forms = [term, term + "e", term + "s", term + "es", term + "ed", term + "ing"];
   if (term && !"aeiouy".includes(term.at(-1)!)) forms.push(term + term.at(-1)! + "ed", term + term.at(-1)! + "ing");
-  if (term === "choos") forms.push("chosen", "chose");
-  if (term === "use") forms.push("used", "using");
+  if (term.endsWith("e")) forms.push(term + "d");
   if (term.endsWith("y")) forms.push(term.slice(0, -1) + "ies", term.slice(0, -1) + "ied");
   return "(" + [...new Set(forms)].filter(form => key(form) === term)
     .map(form => `"${form.replace(/"/g, '""')}"`).join(" OR ") + ")";

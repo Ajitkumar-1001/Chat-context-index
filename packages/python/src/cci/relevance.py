@@ -2,6 +2,7 @@
 
 from collections import Counter
 from collections.abc import Iterator, Sequence
+from functools import lru_cache
 from unicodedata import category, normalize
 
 _STOP_WORDS = frozenset(
@@ -25,16 +26,19 @@ def _words(text: str) -> Iterator[tuple[int, int, str]]:
             start = None
 
 
+@lru_cache(maxsize=65_536)
 def _key(word: str) -> str:
-    """A small, deterministic inflection key shared with the TypeScript implementation."""
-    if word in ("chosen", "chose"):
-        return "choos"
-    if word in ("used", "using"):
-        return "use"
+    """A small, deterministic inflection key shared with the TypeScript implementation.
+
+    Rules are generic suffix rules only; `spec/fixtures/term-normalization.json` pins them.
+    """
     if len(word) < 4 or not word.isascii() or not word.isalpha():
         return word
     if len(word) == 4:
         if word.endswith("e") or (word.endswith("s") and not word.endswith(("ss", "us", "is"))):
+            return word[:-1]
+        # ponytail: "used" -> "use" also maps "shed" -> "she"; FTS5 porter stemming if collisions matter.
+        if word.endswith("ed") and word[1] not in "aeiou":
             return word[:-1]
         return word
     if word.endswith("ies"):
@@ -75,10 +79,8 @@ def fts_term_expression(key: str) -> str:
     forms = [key, key + "e", key + "s", key + "es", key + "ed", key + "ing"]
     if key and key[-1] not in "aeiouy":
         forms.extend((key + key[-1] + "ed", key + key[-1] + "ing"))
-    if key == "choos":
-        forms.extend(("chosen", "chose"))
-    if key == "use":
-        forms.extend(("used", "using"))
+    if key.endswith("e"):
+        forms.append(key + "d")
     if key.endswith("y"):
         forms.extend((key[:-1] + "ies", key[:-1] + "ied"))
     return "(" + " OR ".join(
