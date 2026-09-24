@@ -1,12 +1,13 @@
 {
   "goal": "Complete docs/release-execution-plan.md through verified production release and delivery",
-  "status": "IN_PROGRESS_EXTERNAL_INPUTS_PENDING",
+  "status": "ENGINEERING_VERIFICATION_IN_PROGRESS_EXTERNAL_INPUTS_PENDING",
   "done": [
-    "Artifact approval binding passes57focused tests and four real-CI-bundle integration checks",
-    "Website check/build passes with0errors/warnings/hints",
-    "Existing installed live smoke remainsPASS for identical wheel"
+    "Artifact approval binding merged in PR #8; 57 focused tests and four real-CI-bundle integration checks passed.",
+    "Artifact approval milestone passed all 21 hosted CI jobs, including 16 package combinations, at 4b9a26b2a98cfdb805d7b5e592df193d8f974ce0 (run 36062294482).",
+    "Guarded comparison and native/cache entry points pass 170 combined local checks against main 9a1a6fd.",
+    "Independent review findings have regression coverage; original evaluators and fixture remain unchanged."
   ],
-  "doing": "Add exclusive allocation and complete provider/model guards around frozen comparison evaluator",
+  "doing": "Final configured lint and hosted CI for the guarded evaluation follow-up.",
   "blocked": [
     {
       "priority": "P0",
@@ -34,9 +35,12 @@
       "reason": "No hosting target supplied or found; GitHub Pages not configured"
     }
   ],
-  "next": "Verify comparison guard, run hostedCI on isolated branch, and freeze candidate once inputs are ready",
+  "next": "Retain the new candidate identity after hosted CI; execute dependent gates when external inputs arrive.",
   "deferred": [],
   "publication_performed": false,
   "new_model_calls": 0,
-  "restore_path": "/private/tmp/cont-index-execution-20260924-prestate and isolated codex/release-evidence-binding worktree"
+  "restore_path": "/private/tmp/cont-index-execution-20260924-prestate and isolated codex/release-evidence-binding worktree",
+  "candidate_notice": "Main received runtime changes after the earlier live smoke. That smoke applies only to wheel a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0; it is not proof for the new candidate.",
+  "pull_request": null,
+  "merged_artifact_guard_pull_request": "https://github.com/Ajitkumar-1001/Chat-context-index/pull/8"
 }
