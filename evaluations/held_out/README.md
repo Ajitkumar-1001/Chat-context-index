@@ -16,6 +16,37 @@ validation only — never tune retrieval, prompts, or scoring logic against it**
 Regenerate `fixture.json` only when the generator itself changes; do not hand-edit it to fix a
 failing run.
 
+## Guarded release execution
+
+For new paid release runs, invoke `evaluations/run_allocated_release.py` for native
+`ask()` and development cache trials, or `evaluations/run_allocated_comparison.py`
+for the three-strategy comparison. These entry points wrap the unchanged evaluators;
+the historical commands below describe earlier runs.
+
+Install the exact candidate wheel in an isolated environment. Freeze the provider
+profile, model allowlist, pricing, feasible pacing/timeouts, original evaluator and
+fixture hashes, and a separate canonical allocation for each run. The native/cache
+outer plan pins the original release plan and both guard sources. The comparison
+outer plan pins its inner comparison plan and every evaluator/guard source it uses.
+Allocation books, account capacity evidence, and detailed preparation remain local.
+
+From the repository root, preflight the native/cache outer plan with:
+
+```bash
+"$EVAL_PYTHON" -I evaluations/run_allocated_release.py \
+  --plan "$FROZEN_OUTER_PLAN" --wheel "$CANDIDATE_WHEEL" \
+  --allocation-book evaluations/results/release-readiness/allocations.json \
+  --out "$NEW_RESULT_DIRECTORY" --env-file "$PROVIDER_ENV_FILE"
+```
+
+Use the comparison entry point with the same flags for its own outer plan. Preflight
+dispatches no requests and creates no output or claim; `execution_ready: false`
+still blocks execution. Add `--execute` only with verified capacity and an approved
+allocation. A claim is consumed once, including after interruption. Redirects and
+SDK retries are disabled; unknown usage or changed transport/model settings stops
+later dispatch. Keep the claim, journal, report, and `allocation-accounting.json`.
+Execution completeness alone does not establish reviewed quality or cost savings.
+
 ## Regenerating
 
 ```bash

@@ -69,9 +69,9 @@ jobs:
         working-directory: packages/python
       - name: Run native TypeScript memory suite
         run: node --test tests/memory/*.test.mjs
-      - name: Lint and typecheck the bounded release evaluator
+      - name: Lint release controls and bounded evaluators, then typecheck native evaluation
         run: |
-          python -m ruff check evaluations/held_out/release_validation.py tests/evaluations/test_release_validation.py --config packages/python/pyproject.toml
+          python -m ruff check evaluations/held_out/release_validation.py evaluations/run_allocated_comparison.py evaluations/run_allocated_release.py scripts/release_controls.py tests/evaluations/test_release_validation.py tests/evaluations/test_allocated_comparison.py tests/evaluations/test_allocated_release.py tests/release --config packages/python/pyproject.toml
           python -m mypy evaluations/held_out/release_validation.py --ignore-missing-imports
 
   clean-install:
