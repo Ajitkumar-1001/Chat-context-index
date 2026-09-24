@@ -1,16 +1,23 @@
 # Production readiness execution — September 24, 2026
 
-**BLOCKED for production release.** The release hardening is implemented locally;
+**BLOCKED for production release.** Release hardening is merged and verified in hosted CI;
 real-model quality, reference performance, actual human validation, and registry
-identities are not established. No registry publication or release tag was created.
+identities are not established. This work created no registry publication or release tag.
 
 ## Completed work
 
-- The prior candidate passed all [16 hosted package combinations](../release-readiness/hosted-ci-20260924.json).
-  The updated release/security workflows and npm repository metadata need a fresh hosted run.
+- The updated release/security workflows and npm repository metadata passed all
+  [16 hosted package combinations](hosted-verification.json), 266 Python tests, 21 Node tests,
+  lint/typechecks, and security scans. All 21 jobs passed in
+  [run 36043232899](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36043232899)
+  on main commit `b3bb918be1edb21bddb735ad92b5a52d59deafb7`.
 - Release publishing now verifies source commit, workflow run, tag/version, package identity,
   and archive checksums before copying the exact CI-installed artifacts. It requires an
   explicit `RELEASE_APPROVED_SHA` in addition to protected environment approval.
+- The downloaded CI candidate passed that guard for version `0.1.0`. The
+  [manifest](hosted-artifact-manifest.json) binds all four archive hashes to the run and
+  source commit; the three publication archives were copied without rebuilding.
+  This verification did not approve or publish a release.
 - GitHub's `release` environment now requires owner approval and accepts only `v*` tags.
   An active ruleset limits version-tag creation, updates, and deletion to the owner.
   The final source approval variable has not been set.
@@ -65,3 +72,7 @@ Account-specific limits require the owner's provider account information; see
 
 Publication remains blocked while any required evidence is missing. Prepared scripts,
 blank human records, and a zero-request preflight do not close their execution gates.
+
+The [gate record](readiness.json) records each original request, its evidence, and the
+remaining external input. Local copies of hosted package and scan reports are retained
+under `hosted-evidence/` so verification does not depend on GitHub artifact retention.

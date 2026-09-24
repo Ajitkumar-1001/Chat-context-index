@@ -1,0 +1,113 @@
+{
+  "status": "BLOCKED_FOR_PRODUCTION",
+  "date_utc": "2026-09-24",
+  "candidate": {
+    "source_sha": "b3bb918be1edb21bddb735ad92b5a52d59deafb7",
+    "hosted_run_id": 36043232899,
+    "version": "0.1.0",
+    "archive_manifest": "hosted-artifact-manifest.json"
+  },
+  "gates": [
+    {
+      "request": "Provider capacity, evaluation budget, installed live smoke and actual usage",
+      "status": "INCOMPLETE",
+      "completed": [
+        "Provider metadata endpoint reachable; configured model listed",
+        "Bounded capacity diagnostic implemented and tested",
+        "Two indexing responses recorded 151 input and 66 output tokens"
+      ],
+      "evidence": [
+        "provider-metadata.json",
+        "live-smoke-summary.json",
+        "live-smoke-extended-summary.json"
+      ],
+      "blockers": [
+        "First smoke timed out; follow-up stopped on HTTP 503 before expected original-evidence retrieval",
+        "Full evaluation request forecast exceeds existing cumulative allowance; additional budget requested, not granted"
+      ],
+      "new_generation_attempts": 4,
+      "unknown_usage_attempts": 2,
+      "input_tokens_observed": 151,
+      "output_tokens_observed": 66,
+      "reserved_tokens_including_unknown": 2345,
+      "allocations_reusable": false
+    },
+    {
+      "request": "Three real-model quality/cost trials, cache measurements and human review",
+      "status": "PREPARED_NOT_RUN",
+      "evidence": [
+        "human-validation-preparation.json",
+        "../../../docs/validation/human-review.md"
+      ],
+      "blockers": [
+        "Successful smoke, verified capacity and sufficient approved budget",
+        "Final candidate/protocol/allocations must be frozen before held-out outcomes",
+        "Actual human reviewer must complete outcome review"
+      ]
+    },
+    {
+      "request": "16-job hosted package CI matrix and GitHub authentication",
+      "status": "PASS",
+      "evidence": [
+        "hosted-run.json",
+        "hosted-verification.json"
+      ],
+      "matrix_cells": 16,
+      "writer_reader_combinations_per_cell": 9,
+      "python_tests_passed": 266,
+      "node_tests_passed": 21,
+      "all_ci_jobs_passed": 21,
+      "authentication": "Authenticated GitHub access worked for actual hosted evidence and release control configuration"
+    },
+    {
+      "request": "Dedicated Linux performance, cold searches and scale",
+      "status": "PREPARED_NOT_RUN",
+      "evidence": [
+        "performance-preparation/README.md",
+        "../../../docs/reference-performance-runner.md"
+      ],
+      "blockers": [
+        "No dedicated Linux x64 4-vCPU/8-GiB local-SSD runner supplied",
+        "Exclusive reservation and host page-cache eviction authorization required"
+      ],
+      "local_checks_are_reference_evidence": false
+    },
+    {
+      "request": "Two unfamiliar-developer integration trials",
+      "status": "PREPARED_NOT_RUN",
+      "evidence": [
+        "human-validation-preparation.json",
+        "../../../docs/validation/developer-adoption.md"
+      ],
+      "actual_trials_completed": 0,
+      "blockers": [
+        "Two actual unfamiliar developers must perform and attest the documented integrations"
+      ]
+    },
+    {
+      "request": "Registry ownership, trusted publishing, protections, security and final artifact approval",
+      "status": "PARTIAL",
+      "evidence": [
+        "release-controls/controls.json",
+        "release-controls/license-review.json",
+        "hosted-verification.json",
+        "hosted-artifact-manifest.json"
+      ],
+      "completed": [
+        "Hosted dependency and secret scans passed",
+        "Scoped package/dependency attribution review passed",
+        "Release environment requires owner review and accepts only version tags",
+        "Active version-tag protection ruleset configured and read back",
+        "Exact hosted artifact publication guard passed without rebuilding"
+      ],
+      "blockers": [
+        "npm owner session is unauthenticated; PyPI/npm ownership and publisher identities unverified",
+        "Registry-side trusted publisher setup incomplete",
+        "Final approval withheld while evidence gates remain open; RELEASE_APPROVED_SHA not set"
+      ]
+    }
+  ],
+  "registry_publication_performed": false,
+  "release_tag_created_by_this_work": false,
+  "production_ready": false
+}

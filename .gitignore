@@ -224,6 +224,7 @@ vault-context/
 docs/project-brief.md
 docs/release-readiness/
 spec/**/*.md
+TODOS.md
 benchmarks/T083-macos-arm64-20260923/
 
 # Publish validation results, but keep provider allocations and release planning local.

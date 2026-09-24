@@ -1,0 +1,4 @@
+conformance-tests	Run conformance, memory, examples, and evaluation accounting	2026-09-24T18:45:07.3658150Z ============================= 266 passed in 31.88s =============================
+conformance-tests	Run native TypeScript memory suite	2026-09-24T18:45:08.6633572Z # tests 21
+conformance-tests	Run native TypeScript memory suite	2026-09-24T18:45:08.6634017Z # pass 21
+conformance-tests	Run native TypeScript memory suite	2026-09-24T18:45:08.6634246Z # fail 0

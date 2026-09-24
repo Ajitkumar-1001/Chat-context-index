@@ -1,25 +1,27 @@
 # Release status — September 24, 2026 UTC
 
-Release is **blocked**. Local regression, package installation, cross-language checks, and all
-16 hosted package combinations passed for the preceding 0.1.0 candidate. The new release
-hardening and npm metadata change have fresh local checks; their hosted validation is pending.
-Reference performance, live quality/cost evidence, and developer adoption remain open. PyPI and npm returned 404 for
+Release is **blocked**. The updated release controls, security workflow, regression suite,
+and all 16 hosted package combinations passed on main commit
+`b3bb918be1edb21bddb735ad92b5a52d59deafb7`. The exact retained CI archives also passed the
+publication guard locally, without publishing. Reference performance, live quality/cost
+evidence, human review, developer adoption, and registry setup remain open. PyPI and npm returned 404 for
 version 0.1.0 at this check. A GitHub [prerelease](https://github.com/Ajitkumar-1001/Chat-context-index/releases/tag/pre-release)
 exists without assets; it did not run the tag-triggered registry release workflow.
 
 The [production-readiness execution record](../evaluations/results/production-readiness-20260924/README.md)
 tracks the current work, including protected releases, exact-artifact publication checks,
-security scanning, prepared reference/human validation, and a failed bounded capacity attempt.
+security scanning, prepared reference/human validation, and two incomplete bounded capacity attempts.
 
 | Gate | Current evidence |
 | --- | --- |
-| Python regression | 224 passed locally on macOS arm64 / Python 3.12.11, including disposable Redis and clean-install tests |
-| TypeScript regression | 21 native memory tests passed; TypeScript build passed on Node 22.23.1 |
-| Static checks | Ruff and mypy passed for the Python package |
+| Python regression | **266 passed** in the current hosted conformance job, including Redis, evaluator, performance-gate, and release-control checks |
+| TypeScript regression | **21 passed** in the current hosted native memory suite; TypeScript typecheck and package builds passed |
+| Static checks | Hosted Python lint/typecheck, TypeScript typecheck, and bounded evaluator static checks passed |
 | Cross-language retrieval | Shared fixture compares ordered `search()`, `retrieve()`, and prepared context output, including correction and duplicate cases |
 | Cache failure accounting | Python `stats()` reports Redis errors and SQLite fallback lookups/hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend |
 | Fresh local packages | Wheel, source distribution, and npm tarball rebuilt and installed outside the checkout after npm repository metadata changed; all nine writer/reader combinations, TypeScript consumer typecheck, package documentation, and default operation passed. [Current report](../evaluations/results/production-readiness-20260924/release-controls/package-memory.json) |
-| Hosted matrix | **Passed:** all 16 Python 3.11–3.14 / Node 22 and 24 / Ubuntu x64 and macOS arm64 package combinations passed with nine writer/reader checks each. Every cell produced the same wheel, sdist, and npm archive hashes as the local package report. [Per-cell evidence](../evaluations/results/release-readiness/hosted-ci-20260924.json), [PR run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36034703337), [merged-main run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36034722343) |
+| Hosted matrix | **Passed:** all 16 Python 3.11–3.14 / Node 22 and 24 / Ubuntu x64 and macOS arm64 package combinations passed with nine writer/reader checks each. [Current verification](../evaluations/results/production-readiness-20260924/hosted-verification.json), [merged-main run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36043232899) |
+| CI artifacts and security | The retained wheel, sdist, npm tarball, and rebuilt wheel passed the source/run/version/checksum guard; publication archives were copied without rebuilding. Hosted secret and dependency scans passed. [Archive manifest](../evaluations/results/production-readiness-20260924/hosted-artifact-manifest.json), [scan evidence](../evaluations/results/production-readiness-20260924/hosted-verification.json) |
 | Reference performance | **Not run.** Updated installed packages meet the three warm single-request thresholds in [local macOS runs](benchmark-reproduction.md), but Python's process-cold first-search p95 was 112.6 ms and search latency grows at higher concurrency. The dedicated Linux x64 runner, filesystem-cold pass, and scale point remain outstanding |
 | Installed-package live smoke | **INCOMPLETE:** the first attempt timed out; a separately allocated 60-second follow-up recorded 151 input/66 output tokens from two indexing calls before HTTP 503 on the third. Retrieval was not reached. Both failed calls retain unknown-usage reservations; no further generation requests were made. [Latest attempt](../evaluations/results/production-readiness-20260924/live-smoke-extended-summary.json) |
 | Quality, cost, human review | **Not run for these artifacts.** Three frozen trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open |
@@ -52,6 +54,6 @@ python tests/packaging/verify_packages.py --report evaluations/results/package-m
 
 The CI matrix uses GitHub's published [`macos-15` arm64 and `ubuntu-24.04` x64 runner
 labels](https://github.com/actions/runner-images#available-images). Each job verifies its
-architecture. PR #2 merged before its CI jobs finished; the PR run and a separate post-merge
-main run subsequently passed. Hosted package compatibility does not substitute for the dedicated
+architecture. The current post-merge main run includes the release-hardening changes and
+passed all 21 jobs. Hosted package compatibility does not substitute for the dedicated
 reference Linux performance run.
