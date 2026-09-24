@@ -21,7 +21,7 @@
 </div>
 
 > [!NOTE]
-> **Pre-release.** Evidence selection is fixed in Python and TypeScript and passes development regressions, clean package installs, and local Linux checks. The rebuilt wheel's live smoke was interrupted by HTTP 429; held-out quality and cost savings remain unverified for this build. [Fix and verification](evaluations/evidence-selection/README.md).
+> **Pre-release.** The current installed Python wheel passed its real-model development smoke: it retrieved the expected original evidence after reopening SQLite, with complete token usage across eight calls. Held-out quality, cost savings, and the remaining production gates are still unverified. [Verified smoke result](evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json) · [Release status](docs/release-status.md).
 
 Release validation now includes bounded native answer review, source-distribution installation checks,
 and a configured runtime/platform matrix. [Implementation progress and remaining gates](docs/release-status.md).
@@ -107,8 +107,9 @@ CCI_API_KEY=your-provider-key
 Presets cover OpenAI, Gemini, Anthropic, Groq, OpenRouter, and local Ollama through their Chat Completions
 compatibility endpoints. Set `CCI_BASE_URL` for another compatible service. Other native APIs can implement
 the package's `Provider` contract. See [configuration and limits](evaluations/LIVE_SMOKE.md). All presets
-have offline routing tests; an earlier Python wheel passed the Gemini development smoke. The rebuilt
-wheel's smoke encountered HTTP 429. Other providers have not passed a live run.
+have offline routing tests; the current installed Python wheel passed the
+[Gemini development smoke](evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json).
+Other providers have not passed a live run.
 
 ### Cache eligible model work
 
@@ -137,6 +138,26 @@ memoization backend.
 
 ## Measured example
 
+The [installed-package live smoke on September 24, 2026](evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json)
+**passed** using the CI-verified Python wheel and `gemini-3.5-flash-lite`. It indexed four synthetic
+messages, closed and reopened SQLite, then retrieved the original “The deployment target is Oslo.”
+for “Where should the service launch?” through tree navigation. The result preserved sequence 1,
+its message ID, and the `/content` source pointer. Lexical search found no evidence.
+
+| Operation | Successful calls | Actual input tokens | Actual output tokens |
+| :--- | ---: | ---: | ---: |
+| Indexing | 6 | 653 | 239 |
+| Tree navigation | 2 | 405 | 62 |
+| **Total** | **8** | **1,058** | **301** |
+
+The run had **zero errors, retries, or missing usage**. Indexing unchanged history made zero calls.
+Estimated cost from the recorded tokens and frozen model prices was **$0.0010699**, below the
+**$0.04** smoke cap. This verifies one Python development fixture; it does not establish general
+recall, answer quality, native TypeScript live behavior, sustained provider capacity, or cost savings.
+Earlier failed attempts and their unknown-usage reservations remain in the
+[execution record](evaluations/results/production-readiness-20260924/README.md) and
+[historical run reports](evaluations/LIVE_SMOKE.md#current-environment).
+
 The earlier [real-model comparison](evaluations/held_out/reports/README.md) used the previous Python wheel
 and `gemini-3.5-flash-lite`. In each of two completed answer-generation trials:
 
@@ -154,17 +175,6 @@ A separate development probe reproduced loss of a needed message during context 
 even when tree navigation found the correct chunk. The new implementation retains that source in
 [the installed-wheel probe](evaluations/results/context-selection-fixed-installed.json).
 These historical held-out scores must be rerun against the fixed implementation before release.
-
-The earlier [installed-wheel live smoke](evaluations/results/live-smoke.json) used `gemini-3.5-flash-lite`
-with four synthetic messages. After closing and reopening SQLite, tree navigation retrieves the original
-“The deployment target is Oslo.” for “Where should the service launch?”; lexical search finds no evidence.
-The successful run records **1,047 input tokens and 288 output tokens** across six indexing and two
-navigation calls. Indexing unchanged history makes zero calls. This verifies one development fixture;
-it does not measure general recall, answer quality, or cost savings. Earlier failed attempts are preserved
-in the [run history](evaluations/LIVE_SMOKE.md#current-environment), including a timeout with unknown usage.
-The [new wheel's smoke](evaluations/results/live-smoke-evidence-selection.json) stopped on HTTP 429
-during indexing: one successful call recorded 76 input and 31 output tokens, and one rejected call
-has unknown usage. It did not reach retrieval.
 
 The [tree dry run](evaluations/results/tree-memory.json) uses 128 synthetic messages and a deterministic provider double. Full-history evidence contains **207,260 characters**; selected memory contains **4,868**. Navigation adds **19,492 input characters across four calls**. Initial indexing takes **171 calls**; an unchanged rerun takes zero. These are reproducible mechanics and character counts, **not token savings, dollar savings, or semantic recall scores**. [Evaluation script](evaluations/tree_memory.py).
 
@@ -219,7 +229,7 @@ The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatInd
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- The current macOS local run passes 224 Python tests, 21 native TypeScript tests, and nine fresh installed-package writer/reader checks. All 16 hosted package combinations pass. Dedicated Linux performance and the real-model quality gate remain open. [Release status](docs/release-status.md).
+- The current hosted run passes 266 Python tests, 21 native TypeScript tests, and all 16 package combinations with nine writer/reader checks each. The installed Python live smoke also passes. Dedicated Linux performance and the held-out quality/cost gate remain open. [Release status](docs/release-status.md).
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 

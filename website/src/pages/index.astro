@@ -1,16 +1,18 @@
 ---
 import { Code } from 'astro:components';
-// Only committed (git-tracked) evidence files are imported; the page is rebuilt from them.
-import hosted from '../../../evaluations/results/release-readiness/hosted-ci-20260924.json';
-import packages from '../../../evaluations/results/release-readiness/package-memory-20260924.json';
+// Only public evidence files are imported; the page is rebuilt from them.
+import hosted from '../../../evaluations/results/production-readiness-20260924/hosted-verification.json';
+import packages from '../../../evaluations/results/production-readiness-20260924/hosted-evidence/packages-ubuntu-24.04-py3.12-node22/package-memory.json';
+import smoke from '../../../evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json';
 import perfPy from '../../../evaluations/results/release-readiness/performance-macos-20260924.json';
 import perfTs from '../../../evaluations/results/release-readiness/performance-typescript-macos-20260924.json';
-import preflight from '../../../evaluations/results/release-readiness/preflight-20260924.json';
 import recallLexical from '../../../evaluations/results/release-readiness/dev-recall-lexical-20260924.json';
 import recallTree from '../../../evaluations/results/release-readiness/dev-recall-tree-20260924.json';
 
 const repo = 'https://github.com/Ajitkumar-1001/Chat-context-index';
 const blob = `${repo}/blob/main`;
+const evidencePath = `${blob}/evaluations/results/production-readiness-20260924`;
+const smokeReport = `${evidencePath}/live-smoke-retry-003-summary.json`;
 // Gate wording mirrors docs/release-status.md; update both together.
 const asOf = 'September 24, 2026 (UTC)';
 
@@ -34,26 +36,29 @@ const minor = (v: string) => v.split('.').slice(0, 2).join('.');
 const major = (v: string) => v.replace(/^v/, '').split('.')[0];
 
 const gates: { name: string; status: Status; evidence: string; href?: string }[] = [
-  { name: 'Python regression', status: 'pass', evidence: '224 tests passed locally on macOS arm64 / Python 3.12.11, including disposable Redis and clean-install tests.' },
-  { name: 'TypeScript regression', status: 'pass', evidence: '21 native memory tests passed; the TypeScript build passed on Node 22.23.1.' },
-  { name: 'Static checks', status: 'pass', evidence: 'Ruff and mypy passed for the Python package.' },
+  { name: 'Python regression', status: 'pass', evidence: `${hosted.tests.python_passed} tests passed in hosted CI, including Redis, evaluator, performance-gate, and release-control checks.` },
+  { name: 'TypeScript regression', status: 'pass', evidence: `${hosted.tests.node_passed} native memory tests passed; hosted TypeScript typecheck and package builds passed.` },
+  { name: 'Static checks', status: 'pass', evidence: 'Hosted Python lint/typecheck, TypeScript typecheck, and bounded evaluator static checks passed.' },
   { name: 'Cross-language retrieval', status: 'pass', evidence: 'A shared fixture compares ordered search(), retrieve(), and prepared-context output across runtimes, including correction and duplicate cases.' },
   { name: 'Cache failure accounting', status: 'pass', evidence: 'Python stats() reports Redis errors and SQLite fallback lookups and hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend.' },
-  { name: 'Fresh local packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${blob}/evaluations/results/release-readiness/package-memory-20260924.json` },
-  { name: 'Hosted package matrix', status: 'pass', evidence: `All ${hosted.matrix_cells_passed} Python 3.11–3.14 × Node 22/24 × Ubuntu x64/macOS arm64 cells passed and reproduced the local archive hashes.`, href: `${repo}/actions/runs/${hosted.main_ci_run_id}` },
+  { name: 'Installed packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${evidencePath}/hosted-evidence/packages-ubuntu-24.04-py3.12-node22/package-memory.json` },
+  { name: 'Hosted package matrix', status: 'pass', evidence: `All ${hosted.matrix_cells} Python 3.11–3.14 × Node 22/24 × Ubuntu x64/macOS arm64 cells passed with matching source and archive hashes.`, href: hosted.run_url },
+  { name: 'CI artifacts and security', status: 'pass', evidence: 'Hosted secret/dependency scans and the exact-archive publication guard passed. No package was published.', href: `${evidencePath}/hosted-verification.json` },
   { name: 'Reference performance', status: 'open', evidence: 'Local macOS runs meet the three warm single-request thresholds. The dedicated Linux x64 runner, filesystem-cold pass, and scale point are outstanding.' },
-  { name: 'Installed-package live smoke', status: 'blocked', evidence: `Preflight passed with ${preflight.provider_calls} provider calls but is not execution-ready: ${preflight.reason_not_ready}` },
+  { name: 'Installed-package live smoke', status: smoke.status === 'PASS' ? 'pass' : 'blocked', evidence: `Installed Python package retrieved the expected original evidence through tree navigation after SQLite reopen. ${smoke.attempts} calls recorded ${smoke.actual_input_tokens_observed.toLocaleString('en-US')} input / ${smoke.actual_output_tokens_observed} output tokens, with ${smoke.errors} errors and no unknown usage in this run.`, href: smokeReport },
   { name: 'Quality, cost, and human review', status: 'open', evidence: 'Three frozen held-out trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open.' },
+  { name: 'Registry setup and final approval', status: 'blocked', evidence: 'Release protections are configured. Package ownership, trusted publisher identities, and final artifact approval remain open.' },
 ];
 
-const pythons = [...new Set(hosted.cells.map((c) => minor(c.python)))];
-const matrixRows = [...new Set(hosted.cells.map((c) => `${c.os} ${c.machine}|${major(c.node)}`))].map((key) => {
+const cells = hosted.cells.map((c) => ({ ...c, os: c.cell.split('-py')[0].replace(/^packages-/, '') }));
+const pythons = [...new Set(cells.map((c) => minor(c.python)))];
+const matrixRows = [...new Set(cells.map((c) => `${c.os} ${c.machine}|${major(c.node)}`))].map((key) => {
   const [platform, node] = key.split('|');
   return {
     platform,
     node,
     cells: pythons.map((py) =>
-      hosted.cells.find((c) => `${c.os} ${c.machine}` === platform && major(c.node) === node && minor(c.python) === py),
+      cells.find((c) => `${c.os} ${c.machine}` === platform && major(c.node) === node && minor(c.python) === py),
     ),
   };
 });
@@ -150,9 +155,10 @@ try {
       <div class="callout" role="note">
         <p>
           <span class="pill blocked">Release blocked</span>
-          The candidate passes local regression, package installation, cross-language checks, and all
-          {hosted.matrix_cells_passed} hosted package combinations. Reference performance, live quality and
-          cost evidence, and developer adoption remain open.
+          The candidate passes hosted regression, package installation, cross-language checks, all
+          {hosted.matrix_cells} hosted package combinations, and an installed Python live-model smoke test.
+          Held-out quality and cost comparisons, reference performance, human review, developer adoption,
+          and registry setup remain open.
         </p>
         <p>
           Nothing is published yet: PyPI and npm return 404 for 0.1.0, and the
@@ -197,8 +203,8 @@ try {
         <h2>Release gates</h2>
         <p class="muted">
           Mirrors <a href={`${blob}/docs/release-status.md`}>docs/release-status.md</a>. Candidate built from
-          <a href={`${repo}/commit/${hosted.main_merge_sha}`}><code>{hosted.main_merge_sha.slice(0, 7)}</code></a>
-          (PR <a href={`${repo}/pull/${hosted.pull_request}`}>#{hosted.pull_request}</a>).
+          <a href={`${repo}/commit/${hosted.source_sha}`}><code>{hosted.source_sha.slice(0, 7)}</code></a>;
+          all {hosted.all_ci_jobs} jobs passed in <a href={hosted.run_url}>the verified main run</a>.
         </p>
         <div class="table">
           <table class="stack">
@@ -231,9 +237,9 @@ try {
 
         <h3>Hosted package matrix</h3>
         <p class="muted">
-          Each cell installs the wheel, sdist, and npm archive and runs {hosted.cells[0]?.writer_reader_checks}
-          writer/reader checks. <a href={`${repo}/actions/runs/${hosted.pull_request_ci_run_id}`}>PR run</a> ·
-          <a href={`${repo}/actions/runs/${hosted.main_ci_run_id}`}>main run</a>
+          Each cell installs the wheel, sdist, and npm archive and runs {hosted.writer_reader_checks_per_cell}
+          writer/reader checks. <a href={hosted.run_url}>Verified main run</a> ·
+          <a href={`${evidencePath}/hosted-verification.json`}>Retained evidence</a>
         </p>
         <div class="table">
           <table class="matrix">
@@ -266,7 +272,10 @@ try {
             </tbody>
           </table>
         </div>
-        {hosted.limits.map((l) => <p class="note">{l}</p>)}
+        <p class="note">
+          These checks establish installed-package compatibility. Live-model results, reference performance,
+          human validation, and registry approval are separate evidence.
+        </p>
 
         <h3>Cross-runtime history files</h3>
         <p class="muted">
@@ -304,9 +313,9 @@ try {
       <section id="performance">
         <h2>Performance</h2>
         <p class="muted">
-          Installed candidate packages on a local {perfPy.environment.platform} machine, using a
-          {perfPy.fixture.total_messages.toLocaleString('en-US')}-message reference fixture. This is not the
-          reference run.
+          Historical installed-package measurements on a local {perfPy.environment.platform} machine, using a
+          {perfPy.fixture.total_messages.toLocaleString('en-US')}-message reference fixture. These retain their
+          original artifact identities and do not close the dedicated Linux reference gate.
         </p>
         <div class="table">
           <table>
@@ -352,6 +361,36 @@ try {
 
       <section id="quality">
         <h2>Retrieval quality</h2>
+        <h3>Installed Python live smoke <span class={`pill ${smoke.status === 'PASS' ? 'pass' : 'blocked'}`}>{smoke.status}</span></h3>
+        <p>
+          The installed wheel completed a development-fixture smoke with <code>{smoke.model}</code>,
+          then retrieved the expected original evidence through tree navigation after reopening SQLite:
+          <q>{smoke.checks.evidence[0].excerpt}</q>
+          <a class="more" href={smokeReport}>Recorded result</a>
+        </p>
+        <div class="stats">
+          <div class="stat">
+            <p class="stat-label">Actual tokens reported by the provider</p>
+            <p class="stat-value">{smoke.total_actual_tokens_observed.toLocaleString('en-US')} <span>total</span></p>
+            <p>{smoke.actual_input_tokens_observed.toLocaleString('en-US')} input · {smoke.actual_output_tokens_observed} output</p>
+          </div>
+          <div class="stat">
+            <p class="stat-label">Provider calls</p>
+            <p class="stat-value">{smoke.attempts} <span>calls</span></p>
+            <p>{smoke.checks.index.provider_usage.current_provider_calls} indexing · {smoke.checks.retrieval_usage.current_provider_calls} tree navigation</p>
+          </div>
+          <div class="stat">
+            <p class="stat-label">Estimated cost for this smoke</p>
+            <p class="stat-value">${smoke.estimated_usd_from_actual_tokens.toFixed(7)}</p>
+            <p>{smoke.errors} errors · {smoke.usage_unknown ? 'unknown usage' : 'all usage recorded'}</p>
+          </div>
+        </div>
+        <p class="note">
+          One visible development conversation; this does not measure held-out answer quality, TypeScript
+          live-model behavior, sustained provider capacity, or cost savings. Cost uses actual tokens and the
+          frozen prices; it is an estimate, not an invoice. Earlier failed calls retain their separate
+          unknown-usage reservations. The three-trial quality/cost evaluation and human review remain open.
+        </p>
         <h3>Development recall (no model calls)</h3>
         <div class="stats">
           {[recallLexical, recallTree].map((r) => (
@@ -436,8 +475,8 @@ try {
               <tr><th scope="col">File</th><th scope="col">SHA-256</th></tr>
             </thead>
             <tbody>
-              {Object.entries(hosted.artifact_sha256).map(([file, sha]) => (
-                <tr><th scope="row"><code>{file}</code></th><td><code class="hash">{sha}</code></td></tr>
+              {hosted.artifacts.map(({ filename, sha256 }) => (
+                <tr><th scope="row"><code>{filename}</code></th><td><code class="hash">{sha256}</code></td></tr>
               ))}
             </tbody>
           </table>
@@ -451,7 +490,7 @@ try {
         <a href={`${blob}/UPSTREAM.md`}>Upstream attribution</a> (derived from VectifyAI/ChatIndex; not endorsed by
         VectifyAI).
       </p>
-      <p class="muted">Figures on this page are read from the committed evidence files at build time.</p>
+      <p class="muted">Figures on this page are read from the public evidence files at build time.</p>
     </footer>
 
     <script>

@@ -29,6 +29,9 @@ identities are not established. This work created no registry publication or rel
   license/attribution review. No secrets or known dependency vulnerabilities were found.
 - A bounded capacity diagnostic reuses the frozen evaluator without declaring provider
   capacity available first. Eight diagnostic tests and the existing 31 runner tests pass.
+- The [fresh installed-package live smoke](live-smoke-retry-003-summary.json) passed with
+  exact original-evidence retrieval after reopen, eight successful model calls, and complete
+  actual token usage. The frozen fixture, evaluator, and CI-verified wheel were unchanged.
 - [Reference-runner tooling](../../../docs/reference-performance-runner.md) verifies
   hardware/reservation and installed archives, measures Python and TypeScript at 10k/100k,
   and includes process-cold and filesystem-cold checks. Seven gate tests and installed
@@ -48,9 +51,21 @@ timeout within the original cumulative allowance. Two indexing calls succeeded a
 151 input tokens plus 66 output tokens; a third returned HTTP 503 without usage. The smoke
 did not reach original-evidence retrieval. Across both runs there were four generation
 attempts, two with unknown usage; the combined charged/reserved amount is 2,345 tokens.
-Both allocations remain consumed. No further generation requests or held-out trials were
-made. Operational journals and the prior cumulative allowance remain local; unknown usage
-is never counted as free, and these partial tokens cannot establish complete cost savings.
+Both allocations remain consumed; their unknown usage is never counted as free.
+
+The user then authorized one fresh bounded attempt. [Retry 003](live-smoke-retry-003-summary.json)
+**passed**: six indexing calls and two tree-navigation calls reported **1,058 input tokens and
+301 output tokens**, with no errors, retries, or unknown usage. After reopening SQLite, the
+installed package returned the exact original message, “The deployment target is Oslo.”,
+with sequence 1, its message ID, and `/content` source pointer. Lexical retrieval found no
+evidence; unchanged indexing made zero calls.
+
+The new run's standard-price estimate is **$0.0010699**, below its $0.04 ceiling. This is an
+estimate from API token counts, not an invoice or cost-savings result. Across these three
+runs there were 12 attempts, two with unknown usage, and 3,704 charged/reserved tokens.
+All three allocations remain consumed. The cumulative accounting and allocation-book
+snapshots remain local. No held-out or cache trials were started, and this small smoke
+does not establish sustained provider capacity.
 
 The configured model's pricing was checked against
 [Google's pricing documentation](https://ai.google.dev/gemini-api/docs/pricing).
@@ -59,9 +74,10 @@ Account-specific limits require the owner's provider account information; see
 
 ## Remaining gates
 
-1. Establish provider responsiveness/capacity, reconcile the consumed allocation, then
-   complete a new bounded installed smoke with actual token usage. The full evaluation
-   forecast exceeds the prior request allowance; additional budget is awaiting the owner.
+1. Approve sufficient evaluation budget and verify sustained account capacity. The installed
+   smoke and accounting reconciliation are complete. The remaining evaluation forecast is
+   1,966 requests against 674 unallocated request slots; unused slots in consumed smoke
+   envelopes have not been silently reused. Additional budget is awaiting the owner.
 2. Freeze final candidate/protocol/allocations and run three native and comparison trials,
    real-provider cache measurements, and actual human answer review.
 3. Execute the reference workload on the dedicated Linux x64 4-vCPU/8-GiB local-SSD runner.

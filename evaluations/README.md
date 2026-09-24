@@ -1,5 +1,14 @@
 # Conversation memory development evaluation
 
+## Current installed-package smoke (September 24, 2026)
+
+The [CI-verified Python wheel passed the bounded live smoke](results/production-readiness-20260924/live-smoke-retry-003-summary.json):
+tree navigation retrieved the exact original evidence after closing and reopening SQLite.
+Eight calls reported 1,058 input tokens and 301 output tokens, with no errors or unknown
+usage. Earlier failures retain their reservations. This closes the development smoke;
+held-out quality, total cost savings, and the other [release gates](../docs/release-status.md)
+remain open. The sections below preserve earlier evaluation results.
+
 ## Evidence-selection fix (September 23, 2026)
 
 The current Python and TypeScript implementations rank original evidence before applying limits,
@@ -19,7 +28,7 @@ implementation remain unverified. Existing reports below describe the earlier im
 
 For the installed-wheel development smoke test and configurable provider/model selection, see
 [live-model setup](LIVE_SMOKE.md). Both live evaluators support presets and custom Chat Completions endpoints.
-Its [current report](results/live-smoke.json) is `PASS` with `gemini-3.5-flash-lite`: the installed wheel
+Its [earlier report](results/live-smoke.json) is `PASS` with `gemini-3.5-flash-lite`: the installed wheel
 retrieved the expected original evidence after closing and reopening SQLite. The successful run records
 1,047 input tokens and 288 output tokens across eight calls, with no unknown usage. Earlier failed attempts
 remain in the [run history](LIVE_SMOKE.md#current-environment). This is one development query, not held-out

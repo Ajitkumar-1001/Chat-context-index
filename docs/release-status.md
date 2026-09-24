@@ -10,7 +10,8 @@ exists without assets; it did not run the tag-triggered registry release workflo
 
 The [production-readiness execution record](../evaluations/results/production-readiness-20260924/README.md)
 tracks the current work, including protected releases, exact-artifact publication checks,
-security scanning, prepared reference/human validation, and two incomplete bounded capacity attempts.
+security scanning, prepared reference/human validation, and a successful installed-package live
+smoke after two earlier incomplete attempts.
 
 | Gate | Current evidence |
 | --- | --- |
@@ -23,7 +24,7 @@ security scanning, prepared reference/human validation, and two incomplete bound
 | Hosted matrix | **Passed:** all 16 Python 3.11–3.14 / Node 22 and 24 / Ubuntu x64 and macOS arm64 package combinations passed with nine writer/reader checks each. [Current verification](../evaluations/results/production-readiness-20260924/hosted-verification.json), [merged-main run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36043232899) |
 | CI artifacts and security | The retained wheel, sdist, npm tarball, and rebuilt wheel passed the source/run/version/checksum guard; publication archives were copied without rebuilding. Hosted secret and dependency scans passed. [Archive manifest](../evaluations/results/production-readiness-20260924/hosted-artifact-manifest.json), [scan evidence](../evaluations/results/production-readiness-20260924/hosted-verification.json) |
 | Reference performance | **Not run.** Updated installed packages meet the three warm single-request thresholds in [local macOS runs](benchmark-reproduction.md), but Python's process-cold first-search p95 was 112.6 ms and search latency grows at higher concurrency. The dedicated Linux x64 runner, filesystem-cold pass, and scale point remain outstanding |
-| Installed-package live smoke | **INCOMPLETE:** the first attempt timed out; a separately allocated 60-second follow-up recorded 151 input/66 output tokens from two indexing calls before HTTP 503 on the third. Retrieval was not reached. Both failed calls retain unknown-usage reservations; no further generation requests were made. [Latest attempt](../evaluations/results/production-readiness-20260924/live-smoke-extended-summary.json) |
+| Installed-package live smoke | **PASS:** the CI-verified Python wheel indexed the development fixture, preserved original records after reopen, and used tree navigation to retrieve the exact expected evidence. Eight calls reported **1,058 input / 301 output tokens**, with no errors or unknown usage; estimated cost **$0.0010699**, within the $0.04 cap. Earlier failed-call reservations remain intact. [Verified run](../evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json) |
 | Quality, cost, human review | **Not run for these artifacts.** Three frozen trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open |
 | Release protection | GitHub owner approval and tag-only deployment policy configured on `release`; active ruleset protects `v*` tags. Exact-archive workflow and final source-approval gate implemented; registry ownership/trusted publisher setup and final approval remain open |
 
