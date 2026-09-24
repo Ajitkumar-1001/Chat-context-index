@@ -5,7 +5,7 @@ import { BoundedProvider } from "./provider.js";
 import { RetrievalResult, retrieve, currentCacheGeneration } from "./retrieve.js";
 import { Message } from "./models.js";
 import { HistoryStore } from "./store.js";
-import { excerptForQuery, queryTerms, relevance } from "./relevance.js";
+import { excerptForQuery, queryTerms } from "./relevance.js";
 
 export interface ContextItem {
   messageId: string; seq: number; sourcePointer: string; excerpt: string;
@@ -77,10 +77,22 @@ export async function prepareContext(store: HistoryStore, query: string, options
   const end = result.snapshot.snapshotMaxSeq;
   const recent = recentMessages ? await store.getMessages(Math.max(1, end - recentMessages + 1), end, recentMessages) : [];
   const candidates = recent.reverse().flatMap(messageItems);
-  const terms = queryTerms(query);
-  const ranked = result.evidence.map(candidate => ({ candidate, score: relevance(candidate.excerpt, terms) }))
-    .sort((a, b) => b.score - a.score || b.candidate.seq - a.candidate.seq).map(({ candidate }) => candidate);
-  candidates.push(...ranked.map(e => ({ messageId: e.messageId, seq: e.seq, sourcePointer: e.sourcePointer, excerpt: e.excerpt })));
+  // Retrieval IDs retain selection priority after evidence is rendered chronologically.
+  const ranked = [...result.evidence].sort((a, b) =>
+    Number(a.evidenceId.slice(3)) - Number(b.evidenceId.slice(3)));
+  const groups = new Map<string, typeof ranked>();
+  for (const evidence of ranked) {
+    const key = JSON.stringify([evidence.contentHash, evidence.sourcePointer]);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(evidence);
+  }
+  const first: typeof ranked = [], copies: typeof ranked = [];
+  for (const group of groups.values()) {
+    const original = group.reduce((a, b) => a.seq <= b.seq ? a : b);
+    first.push(original);
+    copies.push(...group.filter(evidence => evidence !== original));
+  }
+  candidates.push(...[...first, ...copies].map(e => ({ messageId: e.messageId, seq: e.seq, sourcePointer: e.sourcePointer, excerpt: e.excerpt })));
   const context = packContext(candidates, { ...options, query });
   if (await currentCacheGeneration(store) !== result.snapshot.cacheGeneration) throw new VersionConflict("history was cleared while preparing conversation context");
   return { ...context, retrieval: result };

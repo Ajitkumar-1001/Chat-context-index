@@ -1,0 +1,15 @@
+{
+  "cci_module_path": "/Users/ajit/dev/cont-index/packages/python/src/cci/__init__.py",
+  "context": {
+    "excerpt_chars": 200,
+    "max_chars": 4000,
+    "max_messages": 8,
+    "recent_messages": 4
+  },
+  "context_recall": 1.0,
+  "misses": [],
+  "mode": "lexical",
+  "queries": 60,
+  "retrieval_recall": 1.0,
+  "split": "dev"
+}

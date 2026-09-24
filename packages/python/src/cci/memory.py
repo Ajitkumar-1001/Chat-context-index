@@ -13,8 +13,8 @@ from cci.context_assembly import EvidenceBlock, render_evidence_context
 from cci.errors import VersionConflict
 from cci.models import Message
 from cci.provider import MemoizedProvider
-from cci.relevance import excerpt_for_query, query_terms, relevance
-from cci.retrieve import RetrievalResult, retrieve
+from cci.relevance import excerpt_for_query, query_terms
+from cci.retrieve import Evidence, RetrievalResult, retrieve
 from cci.stats import stats
 from cci.store import HistoryStore
 
@@ -150,10 +150,22 @@ async def prepare_context(
     ) if recent_messages else []
     # Newest first for selection priority; pack_context restores chronological display order.
     candidates = [item for message in reversed(recent) for item in message_items(message)]
-    terms = query_terms(query)
+    # Retrieval IDs retain selection priority after evidence is rendered chronologically.
+    ranked = sorted(result.evidence, key=lambda e: int(e.evidence_id.split("_")[1]))
+    # Give each distinct text one chance before copies consume the remaining slots.
+    # The earliest source of identical text is its representative; a later changed
+    # correction is different text and keeps its own higher-priority slot.
+    groups: dict[tuple[str, str], list[Evidence]] = {}
+    for evidence in ranked:
+        groups.setdefault((evidence.content_hash, evidence.source_pointer), []).append(evidence)
+    first: list[Evidence] = []
+    copies: list[Evidence] = []
+    for group in groups.values():
+        original = min(group, key=lambda e: e.seq)
+        first.append(original)
+        copies.extend(e for e in group if e is not original)
     candidates.extend(
-        ContextItem(e.message_id, e.seq, e.source_pointer, e.excerpt)
-        for e in sorted(result.evidence, key=lambda e: (-relevance(e.excerpt, terms), -e.seq))
+        ContextItem(e.message_id, e.seq, e.source_pointer, e.excerpt) for e in first + copies
     )
     context = pack_context(candidates, max_messages=max_messages, max_chars=max_chars,
                            excerpt_chars=excerpt_chars, max_tokens=max_tokens, token_counter=token_counter,

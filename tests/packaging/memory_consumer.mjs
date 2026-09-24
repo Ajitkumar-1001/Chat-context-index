@@ -2,6 +2,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { HistoryStore, ingest, index, retrieve, prepareContext, packContext, BoundedProvider } from "chat-context-index";
 
@@ -19,6 +20,18 @@ class Router {
 }
 
 const [phase, dbPath] = process.argv.slice(2);
+if (phase === "default") {
+  const require = createRequire(import.meta.url);
+  assert.throws(() => require.resolve("redis"), { code: "MODULE_NOT_FOUND" });
+  const defaults = await HistoryStore.open(dbPath);
+  try {
+    assert.equal(defaults.config.cacheBackend, "sqlite");
+    await ingest(defaults, defaults.historyId, [{ role: "user", content: "Target is Oslo." }],
+      "default-check", "initial");
+    assert((await retrieve(defaults, "Oslo", "lexical")).evidence.length > 0);
+  } finally { await defaults.close(); }
+  process.exit(0);
+}
 const store = await HistoryStore.open(dbPath, {
   cacheBackend: "none", treeMaxChildren: 2, targetChunkSizeScalars: 1,
 });

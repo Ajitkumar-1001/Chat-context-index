@@ -25,7 +25,7 @@ from .errors import VersionConflict
 from .io_worker import fetchone
 from .provider import CallBudget, MemoizedProvider
 from .relevance import query_terms, relevance
-from .search import Diagnostic, LexicalCandidate, search
+from .search import Diagnostic, LexicalCandidate, linked_corrections, search
 from .store import HistoryStore
 
 CONTRACT_VERSION = 1
@@ -159,14 +159,18 @@ async def retrieve(
         async with store.connection:
             snapshot = await _capture_snapshot(store)
             search_result = await search(store, query, limit=limit)
+            corrections, correction_limited = await linked_corrections(
+                store, search_result.candidates, query, snapshot.snapshot_max_seq, limit,
+            )
             tree_exists = await _has_tree(store)
 
     index_degraded = not tree_exists
     actual_mode = "lexical"
     diagnostics = list(search_result.diagnostics)
-    candidates = list(search_result.candidates)
+    candidates = list(search_result.candidates) + corrections
+    correction_keys = {(c.message_id, c.source_pointer) for c in corrections}
     selected_chunks = []
-    limited = len(candidates) >= limit
+    limited = len(search_result.candidates) >= limit or correction_limited
     if mode != "lexical" and provider is not None and tree_exists and query.strip():
         from .tree_retrieval import navigate_tree
 
@@ -189,7 +193,7 @@ async def retrieve(
     if current.cache_generation != snapshot.cache_generation:
         raise VersionConflict("history was cleared between snapshot capture and result emission")
     if selected_chunks and current.index_revision != snapshot.index_revision:
-        candidates = list(search_result.candidates)
+        candidates = list(search_result.candidates) + corrections
         selected_chunks = []
         actual_mode = "lexical"
         index_degraded = True
@@ -197,9 +201,13 @@ async def retrieve(
 
     unique: dict[tuple[str, str], LexicalCandidate] = {}
     terms = query_terms(query)
-    candidates.sort(key=lambda candidate: (-relevance(candidate.excerpt, terms), -candidate.seq))
+    candidates.sort(key=lambda candidate: (
+        -int((candidate.message_id, candidate.source_pointer) in correction_keys),
+        -relevance(candidate.excerpt, terms), -candidate.seq,
+    ))
     for candidate in candidates:
         unique.setdefault((candidate.message_id, candidate.source_pointer), candidate)
+    limited |= len(unique) > limit
     evidence = [
         Evidence(
             evidence_id=f"ev_{i + 1}",
@@ -209,7 +217,7 @@ async def retrieve(
             excerpt=c.excerpt,
             content_hash=c.content_hash,
         )
-        for i, c in enumerate(unique.values())
+        for i, c in enumerate(list(unique.values())[:limit])
     ]
     bounded: list[Evidence] = []
     for item in evidence:

@@ -219,6 +219,9 @@ class RedisMemoCache:
         self._now = now
         self._consecutive_failures = 0
         self._circuit_open_until: float | None = None
+        self.redis_errors = 0
+        self.sqlite_fallback_lookups = 0
+        self.sqlite_fallback_hits = 0
         self.commands: list[tuple[Any, ...]] = []
 
     def _record(self, *parts: Any) -> None:
@@ -230,6 +233,7 @@ class RedisMemoCache:
         return self._now() >= self._circuit_open_until
 
     def _note_failure(self) -> None:
+        self.redis_errors += 1
         self._consecutive_failures += 1
         if self._consecutive_failures >= self._breaker_failures:
             self._circuit_open_until = self._now() + self._breaker_probe_s
@@ -253,9 +257,14 @@ class RedisMemoCache:
                 self._note_failure()
 
         # Redis unavailable, circuit open, or miss: fall through to the SQLite fallback.
+        sqlite_fallback = isinstance(self._fallback, SqliteMemoCache)
+        if sqlite_fallback:
+            self.sqlite_fallback_lookups += 1
         value = await self._fallback.get(key, now=now)
         if value is None:
             return None
+        if sqlite_fallback:
+            self.sqlite_fallback_hits += 1
 
         remaining = value.absolute_expiry - now
         if remaining > 0 and self._available():
@@ -288,14 +297,18 @@ class RedisMemoCache:
         """Bounded cursor iteration + bounded deletion batches over the owned prefix — never
         `KEYS *`, `FLUSHDB`, or `FLUSHALL` (spec/cache-format.md Purge scoping)."""
         cursor = 0
-        while True:
-            self._record("SCAN", cursor, f"{prefix}*")
-            cursor, keys = await self._client.scan(cursor=cursor, match=f"{prefix}*", count=batch_size)
-            if keys:
-                self._record("DEL", *keys)
-                await self._client.delete(*keys)
-            if cursor == 0:
-                break
+        try:
+            while True:
+                self._record("SCAN", cursor, f"{prefix}*")
+                cursor, keys = await self._client.scan(cursor=cursor, match=f"{prefix}*", count=batch_size)
+                if keys:
+                    self._record("DEL", *keys)
+                    await self._client.delete(*keys)
+                if cursor == 0:
+                    break
+        except Exception:
+            self._note_failure()
+            raise
 
     async def aclose(self) -> None:
         await self._client.aclose()

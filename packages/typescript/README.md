@@ -28,6 +28,9 @@ Without a provider, retrieval uses local keyword search. For tree retrieval, exp
 The host supplies the adapter; importing the package makes no model calls. Context limits
 include rendered source labels; an optional tokenizer callback can enforce a model-specific
 memory token budget. Public TypeScript declarations are included.
+The TypeScript provider wrapper currently has no Redis or SQLite memoization backend; its
+`cacheBackend` configuration does not cache model calls. Python's optional cache is described
+in the [Redis example](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/docs/quickstart-redis.md).
 
 Use one owning application process per history on durable local storage. The host controls
 authentication, history ownership, turn scheduling, and execution checkpoints. Conversation
@@ -36,4 +39,5 @@ unverified.
 
 [Integration example](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/examples/typescript/rag-chat.mjs)
 and [source repository](https://github.com/Ajitkumar-1001/Chat-context-index).
-Licensed under Apache-2.0; the license text is included in the archive.
+Licensed under Apache-2.0; license text and [upstream attribution](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/UPSTREAM.md)
+are included in the archive.

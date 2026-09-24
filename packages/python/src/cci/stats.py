@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .cache import RedisMemoCache
 from .io_worker import fetchone
 from .store import HistoryStore
 
@@ -39,6 +40,9 @@ class Stats:
     memo_hits: int
     memo_misses: int
     memo_errors: int
+    redis_errors: int
+    sqlite_fallback_lookups: int
+    sqlite_fallback_hits: int
     reused_operation_usage_count: int
     usage_unknown: bool
 
@@ -73,6 +77,7 @@ async def stats(store: HistoryStore) -> Stats:
             history_revision, index_revision, cache_generation, index_committed_seq = row
 
     log = store.usage_log
+    redis_cache = store.cache if isinstance(store.cache, RedisMemoCache) else None
     return Stats(
         history_message_count=message_count,
         ingest_receipt_count=receipt_count,
@@ -89,6 +94,9 @@ async def stats(store: HistoryStore) -> Stats:
         memo_hits=log.memo_hits,
         memo_misses=log.memo_misses,
         memo_errors=log.memo_errors,
+        redis_errors=redis_cache.redis_errors if redis_cache else 0,
+        sqlite_fallback_lookups=redis_cache.sqlite_fallback_lookups if redis_cache else 0,
+        sqlite_fallback_hits=redis_cache.sqlite_fallback_hits if redis_cache else 0,
         reused_operation_usage_count=log.reused_operation_usage_count,
         usage_unknown=log.usage_unknown_count > 0,
     )

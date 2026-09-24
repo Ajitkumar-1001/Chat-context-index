@@ -37,7 +37,7 @@ REDIS_URL: str | None = None
 
 def setup_module(module) -> None:
     global REDIS_URL
-    subprocess.run(["docker", "rm", "-f", _CONTAINER_NAME], capture_output=True)
+    subprocess.run(["docker", "rm", "-f", _CONTAINER_NAME], capture_output=True, check=False)
     subprocess.run(
         [
             "docker", "run", "-d", "--rm", "-p", "0:6379", "--name", _CONTAINER_NAME,
@@ -48,7 +48,8 @@ def setup_module(module) -> None:
     port = None
     for _ in range(50):
         result = subprocess.run(
-            ["docker", "port", _CONTAINER_NAME, "6379"], capture_output=True, text=True
+            ["docker", "port", _CONTAINER_NAME, "6379"], capture_output=True, text=True,
+            check=False,
         )
         if result.stdout.strip():
             port = result.stdout.strip().rsplit(":", 1)[-1]
@@ -64,19 +65,20 @@ def setup_module(module) -> None:
         try:
             redis_sync.from_url(REDIS_URL).ping()
             break
-        except Exception:
+        except redis_sync.RedisError:
             time.sleep(0.1)
     else:
         raise RuntimeError("redis container did not become ready in time")
 
 
 def teardown_module(module) -> None:
-    subprocess.run(["docker", "rm", "-f", _CONTAINER_NAME], capture_output=True)
+    subprocess.run(["docker", "rm", "-f", _CONTAINER_NAME], capture_output=True, check=False)
 
 
 def _make_cache(tmpdir: str, **overrides) -> RedisMemoCache:
     fallback = SqliteMemoCache(os.path.join(tmpdir, "fallback.sqlite3"))
-    kwargs = dict(operation_timeout_ms=200, circuit_breaker_failures=3, circuit_breaker_probe_s=30)
+    kwargs = {"operation_timeout_ms": 200, "circuit_breaker_failures": 3,
+              "circuit_breaker_probe_s": 30}
     kwargs.update(overrides)
     return RedisMemoCache(REDIS_URL, fallback, **kwargs)
 
@@ -102,6 +104,7 @@ def test_f8_refill_lifetime_bounded_by_original_expiry():
             hit_at_150 = await cache.get(key, now=150)
             assert hit_at_150 is not None
             assert hit_at_150.absolute_expiry == 160
+            assert (cache.redis_errors, cache.sqlite_fallback_lookups, cache.sqlite_fallback_hits) == (0, 1, 1)
 
             set_commands = [c for c in cache.commands if c[0] == "SET"]
             assert set_commands, "the fallback hit must have refilled Redis"
@@ -139,6 +142,8 @@ def test_f9_stalled_command_bypassed_within_budget():
             elapsed = time.monotonic() - start
             assert result is not None and result.payload["text"] == "fallback answer"
             assert elapsed < 0.3, "a stalled command must be bypassed, not waited out"
+            assert cache.redis_errors >= 1  # GET and refill SET can both time out.
+            assert (cache.sqlite_fallback_lookups, cache.sqlite_fallback_hits) == (1, 1)
 
             await stall_task
             await stall_client.aclose()
@@ -151,7 +156,7 @@ def test_f9_rejected_authentication_bypassed_to_fallback():
     async def scenario() -> None:
         with tempfile.TemporaryDirectory() as d:
             fallback = SqliteMemoCache(os.path.join(d, "fallback.sqlite3"))
-            bad_url = REDIS_URL.replace("redis://", "redis://:wrongpassword@")
+            bad_url = REDIS_URL.replace("redis://", "redis://invalid-user:wrongpassword@")
             cache = RedisMemoCache(
                 bad_url, fallback,
                 operation_timeout_ms=200, circuit_breaker_failures=3, circuit_breaker_probe_s=30,
@@ -166,6 +171,8 @@ def test_f9_rejected_authentication_bypassed_to_fallback():
 
             result = await cache.get(key, now=200)
             assert result is not None and result.payload["text"] == "fallback answer 2"
+            assert cache.redis_errors >= 1  # The nonexistent ACL user must be rejected.
+            assert (cache.sqlite_fallback_lookups, cache.sqlite_fallback_hits) == (1, 1)
 
             await cache.aclose()
 
@@ -181,6 +188,7 @@ def test_f9_legitimate_miss_does_not_trip_circuit_breaker():
                 result = await cache.get(key, now=100)
                 assert result is None
             assert cache._consecutive_failures == 0, "a legitimate miss is never a breaker failure"
+            assert (cache.redis_errors, cache.sqlite_fallback_lookups, cache.sqlite_fallback_hits) == (0, 5, 0)
 
             await cache.aclose()
 

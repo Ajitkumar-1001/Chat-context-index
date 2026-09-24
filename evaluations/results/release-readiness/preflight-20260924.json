@@ -1,0 +1,14 @@
+{
+  "recorded_at_utc": "2026-09-24T17:17:08Z",
+  "status": "PREFLIGHT_PASS",
+  "execution_ready": false,
+  "provider_calls": 0,
+  "wheel_sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0",
+  "package_version": "0.1.0",
+  "python_version": "3.12.11",
+  "isolated_python": true,
+  "installed_sources_match_wheel": true,
+  "openai_version": "2.45.0",
+  "plan": "smoke-plan-20260924.json",
+  "reason_not_ready": "Provider capacity for the frozen profile has not been verified after HTTP 429."
+}
