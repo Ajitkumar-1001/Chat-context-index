@@ -143,3 +143,16 @@ def test_fake_provider_cannot_pass_a_quality_gate():
     }, real_provider=True)
     assert not gates["citation_validity_pass"]
     assert "NOT RUN" in gates["answer_rubric_correctness"]
+
+
+def test_verbatim_copy_of_the_annotated_message_counts_as_evidence():
+    messages = [{"content": "Deploy Tuesday."}, {"content": "Moved: deploy Wednesday."},
+                {"content": "Moved: deploy Wednesday."}]
+    unit = {"message_index": 1, "acceptable_span": {"start": 14, "end": 23}}
+    copy = [SimpleNamespace(seq=3, excerpt="Moved: deploy Wednesday.")]
+    assert HARNESS._score_evidence_recall([unit], messages, copy) == 0.0  # unannotated: original only
+    annotated = {**unit, "verbatim_copy_indexes": [2]}
+    assert HARNESS._score_evidence_recall([annotated], messages, copy) == 1.0
+    assert HARNESS._score_evidence_recall(
+        [annotated], messages, [SimpleNamespace(seq=3, excerpt="Moved: deploy")]
+    ) == 0.0  # the copy still needs the complete span
