@@ -25,6 +25,7 @@ for (const fixture of cases) {
     const result = await retrieve(store, fixture.query, mode, fixture.max_messages, { provider });
     const context = await prepareContext(store, fixture.query, {
       mode, provider, recentMessages: fixture.recent_messages ?? 0, maxMessages: fixture.max_messages,
+      ...(fixture.max_chars === undefined ? {} : { maxChars: fixture.max_chars }),
     });
     const ids = (await store.getMessages(1, fixture.messages.length)).map(message => message.messageId);
     let rendered = context.text;

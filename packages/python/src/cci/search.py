@@ -11,17 +11,15 @@ from __future__ import annotations
 
 import hashlib
 import json
-import re
+from collections import Counter
 from dataclasses import dataclass, field
 
 from .io_worker import fetchall
-from .relevance import excerpt_for_query, fts_term_expression, query_terms, relevance
+from .relevance import best_anchor, excerpt_for_query, fts_term_expression, query_terms, relevance, text_keys
 from .store import HistoryStore
 
 DEFAULT_LIMIT = 20
-_CORRECTION_TERMS = query_terms(
-    "correction corrected reconsidered revised instead retired change changed moved actually superseded"
-)
+MAX_LINKED = 2
 
 
 @dataclass(frozen=True)
@@ -46,33 +44,20 @@ class SearchResult:
     diagnostics: list[Diagnostic] = field(default_factory=list)
 
 
-def is_correction(text: str) -> bool:
-    return relevance(text, _CORRECTION_TERMS) > 0
-
-
-def _source_anchor(source: LexicalCandidate, query_keys: set[str]) -> str | None:
-    """Prefer a source-specific name; otherwise use the last non-query content word."""
-    eligible: list[tuple[bool, int, str]] = []
-    for match in re.finditer(r"\w+", source.excerpt):
-        raw = match.group()
-        terms = query_terms(raw)
-        if not terms:
-            continue
-        term = terms[0]
-        if term in query_keys or (len(term) < 5 and not any(c.isdigit() for c in term)):
-            continue
-        eligible.append((any(c.isupper() for c in raw), match.start(), term))
-    return max(eligible)[2] if eligible else None
-
-
-def _candidate_from_row(row: tuple, terms: list[str]) -> LexicalCandidate | None:
-    message_id, seq, original_payload_json, text_projection = row
-    payload = json.loads(original_payload_json)
+def _text_parts(payload: dict) -> list[tuple[str, str]]:
     content = payload.get("content")
-    parts = [("/content", content)] if isinstance(content, str) else [
+    return [("/content", content)] if isinstance(content, str) else [
         (f"/content/{i}/text", block["text"]) for i, block in enumerate(content or [])
         if isinstance(block, dict) and block.get("type") == "text" and isinstance(block.get("text"), str)
     ]
+
+
+def _candidate_from_row(
+    row: tuple, terms: list[str], excerpt_terms: list[str] | None = None,
+) -> LexicalCandidate | None:
+    """The text part matching most `terms`, excerpted around `excerpt_terms` (default: `terms`)."""
+    message_id, seq, original_payload_json, text_projection = row
+    parts = _text_parts(json.loads(original_payload_json))
     if not parts:
         return None
     source_pointer, text = max(parts, key=lambda part: relevance(part[1], terms))
@@ -82,7 +67,7 @@ def _candidate_from_row(row: tuple, terms: list[str]) -> LexicalCandidate | None
         message_id=message_id,
         seq=seq,
         source_pointer=source_pointer,
-        excerpt=excerpt_for_query(text, terms, 200),
+        excerpt=excerpt_for_query(text, excerpt_terms or terms, 200),
         content_hash=hashlib.sha256(text_projection.encode("utf-8")).hexdigest(),
     )
 
@@ -121,35 +106,58 @@ async def search(store: HistoryStore, query: str, limit: int = DEFAULT_LIMIT) ->
 
 async def linked_corrections(
     store: HistoryStore, sources: list[LexicalCandidate], query: str, max_seq: int, limit: int,
-) -> tuple[list[LexicalCandidate], bool]:
-    """Find explicit later revisions sharing an original source's non-query anchor."""
-    query_keys = set(query_terms(query))
-    anchors_by_source = []
-    for source in sources[:4]:
-        anchor = _source_anchor(source, query_keys)
-        anchors_by_source.append((source.seq, [anchor] if anchor else []))
-    anchors = list(dict.fromkeys(term for _, terms in anchors_by_source for term in terms))
+) -> tuple[list[tuple[LexicalCandidate, LexicalCandidate]], bool]:
+    """Pair top hits with the newest later message naming the hit's anchor (plan-eng-review D4).
+
+    No correction vocabulary: a later statement that names the same rare, name-like word is linked
+    whatever its phrasing. Each of the top 4 sources links at most one message, `MAX_LINKED` in
+    total; word-for-word copies of the source and messages past the snapshot are never linked.
+    """
+    tops = sources[:4]
+    if not tops:
+        return [], False
+    query_list = query_terms(query)
+    query_keys = set(query_list)
+    # Rarity counts distinct hit texts: verbatim copies are one statement (SC-011 clarification).
+    distinct_texts = {source.content_hash: source.excerpt for source in sources}
+    hit_counts = Counter(key for excerpt in distinct_texts.values() for key in text_keys(excerpt))
+    cursor = await store.connection.execute(
+        "SELECT message_id, original_payload FROM messages WHERE message_id IN ("
+        + ",".join("?" for _ in tops) + ")", [source.message_id for source in tops],
+    )
+    payloads = {message_id: json.loads(payload) for message_id, payload in await fetchall(cursor)}
+    anchors: list[tuple[LexicalCandidate, str]] = []
+    for source in tops:
+        text = dict(_text_parts(payloads.get(source.message_id, {}))).get(source.source_pointer, "")
+        anchor = best_anchor(text, query_keys, hit_counts)
+        if anchor:
+            anchors.append((source, anchor))
     if not anchors:
         return [], False
-    expression = "(" + " OR ".join(fts_term_expression(term) for term in anchors) + ") AND (" + \
-        " OR ".join(fts_term_expression(term) for term in _CORRECTION_TERMS) + ")"
     row_limit = min(128, max(32, limit * 8))
+    # ponytail: FTS5 walks rowid (insertion order == seq order per history) newest-first and stops at
+    # the limit instead of joining and sorting every match; rows are re-sorted by seq below, so a
+    # rowid/seq divergence would only change which recent rows are seen. Index seq in FTS if it ever does.
     cursor = await store.connection.execute(
-        "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM message_fts "
-        "JOIN messages m ON m.message_id = message_fts.message_id "
-        "WHERE message_fts.history_id = ? AND message_fts MATCH ? AND m.seq <= ? "
-        "ORDER BY m.seq DESC LIMIT ?",
-        (store.history_id, expression, max_seq, row_limit),
+        "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM ("
+        "SELECT message_id FROM message_fts WHERE message_fts MATCH ? AND history_id = ? "
+        "ORDER BY rowid DESC LIMIT ?) f JOIN messages m ON m.message_id = f.message_id "
+        "WHERE m.seq <= ? ORDER BY m.seq DESC",
+        (" OR ".join(dict.fromkeys(fts_term_expression(a) for _, a in anchors)), store.history_id,
+         row_limit, max_seq),
     )
     rows = await fetchall(cursor)
-    found = []
-    for row in rows:
-        candidate = _candidate_from_row(row, anchors + _CORRECTION_TERMS)
-        if candidate is None or not is_correction(candidate.excerpt):
-            continue
-        if any(
-            candidate.seq > seq and relevance(candidate.excerpt, terms)
-            for seq, terms in anchors_by_source if terms
-        ):
-            found.append(candidate)
-    return found, len(rows) >= row_limit
+    links: list[tuple[LexicalCandidate, LexicalCandidate]] = []
+    linked_ids: set[str] = set()
+    for source, anchor in anchors:
+        if len(links) >= MAX_LINKED:
+            break
+        for row in rows:  # newest first
+            if row[1] <= source.seq or row[0] in linked_ids:
+                continue
+            linked = _candidate_from_row(row, [anchor], [anchor, *query_list])
+            if linked is not None and linked.content_hash != source.content_hash:
+                links.append((source, linked))
+                linked_ids.add(linked.message_id)
+                break
+    return links, len(rows) >= row_limit

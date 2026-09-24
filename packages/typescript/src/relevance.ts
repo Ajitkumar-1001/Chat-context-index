@@ -67,6 +67,34 @@ export function ftsTermExpression(term: string): string {
     .map(form => `"${form.replace(/"/g, '""')}"`).join(" OR ") + ")";
 }
 
+export function textKeys(text: string): Set<string> {
+  return new Set([...words(text)].map(([, , word]) => key(word)));
+}
+
+/**
+ * The most name-like non-query key in `text` that is rare among the current hits; mirrors
+ * relevance.py best_anchor (plan-eng-review D16): inner capitals, digits, or a mid-sentence
+ * capital (2) over a sentence-initial capital (1) over lowercase (0); then fewer hits; then later.
+ */
+export function bestAnchor(text: string, queryKeys: Set<string>, hitCounts: Map<string, number>): string | undefined {
+  const chars = Array.from(text);
+  let best: { rank: [number, number, number]; key: string } | undefined;
+  let previousEnd = 0;
+  for (const [start, end, word] of words(text)) {
+    const gap = chars.slice(previousEnd, start).join("").trim();
+    const atSentenceStart = previousEnd === 0 || (gap !== "" && ".!?:;".includes(gap.at(-1)!));
+    previousEnd = end;
+    const stem = key(word), hits = hitCounts.get(stem) ?? 0;
+    if (STOP_WORDS.has(word) || Array.from(stem).length < 3 || queryKeys.has(stem) || hits > 2) continue;
+    const raw = chars.slice(start, end), upper = raw.map(c => /\p{Lu}/u.test(c));
+    const score = upper.slice(1).some(Boolean) || raw.some(c => /\p{N}/u.test(c)) || (upper[0] && !atSentenceStart) ? 2 : upper[0] ? 1 : 0;
+    const rank: [number, number, number] = [score, -hits, start];
+    if (!best || rank[0] > best.rank[0] || (rank[0] === best.rank[0] && (rank[1] > best.rank[1] ||
+      (rank[1] === best.rank[1] && rank[2] > best.rank[2])))) best = { rank, key: stem };
+  }
+  return best?.key;
+}
+
 export function relevance(text: string, terms: string[]): number {
   if (!terms.length) return 0;
   const wanted = new Set(terms), found = new Set<string>();
