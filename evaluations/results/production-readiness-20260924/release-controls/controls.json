@@ -1,0 +1,127 @@
+{
+  "status": "LOCAL_IMPLEMENTATION_VERIFIED_EXTERNAL_RELEASE_GATES_OPEN",
+  "checked_at_utc": "2026-09-24T18:25:29.180675+00:00",
+  "base_commit": "61f6723762150a48e4ecd4c0e75f02f28890895c",
+  "working_tree_changes": true,
+  "implemented": [
+    "CI retains installed wheel, source archive, npm archive and rebuilt wheel with checksums.",
+    "Publication jobs download those same archives; verify commit, run, versions, source fingerprints, nine package checks, license/attribution, scan report and every archive checksum; do not rebuild.",
+    "Publication requires successful whole CI including security, approved source SHA variable, and release environment.",
+    "Gitleaks full-history and unpacked-package scans redact100% of matches.",
+    "pip-audit checks resolved Python runtime extras; npm audit checks locked runtime/build/optional dependencies.",
+    "License inventory and package attribution checks; scoped current-artifact dependency declaration/attribution review passed.",
+    "npm repository metadata added; token authentication retained until registry OIDC setup is verified."
+  ],
+  "local_validation": {
+    "artifact_guard_tests": {
+      "status": "PASS",
+      "count": 16,
+      "report": "tests.xml"
+    },
+    "ruff": "PASS: scripts/release_controls.py tests/release",
+    "workflow_yaml_parse": "PASS (syntax parse; hosted execution outstanding for these changes)",
+    "fresh_package_installation": {
+      "status": "PASS",
+      "writer_reader_combinations": 9,
+      "report": "package-memory.json"
+    },
+    "python_known_vulnerabilities": {
+      "status": "PASS",
+      "count": 0,
+      "packages": 48,
+      "scope": "All resolved runtime extras plus installed audit tools",
+      "report": "python-audit.json",
+      "scanner": "pip-audit2.10.1"
+    },
+    "npm_known_vulnerabilities": {
+      "status": "PASS",
+      "count": 0,
+      "dependencies": 13,
+      "scope": "Locked runtime,optional,build dependencies",
+      "report": "npm-audit.json"
+    },
+    "secrets": {
+      "status": "PASS",
+      "scanner": "Gitleaks8.30.1 checksum-verified binary",
+      "history_commits": 15,
+      "history_bytes": 41411430,
+      "working_tree_source_files": 263,
+      "unpacked_archives": 4,
+      "unpacked_bytes": 723720,
+      "findings": 0,
+      "redaction_percent": 100,
+      "reports": [
+        "secrets-history.json",
+        "secrets-working-tree.json",
+        "secrets-artifacts.json"
+      ]
+    },
+    "licenses": {
+      "package_license_and_attribution": "PASS",
+      "inventory": "PASS",
+      "dependency_compatibility_review": "PASS_SCOPED_ENGINEERING_REVIEW; see license-review.json; no general legal assurance",
+      "reports": [
+        "python-licenses.json",
+        "package-and-npm-licenses.json",
+        "license-review.json"
+      ]
+    }
+  },
+  "external_controls": {
+    "release_environment": {
+      "status": "CONFIGURED_AND_READ_BACK_BY_ROOT",
+      "required_reviewer_user_id": 70541869,
+      "prevent_self_review": false,
+      "reason": "Single maintainer can explicitly approve own release without deadlock",
+      "evidence": "../release-environment-applied.json"
+    },
+    "release_tag_deployment_policy": {
+      "status": "CONFIGURED_AND_READ_BACK_BY_ROOT",
+      "type": "tag",
+      "name": "v*",
+      "evidence": "../release-tag-policy-applied.json"
+    },
+    "protected_release_tags": {
+      "status": "CONFIGURED_AND_READ_BACK_BY_ROOT",
+      "ruleset_id": 23954528,
+      "enforcement": "active",
+      "rules": [
+        "creation",
+        "update",
+        "deletion"
+      ],
+      "evidence": "../release-tag-rules-applied.json"
+    },
+    "RELEASE_APPROVED_SHA": "NOT_SET; final source/evidence approval remains required",
+    "pypi_public_name_http_status": 404,
+    "npm_public_name_http_status": 404,
+    "registry_ownership": "NOT_VERIFIED; public404 does not prove reservation or ownership",
+    "pypi_trusted_publisher": "NOT_VERIFIED",
+    "npm_trusted_publisher": "NOT_VERIFIED; existingNPM_TOKEN workflow auth retained"
+  },
+  "official_references": [
+    "https://docs.npmjs.com/trusted-publishers/",
+    "https://docs.pypi.org/trusted-publishers/using-a-publisher/",
+    "https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-pypi",
+    "https://github.com/gitleaks/gitleaks",
+    "https://github.com/pypa/pip-audit",
+    "https://docs.npmjs.com/cli/v11/commands/npm-audit/"
+  ],
+  "current_npm_oidc_requirements": "npm>=11.5.1 and Node>=22.14, supported hosted runner, registry configuration bound to owner/repository/release.yml/environment, matching repository.url; new configurations must explicitly permit direct npm publish when that command is used.",
+  "remaining": [
+    "Hosted CI run of these workflow/helper changes",
+    "Registry owner sessions and verified PyPI/npm publisher identities",
+    "Real-model quality, human review/adoption and dedicated-runner gates maintained by root",
+    "Explicit final source/artifact approval; RELEASE_APPROVED_SHA remains unset"
+  ],
+  "publication_performed": false,
+  "tag_created": false,
+  "files_sha256": {
+    ".github/workflows/ci.yml": "73ff20e879d61e1d6e6ecb2d4e89cc1331284cfcad2467e0080ae22909780664",
+    ".github/workflows/release.yml": "56ab4e44dea2da5d86a9477eeeaf5e9fd83d718a73d8cf4e3a55aaf1e6a341e6",
+    ".github/workflows/security.yml": "ae4ec0f2e8a34baed52b32e863f874b8b2075a4987cbb61456cb83d9c5a72573",
+    "scripts/release_controls.py": "828af4371144a324468f46333fd4fe3cb5b9bfb129a41bba7da01998788cfaa0",
+    "tests/release/test_release_controls.py": "3fa211a5f471429077efdfb3222eb788c95ddb084d57fe3d6e854255f280119f",
+    "packages/typescript/package.json": "d5a1f6830b2be51ecee1ebdda6e2099c5fcd7bfcbf433d676935faa43dfb694e"
+  }
+}

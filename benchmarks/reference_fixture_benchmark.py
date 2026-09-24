@@ -16,6 +16,8 @@ PRD §12 full workload (opt-in; defaults reproduce the T070/T083 workload exactl
 
 `--messages` changes history size for scale points; it is not the reference fixture.
 Process-cold means a fresh interpreter and SQLite connection; the OS page cache is not dropped.
+On an exclusively reserved Linux runner, --filesystem-cold-trials also drops the host page cache
+before each fresh-process measurement. This requires root or passwordless sudo for tee.
 
 Constitution Principle IV: this script only reports what it actually measured, honestly labeled
 (interpreter, platform, `cci` install location) — it never claims a threshold was met without
@@ -63,10 +65,13 @@ async def main():
     opened = time.perf_counter()
     await search(store, sys.argv[2], limit=8)
     searched = time.perf_counter()
+    from cci.io_worker import fetchone
+    count = await fetchone(await store.connection.execute("SELECT COUNT(*) FROM messages"))
     await store.aclose()
     print(json.dumps({"import_ms": (t1 - t0) * 1000, "open_ms": (opened - start) * 1000,
                       "first_search_ms": (searched - opened) * 1000,
-                      "ru_maxrss": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}))
+                      "ru_maxrss": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+                      "observed_messages": count[0]}))
 asyncio.run(main())
 """
 
@@ -95,6 +100,16 @@ def _rss_bytes(ru_maxrss: int) -> int:
 
 def _store_bytes(directory: str) -> int:
     return sum(p.stat().st_size for p in Path(directory).glob("benchmark.db*"))
+
+
+def _drop_page_cache() -> None:
+    if sys.platform != "linux":
+        raise RuntimeError("filesystem-cold trials require an exclusively reserved Linux host")
+    os.sync()
+    command = ["tee", "/proc/sys/vm/drop_caches"]
+    if os.geteuid() != 0:
+        command = ["sudo", "-n", *command]
+    subprocess.run(command, input="3\n", text=True, capture_output=True, check=True)
 
 
 async def _timed_rounds(calls: list, concurrency: int) -> tuple[list[float], float, int]:
@@ -128,6 +143,7 @@ async def _run(
     concurrency: tuple[int, ...] = (1,),
     cold_trials: int = 0,
     artifact: str | None = None,
+    filesystem_cold_trials: int = 0,
 ) -> dict:
     import apsw
     import cci
@@ -183,19 +199,6 @@ async def _run(
                 await search(store, query, limit=8)
                 search_latencies_ms.append((time.perf_counter() - start) * 1000)
 
-        # Concurrent writers to one history (after search, so search saw exactly the fixture).
-        ingest_by_concurrency: dict[str, dict] = {}
-        for level in (c for c in concurrency if c > 1):
-            batches = [batch() for _ in range(CONCURRENT_INGEST_BATCHES)]
-            calls = [
-                lambda m=m, k=f"concurrent-{level}-{n}": ingest(store, store.history_id, m, source_id, k)
-                for n, m in enumerate(batches)
-            ]
-            latencies, elapsed, errors = await _timed_rounds(calls, level)
-            ingest_by_concurrency[str(level)] = _summary(
-                latencies, errors=errors, throughput_messages_per_s=len(calls) * BATCH_SIZE / elapsed
-            )
-
         await store.aclose()
 
         # SC-009: store open p95, no model work — reopening the now-populated store.
@@ -209,10 +212,34 @@ async def _run(
         cold: list[dict] = []
         for i in range(cold_trials):
             completed = subprocess.run(
-                [sys.executable, "-c", _PROCESS_COLD, path, query_list[i % len(query_list)]],
+                [sys.executable, "-I", "-c", _PROCESS_COLD, path, query_list[i % len(query_list)]],
                 cwd=d, capture_output=True, text=True, check=True,
             )
             cold.append(json.loads(completed.stdout))
+
+        filesystem_cold: list[dict] = []
+        for i in range(filesystem_cold_trials):
+            _drop_page_cache()
+            completed = subprocess.run(
+                [sys.executable, "-I", "-c", _PROCESS_COLD, path, query_list[i % len(query_list)]],
+                cwd=d, capture_output=True, text=True, check=True,
+            )
+            filesystem_cold.append(json.loads(completed.stdout))
+
+        # Run writers last: warm/reopen/cold searches must all see exactly the declared fixture.
+        ingest_by_concurrency: dict[str, dict] = {}
+        store = await HistoryStore.open(path)
+        for level in (c for c in concurrency if c > 1):
+            batches = [batch() for _ in range(CONCURRENT_INGEST_BATCHES)]
+            calls = [
+                lambda m=m, k=f"concurrent-{level}-{n}": ingest(store, store.history_id, m, source_id, k)
+                for n, m in enumerate(batches)
+            ]
+            latencies, elapsed, errors = await _timed_rounds(calls, level)
+            ingest_by_concurrency[str(level)] = _summary(
+                latencies, errors=errors, throughput_messages_per_s=len(calls) * BATCH_SIZE / elapsed
+            )
+        await store.aclose()
 
     search_c1 = search_by_concurrency.get("1") or _summary(search_latencies_ms)
     report = {
@@ -230,7 +257,7 @@ async def _run(
             "cpu_count": os.cpu_count(),
             "physical_memory_bytes": os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES"),
             "cache_backend": cache_backend,
-            "filesystem_cold": "NOT RUN: OS page cache is not dropped by this script",
+            "filesystem_cold": "sync + drop_caches=3 before each child" if filesystem_cold else "NOT RUN",
         },
         "fixture_stats": {
             "reference_fixture": total_messages == TOTAL_MESSAGES,
@@ -262,13 +289,25 @@ async def _run(
         "resources": {"peak_rss_bytes": _rss_bytes(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)},
     }
     if concurrency != (1,):
-        report["concurrency"] = {"search_top8_ms": search_by_concurrency, "ingest_100_ms": ingest_by_concurrency}
+        report["concurrency"] = {
+            "search_top8_ms": search_by_concurrency, "ingest_100_ms": ingest_by_concurrency,
+        }
     if cold:
         report["process_cold"] = {
             "import_ms": _summary([c["import_ms"] for c in cold]),
             "store_open_ms": _summary([c["open_ms"] for c in cold]),
             "first_search_top8_ms": _summary([c["first_search_ms"] for c in cold]),
             "peak_rss_bytes_max": max(_rss_bytes(c["ru_maxrss"]) for c in cold),
+            "total_messages": total_messages,
+            "raw_trials": cold,
+        }
+    if filesystem_cold:
+        report["filesystem_cold"] = {
+            "import_ms": _summary([c["import_ms"] for c in filesystem_cold]),
+            "store_open_ms": _summary([c["open_ms"] for c in filesystem_cold]),
+            "first_search_top8_ms": _summary([c["first_search_ms"] for c in filesystem_cold]),
+            "total_messages": total_messages,
+            "raw_trials": filesystem_cold,
         }
     report["results"]["store_open_ms"]["pass"] = (
         report["results"]["store_open_ms"]["p95"] <= 2000
@@ -295,14 +334,20 @@ def main() -> int:
         help="honest label for this run, e.g. 'Python-preview' (T070) or 'release-candidate' (T083)",
     )
     parser.add_argument("--queries", type=int, default=SEARCH_QUERIES, help="PRD §12 fixed set: 1000")
-    parser.add_argument("--messages", type=int, default=TOTAL_MESSAGES, help="scale point; not the reference fixture")
+    parser.add_argument("--messages", type=int, default=TOTAL_MESSAGES,
+                        help="scale point; not the reference fixture")
     parser.add_argument("--concurrency", default="1", help="comma-separated levels, e.g. 1,4,16")
-    parser.add_argument("--cold-trials", type=int, default=0, help="fresh-interpreter open + first search trials")
-    parser.add_argument("--artifact", default=None, help="artifact identity, e.g. git revision and wheel sha256")
+    parser.add_argument("--cold-trials", type=int, default=0,
+                        help="fresh-interpreter open + first search trials")
+    parser.add_argument("--artifact", default=None,
+                        help="artifact identity, e.g. git revision and wheel sha256")
+    parser.add_argument("--filesystem-cold-trials", type=int, default=0,
+                        help="Linux only: drop the HOST page cache before each trial; reserved host required")
     args = parser.parse_args()
     report = asyncio.run(_run(
         args.out, args.label, args.queries, args.messages,
         tuple(int(c) for c in args.concurrency.split(",")), args.cold_trials, args.artifact,
+        args.filesystem_cold_trials,
     ))
     all_pass = all(r["pass"] for r in report["results"].values())
     return 0 if all_pass else 1

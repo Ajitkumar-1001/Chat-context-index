@@ -32,9 +32,11 @@ async function coldChild() {
   const t2 = performance.now();
   await search(store, argv.query, 8);
   const t3 = performance.now();
+  const count = await store.connection.get("SELECT COUNT(*) AS count FROM messages");
   await store.close();
   process.stdout.write(JSON.stringify({ import_ms: t1 - t0, open_ms: t2 - t1,
-    first_search_ms: t3 - t2, max_rss_kib: process.resourceUsage().maxRSS }) + "\n");
+    first_search_ms: t3 - t2, max_rss_kib: process.resourceUsage().maxRSS,
+    observed_messages: count.count }) + "\n");
 }
 
 async function timedCalls(calls, concurrency) {
@@ -49,6 +51,17 @@ async function timedCalls(calls, concurrency) {
     }));
   }
   return summary(values, { errors, throughput_per_s: calls.length * 1000 / (performance.now() - started) });
+}
+
+function dropPageCache() {
+  if (process.platform !== "linux") throw new Error("filesystem-cold trials require a reserved Linux host");
+  const synced = spawnSync("sync", [], { encoding: "utf8" });
+  if (synced.status !== 0) throw new Error(`sync failed: ${synced.stderr}`);
+  const root = process.getuid() === 0;
+  const dropped = spawnSync(root ? "tee" : "sudo",
+    root ? ["/proc/sys/vm/drop_caches"] : ["-n", "tee", "/proc/sys/vm/drop_caches"],
+    { input: "3\n", encoding: "utf8" });
+  if (dropped.status !== 0) throw new Error(`page-cache drop failed: ${dropped.stderr}`);
 }
 
 async function main() {
@@ -78,16 +91,6 @@ async function main() {
     for (const level of levels) {
       searches[level] = await timedCalls(fixture.queries.map(query => () => search(store, query, 8)), level);
     }
-    const concurrentIngest = {};
-    for (const level of levels.filter(level => level > 1)) {
-      const batches = fixture.concurrent_batches[String(level)];
-      if (!batches) throw new Error(`fixture has no concurrent batches for ${level}`);
-      concurrentIngest[level] = await timedCalls(batches.map((batch, i) => () =>
-        ingest(store, store.historyId, batch, "bench-src", `concurrent-${level}-${i}`)), level);
-      concurrentIngest[level].throughput_messages_per_s =
-        concurrentIngest[level].throughput_per_s * batchSize;
-      delete concurrentIngest[level].throughput_per_s;
-    }
     await store.close();
 
     const opens = [];
@@ -104,13 +107,34 @@ async function main() {
       if (child.status !== 0) throw new Error(`cold child failed: ${child.stderr}`);
       cold.push(JSON.parse(child.stdout));
     }
+    const filesystemCold = [];
+    for (let i = 0; i < Number(argv["filesystem-cold-trials"] ?? 0); i++) {
+      dropPageCache();
+      const child = spawnSync(process.execPath, [script, "--cold-child", "1", "--package", packagePath,
+        "--db", db, "--query", fixture.queries[i % fixture.queries.length]], { encoding: "utf8" });
+      if (child.status !== 0) throw new Error(`filesystem-cold child failed: ${child.stderr}`);
+      filesystemCold.push(JSON.parse(child.stdout));
+    }
+    // Writer load runs last so all search/open trials use the declared history size.
+    const concurrentIngest = {};
+    const writer = await HistoryStore.open(db, { cacheBackend: "none" });
+    for (const level of levels.filter(level => level > 1)) {
+      const batches = fixture.concurrent_batches[String(level)];
+      if (!batches) throw new Error(`fixture has no concurrent batches for ${level}`);
+      concurrentIngest[level] = await timedCalls(batches.map((batch, i) => () =>
+        ingest(writer, writer.historyId, batch, "bench-src", `concurrent-${level}-${i}`)), level);
+      concurrentIngest[level].throughput_messages_per_s =
+        concurrentIngest[level].throughput_per_s * batchSize;
+      delete concurrentIngest[level].throughput_per_s;
+    }
+    await writer.close();
     const result = {
       fixture: { total_messages: fixture.messages.length, seed: fixture.seed, batch_size: batchSize,
         queries: fixture.queries.length, sha256: createHash("sha256").update(raw).digest("hex") },
       environment: { label: argv.label ?? "typescript-local", platform: process.platform,
         machine: process.arch, node: process.version, package_path: packagePath,
         artifact: argv.artifact ?? null, dedicated_linux_runner: false,
-        filesystem_cold: "NOT RUN: OS page cache is not dropped by this script" },
+        filesystem_cold: filesystemCold.length ? "sync + drop_caches=3 before each child" : "NOT RUN" },
       fixture_stats: { message_bytes_avg: fixture.messages.reduce((n, m) =>
         n + Buffer.byteLength(m.content), 0) / fixture.messages.length,
         message_bytes_max: Math.max(...fixture.messages.map(m => Buffer.byteLength(m.content))),
@@ -123,7 +147,13 @@ async function main() {
       process_cold: cold.length ? { import_ms: summary(cold.map(c => c.import_ms)),
         store_open_ms: summary(cold.map(c => c.open_ms)),
         first_search_top8_ms: summary(cold.map(c => c.first_search_ms)),
-        max_rss_kib: Math.max(...cold.map(c => c.max_rss_kib)) } : null,
+        max_rss_kib: Math.max(...cold.map(c => c.max_rss_kib)),
+        total_messages: fixture.messages.length, raw_trials: cold } : null,
+      filesystem_cold: filesystemCold.length ? {
+        import_ms: summary(filesystemCold.map(c => c.import_ms)),
+        store_open_ms: summary(filesystemCold.map(c => c.open_ms)),
+        first_search_top8_ms: summary(filesystemCold.map(c => c.first_search_ms)),
+        total_messages: fixture.messages.length, raw_trials: filesystemCold } : null,
     };
     for (const metric of Object.values(result.results)) metric.pass = metric.p95 <= metric.threshold_p95_ms;
     const text = JSON.stringify(result, null, 2) + "\n";

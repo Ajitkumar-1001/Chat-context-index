@@ -1,0 +1,11 @@
+{
+  "status": "PREPARED_NOT_RUN",
+  "protocol_sha256": {
+    "docs/validation/human-review.md": "aef5ec466baeeb510d07641bf75748f70af67b9374f136dd2dc41cfde6611e74",
+    "docs/validation/prepare_review.py": "f50eb41e8fb7985361bd01de9fd797269fec0e63ff66ea77d73b41d34cf534fe",
+    "docs/validation/developer-adoption.md": "b861d57435a901eff7aebd1748f365360788d8232d9a7631163fb46186026fa6"
+  },
+  "actual_human_reviews": 0,
+  "actual_unfamiliar_developer_trials": 0,
+  "note": "Freeze these inputs with final candidate/evaluation plans before collecting held-out outcomes. Human attestations are outstanding."
+}

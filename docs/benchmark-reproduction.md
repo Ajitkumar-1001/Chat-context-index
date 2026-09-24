@@ -30,7 +30,9 @@ concurrency 1/4/16; store size; memory; and 20 fresh-process import/open/search 
 The TypeScript process holds the exported JSON fixture in memory, so its peak RSS includes
 the fixture and is not directly comparable with Python's generated-on-the-fly RSS.
 The process-cold trial starts a new interpreter but **does not drop the OS page cache**.
-Record a separate filesystem-cold run on the dedicated Linux x64 reference runner, along
+The [dedicated runner guide](reference-performance-runner.md) provides installed-artifact
+automation and explicit filesystem-cold trials, with hardware and reservation verification.
+Record that filesystem-cold run on the dedicated Linux x64 reference runner, along
 with the maximum tested history size, disk growth, peak resident memory, and sustainable
 concurrency. A report from macOS or a shared container is development evidence only.
 

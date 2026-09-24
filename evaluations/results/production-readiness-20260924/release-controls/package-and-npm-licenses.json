@@ -1,0 +1,72 @@
+{
+  "status": "PASS",
+  "scope": "package license/attribution and npm declaration completeness",
+  "npm_dependencies": [
+    {
+      "path": "node_modules/@redis/bloom",
+      "version": "5.12.1",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/@redis/client",
+      "version": "5.12.1",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/@redis/json",
+      "version": "5.12.1",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/@redis/search",
+      "version": "5.12.1",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/@redis/time-series",
+      "version": "5.12.1",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/@types/better-sqlite3",
+      "version": "7.6.13",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/@types/node",
+      "version": "22.20.4",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/better-sqlite3",
+      "version": "13.0.3",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/cluster-key-slot",
+      "version": "1.1.2",
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "node_modules/node-addon-api",
+      "version": "8.9.2",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/redis",
+      "version": "5.12.1",
+      "license": "MIT"
+    },
+    {
+      "path": "node_modules/typescript",
+      "version": "5.9.3",
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "node_modules/undici-types",
+      "version": "6.21.0",
+      "license": "MIT"
+    }
+  ],
+  "dependency_license_scope": "Declaration inventory; compatibility is not inferred automatically"
+}

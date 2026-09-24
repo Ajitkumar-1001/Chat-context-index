@@ -1,0 +1,130 @@
+{
+  "fixture": {
+    "total_messages": 1000,
+    "seed": 7,
+    "batch_size": 100,
+    "queries": 20,
+    "sha256": "69222f09e1e9e5249bf3444188b653a2698207fe5b5364bf4567ecb16fabf6a0"
+  },
+  "environment": {
+    "label": "benchmark-helper-validation-not-reference",
+    "platform": "darwin",
+    "machine": "arm64",
+    "node": "v22.23.1",
+    "package_path": "/tmp/cci-ts-bench-20260924/node_modules/chat-context-index/dist/index.js",
+    "artifact": null,
+    "dedicated_linux_runner": false,
+    "filesystem_cold": "NOT RUN"
+  },
+  "fixture_stats": {
+    "message_bytes_avg": 905.882,
+    "message_bytes_max": 1592,
+    "generation_s": 0.09816199999999999,
+    "store_bytes_after_generation": 8082376
+  },
+  "results": {
+    "store_open_ms": {
+      "p50": 23.822041999999954,
+      "p95": 24.611541999999986,
+      "trials": 20,
+      "threshold_p95_ms": 2000,
+      "pass": true
+    },
+    "batch_ingest_100_ms": {
+      "p50": 9.856625000000008,
+      "p95": 14.01795899999999,
+      "trials": 10,
+      "threshold_p95_ms": 500,
+      "pass": true
+    },
+    "lexical_search_top8_ms": {
+      "p50": 3.6691669999999874,
+      "p95": 4.27962500000001,
+      "trials": 20,
+      "errors": 0,
+      "throughput_per_s": 261.21979850157805,
+      "threshold_p95_ms": 100,
+      "pass": true
+    }
+  },
+  "concurrency": {
+    "search_top8_ms": {
+      "1": {
+        "p50": 3.6691669999999874,
+        "p95": 4.27962500000001,
+        "trials": 20,
+        "errors": 0,
+        "throughput_per_s": 261.21979850157805
+      },
+      "4": {
+        "p50": 8.475666999999987,
+        "p95": 11.21750000000003,
+        "trials": 20,
+        "errors": 0,
+        "throughput_per_s": 353.9880398768944
+      },
+      "16": {
+        "p50": 18.920000000000016,
+        "p95": 40.406542,
+        "trials": 20,
+        "errors": 0,
+        "throughput_per_s": 364.302593595848
+      }
+    },
+    "ingest_100_ms": {
+      "4": {
+        "p50": 22.507875000000013,
+        "p95": 38.143375000000106,
+        "trials": 32,
+        "errors": 0,
+        "throughput_messages_per_s": 11007.61374283377
+      },
+      "16": {
+        "p50": 73.90554199999997,
+        "p95": 123.21287499999994,
+        "trials": 32,
+        "errors": 0,
+        "throughput_messages_per_s": 11808.984145977493
+      }
+    }
+  },
+  "resources": {
+    "max_rss_kib": 140848
+  },
+  "process_cold": {
+    "import_ms": {
+      "p50": 14.554915999999999,
+      "p95": 14.554915999999999,
+      "trials": 2
+    },
+    "store_open_ms": {
+      "p50": 30.708416999999997,
+      "p95": 30.708416999999997,
+      "trials": 2
+    },
+    "first_search_top8_ms": {
+      "p50": 9.804457999999997,
+      "p95": 9.804457999999997,
+      "trials": 2
+    },
+    "max_rss_kib": 74048,
+    "total_messages": 1000,
+    "raw_trials": [
+      {
+        "import_ms": 14.401875,
+        "open_ms": 27.410334,
+        "first_search_ms": 7.462000000000003,
+        "max_rss_kib": 73776,
+        "observed_messages": 1000
+      },
+      {
+        "import_ms": 14.554915999999999,
+        "open_ms": 30.708416999999997,
+        "first_search_ms": 9.804457999999997,
+        "max_rss_kib": 74048,
+        "observed_messages": 1000
+      }
+    ]
+  },
+  "filesystem_cold": null
+}

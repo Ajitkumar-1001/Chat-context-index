@@ -1,0 +1,54 @@
+{
+  "status": "INCOMPLETE",
+  "scope": "One controlled follow-up development smoke with a separately claimed allocation and longer timeout",
+  "started_at_utc": "2026-09-24T18:31:05.268908+00:00",
+  "completed_at_utc": "2026-09-24T18:31:28.483830+00:00",
+  "wheel_sha256": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0",
+  "provider": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "call_timeout_s": 60,
+  "attempts": 3,
+  "calls": [
+    {
+      "call_id": 1,
+      "operation": "indexing",
+      "status": "ok",
+      "error_type": null,
+      "http_status": null,
+      "elapsed_s": 7.87,
+      "input_tokens": 76,
+      "output_tokens": 32,
+      "resolved_model": "gemini-3.5-flash-lite"
+    },
+    {
+      "call_id": 2,
+      "operation": "indexing",
+      "status": "ok",
+      "error_type": null,
+      "http_status": null,
+      "elapsed_s": 12.403,
+      "input_tokens": 75,
+      "output_tokens": 34,
+      "resolved_model": "gemini-3.5-flash-lite"
+    },
+    {
+      "call_id": 3,
+      "operation": "indexing",
+      "status": "error",
+      "error_type": "InternalServerError",
+      "http_status": 503,
+      "elapsed_s": 2.921,
+      "input_tokens": null,
+      "output_tokens": null,
+      "resolved_model": null
+    }
+  ],
+  "actual_input_tokens_observed": 151,
+  "actual_output_tokens_observed": 66,
+  "usage_unknown": true,
+  "expected_original_evidence_retrieved": false,
+  "allocation_reusable": false,
+  "sdk_retries": 0,
+  "further_generation_requests": 0,
+  "private_report_sha256": "f2a8fd116a3da9cd150ee96fee7b3f2b5d178e0ac806e1f2de6340ad398550be"
+}

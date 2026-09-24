@@ -1,0 +1,32 @@
+{
+  "environment_before": {
+    "attestation": {
+      "reason": "No dedicated Linux x64 runner reservation or connection supplied; observed host is Darwin arm64.",
+      "status": "NOT_PROVIDED"
+    },
+    "cpu_count": 14,
+    "machine": "arm64",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "system": "Darwin",
+    "work_directory": "/private/tmp"
+  },
+  "failures": [
+    "requires Linux x86_64; current host is not the reference runner"
+  ],
+  "finished_at": "2026-09-24T18:10:33.035614+00:00",
+  "input_sha256": {
+    "/Users/ajit/dev/cont-index/benchmarks/generate_reference_fixture.py": "d4b764315ed52c191043e0a5401b33107d899895a29a4236a17387780d6ea4a0",
+    "/Users/ajit/dev/cont-index/benchmarks/reference_fixture_benchmark.mjs": "af7b8090338bd455c441add89afbcd01eb51e4bbc421fd18fbb035a61ccedc75",
+    "/Users/ajit/dev/cont-index/benchmarks/reference_fixture_benchmark.py": "abb5711b2a46eb73baeaa16ac8ada67379ee5c48b1042aa389969b915c29456b",
+    "/Users/ajit/dev/cont-index/benchmarks/run_reference_gate.py": "997298e25c85ea1255c432e1832edf85d8e29698609629b6930dfe20f7dcf3d1",
+    "/Users/ajit/dev/cont-index/dist/release/chat-context-index-0.1.0.tgz": "fd68d49afe5cdbc5d73e131ba2cf613d10858575ae071d56489cb42bdf29d482",
+    "/Users/ajit/dev/cont-index/dist/release/chat_context_index-0.1.0-py3-none-any.whl": "6bf4412fe38078b3131f796d1541b10c94191aa7bfc64e263f49e38628e56162",
+    "evaluations/results/production-readiness-20260924/performance-preparation/runner-unavailable.json": "64a15ce097e7d24d0d8423a069e012ff74aa8ae1f9c717d6733ceeba3cd4078b"
+  },
+  "model_calls": 0,
+  "reports": {},
+  "source_commit": "61f6723762150a48e4ecd4c0e75f02f28890895c",
+  "started_at": "2026-09-24T18:10:33.003921+00:00",
+  "status": "BLOCKED",
+  "tracked_changes": "M .github/workflows/ci.yml\n M .github/workflows/release.yml\n M benchmarks/reference_fixture_benchmark.mjs\n M benchmarks/reference_fixture_benchmark.py\n M docs/benchmark-reproduction.md\n M packages/typescript/package.json\n?? .github/workflows/security.yml\n?? benchmarks/run_reference_gate.py\n?? docs/reference-performance-runner.md\n?? docs/validation/\n?? evaluations/check_provider_capacity.py\n?? evaluations/results/production-readiness-20260924/\n?? scripts/\n?? tests/benchmarks/\n?? tests/evaluations/test_human_review_selection.py\n?? tests/evaluations/test_provider_capacity.py"
+}
