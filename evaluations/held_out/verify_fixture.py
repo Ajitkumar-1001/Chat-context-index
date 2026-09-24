@@ -1,6 +1,7 @@
 """Self-check for generate_fixture.py's output (ponytail: non-trivial logic leaves one runnable
-check behind). Verifies: exact split counts (PRD §16.1), and that every answerable query's
-acceptable span actually resolves to its claimed correct_value within the claimed message.
+check behind). Verifies: exact split counts (PRD §16.1), that every answerable query's
+acceptable span actually resolves to its claimed correct_value within the claimed message, and
+that each unit's verbatim_copy_indexes lists exactly the other messages with identical text.
 
 Usage: python verify_fixture.py [fixture.json]
 """
@@ -34,6 +35,7 @@ def verify(path: str) -> None:
 
     answerable_count = 0
     absent_count = 0
+    copy_count = 0
     for q in data["queries"]:
         history = histories_by_label[q["history_label"]]
         if not q["answerable"]:
@@ -54,11 +56,20 @@ def verify(path: str) -> None:
             )
             for wrong in q["answer_rubric"]["must_not_cite_values"]:
                 assert wrong != excerpt, (q["query_id"], "must_not_cite_values must differ from the correct excerpt")
+            copies = [
+                i for i, m in enumerate(history["messages"])
+                if i != unit["message_index"] and m["content"] == content
+            ]
+            assert unit["verbatim_copy_indexes"] == copies, (
+                q["query_id"], "copies must list every identical message"
+            )
+            copy_count += len(copies)
 
     print(f"OK: {path}")
     print(f"  20 histories (12 dev / 8 held-out), message counts in range")
     print(f"  {answerable_count} answerable + {absent_count} absent-answer queries")
     print(f"  every answerable query's acceptable span resolves exactly to its rubric's correct_value")
+    print(f"  every unit lists exactly its word-for-word copies ({copy_count} copies in total)")
 
 
 if __name__ == "__main__":

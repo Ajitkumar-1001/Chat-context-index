@@ -130,16 +130,18 @@ async def _ingest_history(store: HistoryStore, messages: list[dict]) -> None:
 
 
 def _score_evidence_recall(required_units: list[dict], history_messages: list[dict], evidence: list) -> float:
+    """A unit is covered by its acceptable span in the annotated message or in any annotated
+    word-for-word copy of it (SC-011 as clarified 2026-09-23; units without copies score as before)."""
     if not required_units:
         return 1.0
     covered = 0
     for unit in required_units:
-        seq = unit["message_index"] + 1
+        seqs = {unit["message_index"] + 1, *(i + 1 for i in unit.get("verbatim_copy_indexes", []))}
         span = unit["acceptable_span"]
         target_text = history_messages[unit["message_index"]]["content"]
         acceptable_span_text = target_text[span["start"]:span["end"]]
         for ev in evidence:
-            if ev.seq == seq and acceptable_span_text in ev.excerpt:
+            if ev.seq in seqs and acceptable_span_text in ev.excerpt:
                 covered += 1
                 break
     return covered / len(required_units)
