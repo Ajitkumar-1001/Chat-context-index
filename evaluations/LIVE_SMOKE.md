@@ -1,8 +1,13 @@
 # Installed-package live-model smoke test
 
-The successful live run below used an earlier wheel. The current candidate has passed
-installed-package preflight with zero model calls, but its provider capacity is unverified;
-see the [current release status](../docs/release-status.md).
+The [current CI-verified wheel passed a fresh live smoke on September 24, 2026](results/production-readiness-20260924/live-smoke-retry-003-summary.json):
+six indexing and two tree-navigation calls reported 1,058 input / 301 output tokens, with
+zero errors or unknown usage. It retrieved the exact original evidence after reopening SQLite.
+This run used `check_provider_capacity.py` with a fresh frozen allocation capped at 10 calls,
+100,000 reserved tokens, and $0.04; estimated usage cost was $0.0010699. It establishes one
+development smoke, not sustained account capacity or held-out quality. See the
+[current release status](../docs/release-status.md). Earlier runs and the standalone CLI's
+setup and limits are retained below.
 
 This small evaluation subsystem checks one Python wheel against a selected model provider's
 Chat Completions compatibility endpoint. The provider, model ID, API key, and endpoint are configurable.
@@ -18,7 +23,7 @@ The environment prepared on September 23, 2026 is:
 ```
 
 It contains the non-editable `chat-context-index==0.1.0` release candidate, `openai==2.45.0`,
-and `python-dotenv==1.1.1`. The [latest report](results/live-smoke.json) records the import
+and `python-dotenv==1.1.1`. The [earlier report](results/live-smoke.json) records the import
 path and wheel hash and verifies that every installed Python source file matches that wheel.
 The environment is outside the checkout; recreate it if temporary files are removed.
 

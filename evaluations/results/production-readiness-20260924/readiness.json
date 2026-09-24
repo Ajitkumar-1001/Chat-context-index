@@ -10,27 +10,38 @@
   "gates": [
     {
       "request": "Provider capacity, evaluation budget, installed live smoke and actual usage",
-      "status": "INCOMPLETE",
+      "status": "SMOKE_PASS_BUDGET_AND_SUSTAINED_CAPACITY_OPEN",
       "completed": [
         "Provider metadata endpoint reachable; configured model listed",
         "Bounded capacity diagnostic implemented and tested",
-        "Two indexing responses recorded 151 input and 66 output tokens"
+        "Two indexing responses recorded 151 input and 66 output tokens",
+        "Installed CI-verified wheel completed retry-003: exact original evidence after reopen;8calls,1058input/301output tokens,zero errors or unknown usage"
       ],
       "evidence": [
         "provider-metadata.json",
         "live-smoke-summary.json",
-        "live-smoke-extended-summary.json"
+        "live-smoke-extended-summary.json",
+        "live-smoke-retry-003-summary.json"
       ],
       "blockers": [
-        "First smoke timed out; follow-up stopped on HTTP 503 before expected original-evidence retrieval",
-        "Full evaluation request forecast exceeds existing cumulative allowance; additional budget requested, not granted"
+        "Full evaluation request forecast exceeds unallocated request allowance; additional budget requested, not granted",
+        "Bounded smoke does not establish account-wide quota or sustained evaluation capacity"
       ],
-      "new_generation_attempts": 4,
+      "new_generation_attempts": 12,
       "unknown_usage_attempts": 2,
-      "input_tokens_observed": 151,
-      "output_tokens_observed": 66,
-      "reserved_tokens_including_unknown": 2345,
-      "allocations_reusable": false
+      "input_tokens_observed": 1209,
+      "output_tokens_observed": 367,
+      "reserved_tokens_including_unknown": 3704,
+      "allocations_reusable": false,
+      "installed_smoke_status": "PASS",
+      "latest_smoke": {
+        "attempts": 8,
+        "input_tokens": 1058,
+        "output_tokens": 301,
+        "usage_unknown": false,
+        "expected_original_evidence_retrieved": true,
+        "estimated_usd": 0.0010699
+      }
     },
     {
       "request": "Three real-model quality/cost trials, cache measurements and human review",
@@ -40,7 +51,7 @@
         "../../../docs/validation/human-review.md"
       ],
       "blockers": [
-        "Successful smoke, verified capacity and sufficient approved budget",
+        "Sustained provider capacity and sufficient approved budget; installed smoke has passed",
         "Final candidate/protocol/allocations must be frozen before held-out outcomes",
         "Actual human reviewer must complete outcome review"
       ]
