@@ -1,0 +1,39 @@
+{
+  "recorded_at_utc": "2026-09-24T21:33:20.453501+00:00",
+  "checks": {
+    "github_registered_runners": {
+      "status": "NO_REGISTERED_RUNNER",
+      "total_count": 0
+    },
+    "github_pages": {
+      "status": "NOT_CONFIGURED",
+      "http_status": 404
+    },
+    "local_hosting_project_configs": {
+      "vercel": false,
+      "netlify": false,
+      "wrangler": false
+    },
+    "npm_owner_session": {
+      "status": "UNAUTHENTICATED",
+      "error_code": "ENEEDAUTH"
+    },
+    "local_pypirc": {
+      "exists": false,
+      "registry_trusted_publisher_state": "UNKNOWN"
+    },
+    "github_repository_secret_names": [],
+    "github_release_environment_variable_names": [],
+    "website": {
+      "status": "PASS",
+      "command": "npm --prefix website run check",
+      "astro_errors": 0,
+      "astro_warnings": 0,
+      "astro_hints": 0,
+      "static_pages_built": 1,
+      "artifact": "website/dist/index.html",
+      "artifact_sha256": "6c49e236a82b7b84b6da502f0052e909516f7f306dd88ca8972387aaf48a5f03"
+    }
+  },
+  "note": "Read-only account metadata and local build checks. No credentials were logged. No external configuration, deployment, or publication changed."
+}

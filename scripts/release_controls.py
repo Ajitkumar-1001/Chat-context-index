@@ -48,8 +48,8 @@ def unpack(artifacts, output):
     return {"status": "PASS", "archives_unpacked": len(paths)}
 
 
-def verify_artifacts(candidate, sha, run_id, tag, output, root=ROOT):
-    """Reject stale reports, missing checks, changed archives, and unsafe paths before copying."""
+def inspect_candidate(candidate, sha, run_id, tag, root=ROOT):
+    """Check the candidate's own evidence; this does not approve or copy publication files."""
     report_path = candidate / "reports/package-memory.json"
     report = json.loads(report_path.read_text())
     require(json.loads((candidate / "reports/artifact-secrets.json").read_text()) == [],
@@ -126,16 +126,84 @@ def verify_artifacts(candidate, sha, run_id, tag, output, root=ROOT):
             == "git+https://github.com/Ajitkumar-1001/Chat-context-index.git", "npm repository mismatch")
     require(npm_meta.get("license") == python_meta["License-Expression"] == "Apache-2.0",
             "Package license metadata mismatch")
-    # Fail if the destination exists: never publish a stale archive left by an earlier run.
-    output.mkdir()
-    for registry, registry_paths in (("python", [wheel[0], sdist[0]]), ("npm", npm)):
-        destination = output / registry
-        destination.mkdir()
-        for path in registry_paths:
-            shutil.copyfile(path, destination / path.name)
     manifest = {"status": "PASS", "sha": sha, "run_id": str(run_id), "version": version,
                 "package_report_sha256": hashlib.sha256(report_path.read_bytes()).hexdigest(),
                 "artifacts": entries, "rebuilt_for_publication": False}
+    return manifest, {"python": [wheel[0], sdist[0]], "npm": npm}
+
+
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        require(key not in result, f"Duplicate approval JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def verify_approval(approval, approval_sha256, candidate, manifest):
+    """The digest must come from an independent, owner-controlled approval value."""
+    require(approval is not None and isinstance(approval_sha256, str)
+            and re.fullmatch(r"[0-9a-f]{64}", approval_sha256), "Missing or invalid artifact approval")
+    require(approval.is_file() and not approval.is_symlink()
+            and not approval.resolve().is_relative_to(candidate.resolve()),
+            "Approval manifest must be a separate file outside the candidate")
+    data = approval.read_bytes()
+    require(hashlib.sha256(data).hexdigest() == approval_sha256, "Approval manifest digest mismatch")
+    approved = json.loads(data, object_pairs_hook=unique_object)
+    require(isinstance(approved, dict)
+            and set(approved) == {"schema_version", "source_sha", "version", "artifacts"}
+            and type(approved["schema_version"]) is int and approved["schema_version"] == 1,
+            "Invalid approval manifest schema")
+    require(approved["source_sha"] == manifest["sha"], "Approval source commit mismatch")
+    require(approved["version"] == manifest["version"], "Approval package version mismatch")
+    entries = approved["artifacts"]
+    require(isinstance(entries, list) and len(entries) == 4, "Expected four approved artifact entries")
+    hashes = {}
+    for entry in entries:
+        require(isinstance(entry, dict) and set(entry) == {"filename", "sha256"},
+                "Invalid approved artifact entry")
+        name, digest = entry["filename"], entry["sha256"]
+        require(isinstance(name, str) and re.fullmatch(r"[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*", name)
+                and all(part not in {".", ".."} for part in name.split("/")),
+                "Unsafe approved artifact path")
+        require(isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest),
+                "Invalid approved artifact SHA-256")
+        require(name not in hashes, "Duplicate approved artifact entry")
+        hashes[name] = digest
+    require(hashes == {entry["filename"]: entry["sha256"] for entry in manifest["artifacts"]},
+            "Candidate does not match approved artifacts")
+
+
+def approval_manifest(candidate, sha, run_id, tag, output, root=ROOT):
+    """Write a review draft only; generating a manifest never grants publication approval."""
+    manifest, _ = inspect_candidate(candidate, sha, run_id, tag, root)
+    draft = {"schema_version": 1, "source_sha": sha, "version": manifest["version"],
+             "artifacts": sorted(manifest["artifacts"], key=lambda entry: entry["filename"])}
+    # No trailing newline: an owner can store these exact bytes in a GitHub variable.
+    data = json.dumps(draft, sort_keys=True, separators=(",", ":")).encode()
+    with output.open("xb") as handle:
+        handle.write(data)
+    return {"status": "DRAFT_NOT_APPROVED", "sha": sha, "run_id": str(run_id),
+            "version": manifest["version"], "approval_manifest_sha256": hashlib.sha256(data).hexdigest()}
+
+
+def verify_artifacts(candidate, sha, run_id, tag, output, root=ROOT,
+                     approval=None, approval_sha256=None):
+    """Require independent approval and same-run checks before copying exact archives."""
+    manifest, registry_paths = inspect_candidate(candidate, sha, run_id, tag, root)
+    verify_approval(approval, approval_sha256, candidate, manifest)
+    approved_hashes = {entry["filename"]: entry["sha256"] for entry in manifest["artifacts"]}
+    # Fail if the destination exists: never publish a stale archive left by an earlier run.
+    output.mkdir()
+    for registry, paths in registry_paths.items():
+        destination = output / registry
+        destination.mkdir()
+        for path in paths:
+            copied = destination / path.name
+            shutil.copyfile(path, copied)
+            require(hashlib.sha256(copied.read_bytes()).hexdigest() == approved_hashes[path.name],
+                    f"Copied archive checksum mismatch: {path.name}")
+    manifest["approval_manifest_sha256"] = approval_sha256
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     return manifest
 
@@ -162,12 +230,16 @@ def licenses(root=ROOT):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    artifacts = subparsers.add_parser("artifacts")
-    artifacts.add_argument("--candidate", type=Path, required=True)
-    artifacts.add_argument("--sha", required=True)
-    artifacts.add_argument("--run-id", required=True)
-    artifacts.add_argument("--tag", required=True)
-    artifacts.add_argument("--output", type=Path, required=True)
+    for command in ("artifacts", "approval-manifest"):
+        artifacts = subparsers.add_parser(command)
+        artifacts.add_argument("--candidate", type=Path, required=True)
+        artifacts.add_argument("--sha", required=True)
+        artifacts.add_argument("--run-id", required=True)
+        artifacts.add_argument("--tag", required=True)
+        artifacts.add_argument("--output", type=Path, required=True)
+        if command == "artifacts":
+            artifacts.add_argument("--approval", type=Path, required=True)
+            artifacts.add_argument("--approval-sha256", required=True)
     inventory = subparsers.add_parser("licenses")
     inventory.add_argument("--output", type=Path, required=True)
     expand = subparsers.add_parser("unpack")
@@ -175,7 +247,10 @@ def main():
     expand.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "artifacts":
-        result = verify_artifacts(args.candidate, args.sha, args.run_id, args.tag, args.output)
+        result = verify_artifacts(args.candidate, args.sha, args.run_id, args.tag, args.output,
+                                  approval=args.approval, approval_sha256=args.approval_sha256)
+    elif args.command == "approval-manifest":
+        result = approval_manifest(args.candidate, args.sha, args.run_id, args.tag, args.output)
     elif args.command == "unpack":
         result = unpack(args.artifacts, args.output)
     else:
