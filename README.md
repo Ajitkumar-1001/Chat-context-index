@@ -219,7 +219,7 @@ The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatInd
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- The current macOS local run passes 224 Python tests, 21 native TypeScript tests, and nine fresh installed-package writer/reader checks. Hosted CI, dedicated Linux performance, and the real-model quality gate remain open. [Release status](docs/release-status.md).
+- The current macOS local run passes 224 Python tests, 21 native TypeScript tests, and nine fresh installed-package writer/reader checks. All 16 hosted package combinations pass. Dedicated Linux performance and the real-model quality gate remain open. [Release status](docs/release-status.md).
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 

@@ -1,8 +1,10 @@
 # Release status — September 24, 2026 UTC
 
-Release is **blocked**. Local regression, package installation, and cross-language checks pass
-for the current working tree. Hosted CI, reference performance, live quality and cost evidence,
-and developer adoption remain open. No package was published.
+Release is **blocked**. Local regression, package installation, cross-language checks, and all
+16 hosted package combinations pass for the 0.1.0 candidate. Reference performance, live
+quality and cost evidence, and developer adoption remain open. PyPI and npm returned 404 for
+version 0.1.0 at this check. A GitHub [prerelease](https://github.com/Ajitkumar-1001/Chat-context-index/releases/tag/pre-release)
+exists without assets; it did not run the tag-triggered registry release workflow.
 
 | Gate | Current evidence |
 | --- | --- |
@@ -12,7 +14,7 @@ and developer adoption remain open. No package was published.
 | Cross-language retrieval | Shared fixture compares ordered `search()`, `retrieve()`, and prepared context output, including correction and duplicate cases |
 | Cache failure accounting | Python `stats()` reports Redis errors and SQLite fallback lookups/hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend |
 | Fresh local packages | Wheel, source distribution, and npm tarball rebuilt and installed outside the checkout; all nine writer/reader combinations, TypeScript consumer typecheck, package documentation, and default operation passed. [Current report](../evaluations/results/release-readiness/package-memory-20260924.json) |
-| Hosted matrix | **Not run for this working tree.** CI defines 16 Python/Node/OS combinations; the local GitHub CLI token is invalid, so no run IDs or per-cell artifact hashes are available |
+| Hosted matrix | **Passed:** all 16 Python 3.11–3.14 / Node 22 and 24 / Ubuntu x64 and macOS arm64 package combinations passed with nine writer/reader checks each. Every cell produced the same wheel, sdist, and npm archive hashes as the local package report. [Per-cell evidence](../evaluations/results/release-readiness/hosted-ci-20260924.json), [PR run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36034703337), [merged-main run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36034722343) |
 | Reference performance | **Not run.** Updated installed packages meet the three warm single-request thresholds in [local macOS runs](benchmark-reproduction.md), but Python's process-cold first-search p95 was 112.6 ms and search latency grows at higher concurrency. The dedicated Linux x64 runner, filesystem-cold pass, and scale point remain outstanding |
 | Installed-package live smoke | **Blocked by provider capacity.** The preceding candidate encountered HTTP 429 during indexing; capacity and usage accounting for the current artifacts are unverified |
 | Quality, cost, human review | **Not run for these artifacts.** Three frozen trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open |
@@ -44,5 +46,6 @@ python tests/packaging/verify_packages.py --report evaluations/results/package-m
 
 The CI matrix uses GitHub's published [`macos-15` arm64 and `ubuntu-24.04` x64 runner
 labels](https://github.com/actions/runner-images#available-images). Each job verifies its
-architecture. Local macOS results do not substitute for a hosted matrix or the dedicated
+architecture. PR #2 merged before its CI jobs finished; the PR run and a separate post-merge
+main run subsequently passed. Hosted package compatibility does not substitute for the dedicated
 reference Linux performance run.

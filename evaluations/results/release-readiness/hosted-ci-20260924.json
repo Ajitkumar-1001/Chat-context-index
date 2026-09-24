@@ -1,0 +1,187 @@
+{
+  "status": "PASS",
+  "recorded_at_utc": "2026-09-24T17:43:56.898244+00:00",
+  "repository": "Ajitkumar-1001/Chat-context-index",
+  "pull_request": 2,
+  "pull_request_head_sha": "f3e292dec9012cdf1ecb81157c07d4fd2d3c7c7b",
+  "pull_request_ci_run_id": 36034703337,
+  "pull_request_ci_merge_sha": "bf2fa0ea0a2cf1acba911089e92adddf2ba8ccc7",
+  "main_merge_sha": "f43baead3f641b44b35867fc1e9a7b2755936280",
+  "main_ci_run_id": 36034722343,
+  "matrix_cells_passed": 16,
+  "source_sha256": {
+    "python": "076cdb111de30decb2829267eb88df0572ddfe7e25ba1b49792df8356d2d8653",
+    "typescript": "26e820e79b854b0004201caf08f14cf38b7f1870e0f8e85027a6ced6e6e359a0"
+  },
+  "artifact_sha256": {
+    "chat_context_index-0.1.0-py3-none-any.whl": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0",
+    "chat-context-index-0.1.0.tgz": "9d8c712d610f9f47efd22037e8bfbc9f22164f82068748f36035b30f79376ccf",
+    "chat_context_index-0.1.0.tar.gz": "58f700e87dc35ab44fa21eb3e87fe1794cc43847596d4ecb1af82e3853587b2e",
+    "wheel-from-sdist/chat_context_index-0.1.0-py3-none-any.whl": "a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0"
+  },
+  "cells": [
+    {
+      "os": "macos-15",
+      "python": "3.11.9",
+      "node": "v22.23.2",
+      "machine": "arm64",
+      "artifact_name": "packages-macos-15-py3.11-node22",
+      "report_sha256": "e652c5c37b9790916ab3a159452c00d8ef9d655eb21248ae509a4d4dfd45974c",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "macos-15",
+      "python": "3.11.9",
+      "node": "v24.20.0",
+      "machine": "arm64",
+      "artifact_name": "packages-macos-15-py3.11-node24",
+      "report_sha256": "84eec6a37216120edeccbb4e68a0e1ea8a60779a821decbb9a2fbca6219ea7e2",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "macos-15",
+      "python": "3.12.10",
+      "node": "v22.23.2",
+      "machine": "arm64",
+      "artifact_name": "packages-macos-15-py3.12-node22",
+      "report_sha256": "90bcf88637f16073b489e3030da4934e85e3e613020534b7a8e2be41d72ae7b5",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "macos-15",
+      "python": "3.12.10",
+      "node": "v24.20.0",
+      "machine": "arm64",
+      "artifact_name": "packages-macos-15-py3.12-node24",
+      "report_sha256": "f64eb6f6b59a9f1498c72a890fb28f6f387c265194e54df24b50bbcd27cc12fe",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "macos-15",
+      "python": "3.13.15",
+      "node": "v22.23.2",
+      "machine": "arm64",
+      "artifact_name": "packages-macos-15-py3.13-node22",
+      "report_sha256": "4cdc09fe92505d8699d3d19cd27dbfa9fe43740dddffb3077e4815ed541f9355",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "macos-15",
+      "python": "3.13.15",
+      "node": "v24.20.0",
+      "machine": "arm64",
+      "artifact_name": "packages-macos-15-py3.13-node24",
+      "report_sha256": "394e50efe1a1e37654f0a80ff0eba797acf1f9ca49d8802740b9ce01f58b8ca0",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "macos-15",
+      "python": "3.14.7",
+      "node": "v22.23.2",
+      "machine": "arm64",
+      "artifact_name": "packages-macos-15-py3.14-node22",
+      "report_sha256": "6efc560ab42d1c5b6ae8ba96dcab0ac038b5a791040f0576d695cfeb4d7cc91b",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "macos-15",
+      "python": "3.14.7",
+      "node": "v24.20.0",
+      "machine": "arm64",
+      "artifact_name": "packages-macos-15-py3.14-node24",
+      "report_sha256": "cc115000d8bfe0c56ddaf8c042eccea8b5b5c783c39ba212e4dc1e777faf5a33",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "python": "3.11.16",
+      "node": "v22.23.2",
+      "machine": "x86_64",
+      "artifact_name": "packages-ubuntu-24.04-py3.11-node22",
+      "report_sha256": "d5b94994bf7a20b96881fd8d9f0c85edf3544f500ac3f50f6046ba702b28cff1",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "python": "3.11.16",
+      "node": "v24.21.0",
+      "machine": "x86_64",
+      "artifact_name": "packages-ubuntu-24.04-py3.11-node24",
+      "report_sha256": "d276ac296cee1d565bdc208058bfee9073f45c9cb07cc40e8afab1e5229ab4d9",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "python": "3.12.14",
+      "node": "v22.23.2",
+      "machine": "x86_64",
+      "artifact_name": "packages-ubuntu-24.04-py3.12-node22",
+      "report_sha256": "5f3ef5abc29fe581c5085420de5892cf8210c9666834cad0c45af53129910f1c",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "python": "3.12.14",
+      "node": "v24.21.0",
+      "machine": "x86_64",
+      "artifact_name": "packages-ubuntu-24.04-py3.12-node24",
+      "report_sha256": "2208a3989605fb2c74c6faea79c7bd7542a33e58cdd611df257e044416afdd0b",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "python": "3.13.15",
+      "node": "v22.23.2",
+      "machine": "x86_64",
+      "artifact_name": "packages-ubuntu-24.04-py3.13-node22",
+      "report_sha256": "21cbc97322568c3e1b61823dc656ea35ec253eb1d9b2dd276394b700c6f9de82",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "python": "3.13.15",
+      "node": "v24.21.0",
+      "machine": "x86_64",
+      "artifact_name": "packages-ubuntu-24.04-py3.13-node24",
+      "report_sha256": "a3866adfcae25b79faef83f854b141f1a76239c4346036abc1b228b26cbdeaea",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "python": "3.14.7",
+      "node": "v22.23.2",
+      "machine": "x86_64",
+      "artifact_name": "packages-ubuntu-24.04-py3.14-node22",
+      "report_sha256": "c5786eea92ecb3267a18a94c66b6c304dd0ff0e44bbda5106084b4f1b4f60133",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    },
+    {
+      "os": "ubuntu-24.04",
+      "python": "3.14.7",
+      "node": "v24.21.0",
+      "machine": "x86_64",
+      "artifact_name": "packages-ubuntu-24.04-py3.14-node24",
+      "report_sha256": "06486aba65be33514163fe67b4e1782a174f574587053dc73c0241c53f707d19",
+      "writer_reader_checks": 9,
+      "status": "PASS"
+    }
+  ],
+  "limits": [
+    "Matrix tests package behavior with a deterministic provider; it does not prove live model quality or reference-runner performance."
+  ]
+}
