@@ -4,9 +4,6 @@ import { Code } from 'astro:components';
 import hosted from '../../../evaluations/results/production-readiness-20260924/hosted-verification.json';
 import packages from '../../../evaluations/results/production-readiness-20260924/hosted-evidence/packages-ubuntu-24.04-py3.12-node22/package-memory.json';
 import smoke from '../../../evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json';
-
-import hosted from '../../../evaluations/results/release-readiness/hosted-ci-20260924.json';
-import packages from '../../../evaluations/results/release-readiness/package-memory-20260924.json';
 import perfPy from '../../../evaluations/results/release-readiness/performance-macos-20260924.json';
 import perfTs from '../../../evaluations/results/release-readiness/performance-typescript-macos-20260924.json';
 import recallLexical from '../../../evaluations/results/release-readiness/dev-recall-lexical-20260924.json';
@@ -17,7 +14,6 @@ const blob = `${repo}/blob/main`;
 const evidencePath = `${blob}/evaluations/results/production-readiness-20260924`;
 const smokeReport = `${evidencePath}/live-smoke-retry-003-summary.json`;
 // Gate wording mirrors docs/release-status.md; update both together.
-// Gate wording mirrors release-status; update both together.
 const asOf = 'September 24, 2026 (UTC)';
 
 const toc = [
