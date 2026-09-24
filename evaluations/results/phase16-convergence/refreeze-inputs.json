@@ -5,7 +5,7 @@
     "file": "chat_context_index-0.1.0-py3-none-any.whl",
     "build": "cd packages/python && python -m pip wheel --no-deps -w <out> .",
     "builder": "CPython 3.12, pip 25.1.1, macOS arm64",
-    "reproduced": "two builds produced identical bytes"
+    "reproduced": "two pip wheel builds and one python -m build (build 1.6.1) --wheel build produced identical bytes"
   },
   "plan_fields": {
     "fixture": "evaluations/held_out/fixture.json",
