@@ -42,3 +42,41 @@ use installed 0.1.0 candidates on macOS arm64. They meet all three single-reques
 per-request search latency grows substantially at higher concurrency. Python's 20-trial
 process-cold first-search p95 was 112.6 ms, above the 100 ms search target; TypeScript's was
 99.0 ms. These are local observations. The dedicated Linux reference gate remains open.
+
+## Retrieval and context timing
+
+`search()` alone does not exercise correction linking or context packing. `--paths` also times
+`retrieve(mode="lexical")` and `prepare_context(mode="lexical")` over the same 1,000 queries,
+warm at each `--concurrency` level and as a first call in each fresh process:
+
+```bash
+/tmp/cci-python-bench/bin/python -I benchmarks/reference_fixture_benchmark.py \
+  --queries 1000 --cold-trials 20 --paths search,retrieve,prepare --out python-paths-report.json
+```
+
+The report adds `paths.retrieve_lexical_ms` and `paths.prepare_context_lexical_ms`. Compare a
+change against the previous installed wheel on the same machine, run back to back; absolute
+numbers from different hosts are not comparable.
+
+## Development recall bar
+
+`benchmarks/dev_recall.py` scores `prepare_context` on the development split, or on the
+hand-written [paraphrase fixture](../evaluations/paraphrase/fixture.json), without model calls. It
+never reads the held-out split. A word-for-word copy of the annotated message counts as retrieved
+evidence. `--mode tree` uses a fake navigator that keeps every offered node, so it measures loss
+after perfect navigation, not navigation quality.
+
+```bash
+/tmp/cci-python-bench/bin/python -I benchmarks/dev_recall.py --mode lexical --out dev-lexical.json
+/tmp/cci-python-bench/bin/python -I benchmarks/dev_recall.py --mode tree --out dev-tree.json
+/tmp/cci-python-bench/bin/python -I benchmarks/dev_recall.py --mode lexical \
+  --fixture evaluations/paraphrase/fixture.json --out paraphrase-lexical.json
+```
+
+Each report ends with `bar` and `bar_pass`, and the command exits 1 when the bar fails. On the
+development split the bar requires context recall and correction-case recall of at least 0.85 and
+no context that shows a superseded value without its correction. On the paraphrase fixture it
+requires recall of at least 0.80 for corrections that name the old value; corrections that do not
+are reported only. Add `--baseline <report.json>` from the same mode and fixture to require no
+more than a 2-point drop on the development split and no drop on the paraphrase fixture. Current
+installed-wheel results are in [`evaluations/results/phase15-convergence/`](../evaluations/results/phase15-convergence).
