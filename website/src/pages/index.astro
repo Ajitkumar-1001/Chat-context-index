@@ -1,10 +1,10 @@
 ---
 import { Code } from 'astro:components';
 // Only public evidence files are imported; the page is rebuilt from them.
-import verification from '../../../evaluations/results/production-readiness-20260924/execution/main-candidate-verification-20260925.json';
-import packages from '../../../evaluations/results/production-readiness-20260924/execution/main-candidate-package-memory-20260925.json';
+import verification from '../../../evaluations/results/production-readiness-20260924/execution/release-0.1.0-verification.json';
+import packages from '../../../evaluations/results/production-readiness-20260924/execution/release-0.1.0-package-memory.json';
 import smoke from '../../../evaluations/results/production-readiness-20260924/execution/live-smoke-candidate-004-summary.json';
-import perfSummary from '../../../evaluations/results/production-readiness-20260924/execution/hosted-performance-36083318975-summary.json';
+import perfSummary from '../../../evaluations/results/production-readiness-20260924/execution/hosted-performance-36094491463-summary.json';
 import recallLexical from '../../../evaluations/results/release-readiness/dev-recall-lexical-20260924.json';
 import recallTree from '../../../evaluations/results/release-readiness/dev-recall-tree-20260924.json';
 
@@ -12,21 +12,28 @@ const repo = 'https://github.com/Ajitkumar-1001/Chat-context-index';
 const blob = `${repo}/blob/main`;
 const evidencePath = `${blob}/evaluations/results/production-readiness-20260924`;
 const smokeReport = `${evidencePath}/execution/live-smoke-candidate-004-summary.json`;
-const candidateReport = `${evidencePath}/execution/main-candidate-verification-20260925.json`;
+const candidateReport = `${evidencePath}/execution/release-0.1.0-verification.json`;
 const performanceRun = perfSummary.performance_run_url;
-const performanceReport = `${evidencePath}/execution/hosted-performance-36083318975-summary.json`;
+const performanceReport = `${evidencePath}/execution/hosted-performance-36094491463-summary.json`;
+const pypi = verification.publication.pypi;
+const npmRelease = verification.publication.npm;
+const approvedHash = (name: string) => verification.artifacts.find((a) => a.filename === name)?.sha256;
 if (
   packages.ci.GITHUB_SHA !== verification.source_commit ||
   packages.ci.GITHUB_RUN_ID !== verification.ci_run_id ||
   packages.source_report_sha256 !== verification.canonical_package_report_sha256 ||
   JSON.stringify(packages.artifacts) !== JSON.stringify(verification.artifacts) ||
-  smoke.source_sha !== verification.source_commit ||
-  String(smoke.ci_run_id) !== verification.ci_run_id ||
   perfSummary.source_sha !== verification.source_commit ||
   perfSummary.ci_run_id !== verification.ci_run_id ||
   JSON.stringify(perfSummary.artifacts) !== JSON.stringify(verification.artifacts) ||
-  !packages.artifacts.some((artifact) => artifact.filename.endsWith('.whl') && artifact.sha256 === smoke.wheel_sha256)
-) throw new Error('Candidate evidence source, run, or archive mismatch');
+  pypi.files.length !== 2 ||
+  pypi.files.some((file) => approvedHash(file.filename) !== file.sha256)
+) throw new Error('Published evidence source, run, or archive mismatch');
+// The live smoke predates this build; it is shown as earlier-candidate evidence only.
+if (packages.artifacts.some((artifact) => artifact.sha256 === smoke.wheel_sha256)) {
+  throw new Error('Smoke wording assumes it tested an earlier wheel');
+}
+const publishedWheel = pypi.files.find((file) => file.filename.endsWith('.whl'))!;
 const hosted = {
   source_sha: verification.source_commit,
   run_url: verification.ci_run_url,
@@ -59,20 +66,31 @@ const pct = (n: number) => `${Math.round(n * 100)}%`;
 const minor = (v: string) => v.split('.').slice(0, 2).join('.');
 const major = (v: string) => v.replace(/^v/, '').split('.')[0];
 
+const perfPython10k = perfSummary.jobs.find((job) => job.language === 'python' && job.messages === 10000);
+const perfTypescript10k = perfSummary.jobs.find((job) => job.language === 'typescript' && job.messages === 10000);
+const perfPython100k = perfSummary.jobs.find((job) => job.language === 'python' && job.messages === 100000);
+const perfTypescript100k = perfSummary.jobs.find((job) => job.language === 'typescript' && job.messages === 100000);
+if (!perfPython10k || !perfTypescript10k || !perfPython100k || !perfTypescript100k) {
+  throw new Error('Missing performance observation');
+}
+const hostedTargetsPassed = perfSummary.jobs.every((job) => job.status === 'PASS_HOSTED_OBSERVATION');
+const earlierColdSearch = perfSummary.previous_candidate.ten_thousand_filesystem_cold_search_p95_ms;
+
 const gates: { name: string; status: Status; evidence: string; href?: string }[] = [
-  { name: 'Python regression', status: 'pass', evidence: `${hosted.tests.python_passed} tests passed for retained source ${hosted.source_sha.slice(0, 8)}, including Redis, evaluator, performance-gate, and release-control checks.` },
-  { name: 'TypeScript regression', status: 'pass', evidence: `${hosted.tests.node_passed} Node tests passed for the same retained source; TypeScript typecheck and package builds passed.` },
+  { name: 'Python regression', status: 'pass', evidence: `${hosted.tests.python_passed} tests passed for published source ${hosted.source_sha.slice(0, 8)}, including Redis, evaluator, performance-gate, and release-control checks.` },
+  { name: 'TypeScript regression', status: 'pass', evidence: `${hosted.tests.node_passed} Node tests passed for the same source; TypeScript typecheck and package builds passed.` },
   { name: 'Static checks', status: 'pass', evidence: 'Hosted Python lint/typecheck, TypeScript typecheck, and bounded evaluator static checks passed.' },
   { name: 'Cross-language retrieval', status: 'pass', evidence: 'A shared fixture compares ordered search(), retrieve(), and prepared-context output across runtimes, including correction and duplicate cases.' },
   { name: 'Cache failure accounting', status: 'pass', evidence: 'Python stats() reports Redis errors and SQLite fallback lookups and hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend.' },
-  { name: 'Installed packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${evidencePath}/execution/main-candidate-package-memory-20260925.json` },
+  { name: 'Installed packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, all ${packages.migration_checks.length} schema-version-1 migration combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${evidencePath}/execution/release-0.1.0-package-memory.json` },
   { name: 'Hosted package matrix', status: 'pass', evidence: `All ${hosted.matrix_cells} Python 3.11–3.14 × Node 22/24 × Ubuntu x64/macOS arm64 cells passed with matching source and archive hashes.`, href: hosted.run_url },
-  { name: 'CI artifacts and security', status: 'pass', evidence: 'Retained CI passed security scans and candidate inspection. The independent artifact approval remains DRAFT_NOT_APPROVED; no package was published.', href: candidateReport },
-  { name: 'Linux performance', status: 'blocked', evidence: 'The 10k-message hosted run failed the 100 ms filesystem-cold search target: Python 638.076 ms / TypeScript 703.665 ms p95. All four observations completed with zero concurrency errors, but at 100k messages filesystem-cold p95 reached 5.10 / 6.54 seconds and concurrency-16 search p95 reached 11.92 / 9.83 seconds. Fixed 4-CPU/8-GiB reference qualification remains open.', href: performanceReport },
-  { name: 'Candidate live smoke', status: 'pass', evidence: 'Candidate wheel 219fd1e7… passed: eight calls, 1,066 input / 308 output tokens, $0.0010898 estimated cost, and original Oslo evidence recovered after reopening. Unchanged indexing made zero calls.', href: smokeReport },
-  { name: 'Quality, cost, and human review', status: 'open', evidence: 'Three frozen held-out trials, real-provider cache measurements, and answer review remain open; sustained capacity and the next paid allocation are unverified. Two developer-adoption bundles are prepared with blank NOT_RUN records; actual participants are still required.' },
-  { name: 'Website public availability', status: 'blocked', evidence: 'Vercel deployment 6651358929 reported success, but its URL and the repository homepage redirect to Vercel login; public access is unverified.' },
-  { name: 'Registry setup and final approval', status: 'blocked', evidence: 'Release protections and the PyPI pending publisher (release.yml / release) are configured. npm sign-in as ajitkumar1001 was observed, but 2FA is incomplete; package ownership, initial publication/bootstrap, and trusted publishing remain unresolved. Final source/artifact approval is unset.' },
+  { name: 'CI artifacts and security', status: 'pass', evidence: 'CI passed security scans and candidate inspection. The owner approved the exact archive manifest for this source. The release run rebuilt and re-tested the archives on the tag, confirmed they byte-match the approved SHA-256 values, and published them without another rebuild.', href: candidateReport },
+  { name: 'Linux performance (hosted)', status: hostedTargetsPassed ? 'pass' : 'blocked', evidence: `Every 10k-message hosted target passed. Filesystem-cold first search p95 was ${ms(perfPython10k.filesystem_cold_search_p95_ms)} (Python) and ${ms(perfTypescript10k.filesystem_cold_search_p95_ms)} (TypeScript), down from ${ms(earlierColdSearch.python)} and ${ms(earlierColdSearch.typescript)} on the earlier candidate. The 100k observations completed with ${perfSummary.measurement_scope.concurrency_errors_all_jobs} concurrency errors. Fixed 4-CPU/8-GiB reference qualification remains open.`, href: performanceReport },
+  { name: 'Installed-package live smoke', status: 'open', evidence: `Not yet run for the published wheel ${publishedWheel.sha256.slice(0, 8)}…. Earlier candidate wheel ${smoke.wheel_sha256.slice(0, 8)}… passed: eight calls, 1,066 input / 308 output tokens, $0.0010898 estimated cost, and original Oslo evidence recovered after reopening.`, href: smokeReport },
+  { name: 'Quality, cost, and human review', status: 'open', evidence: 'Three frozen held-out trials, real-provider cache measurements, and answer review remain open; sustained capacity and the next paid allocation are unverified. Two developer-adoption bundles were prepared for the earlier candidate e762f7bd and must be rebuilt with the published archives; no participants have run them yet.' },
+  { name: 'Website public availability', status: 'blocked', evidence: 'Vercel production deployments report success, but their URLs and the repository homepage redirect to Vercel login; public access is unverified.' },
+  { name: 'PyPI publication', status: 'pass', evidence: `chat-context-index ${verification.version} was published from tag ${verification.tag} through GitHub trusted publishing, after the protected release environment was approved. Both PyPI files match the approved SHA-256 values.`, href: pypi.url },
+  { name: 'npm publication', status: 'blocked', evidence: 'Not published. The release job stopped with ENEEDAUTH because npm 2FA and a publishing token are not configured. Once a token is configured, re-running that job (with release-environment approval, within GitHub’s re-run window) can publish the same approved archive.', href: npmRelease.job_url },
 ];
 
 const cells = hosted.cells;
@@ -93,13 +111,6 @@ const writers = [...new Set(packages.checks.map((c) => c.writer))];
 const readers = [...new Set(packages.checks.map((c) => c.reader))];
 const checkStatus = (w: string, r: string) => packages.checks.find((c) => c.writer === w && c.reader === r)?.status;
 
-const perfPython10k = perfSummary.jobs.find((job) => job.language === 'python' && job.messages === 10000);
-const perfTypescript10k = perfSummary.jobs.find((job) => job.language === 'typescript' && job.messages === 10000);
-const perfPython100k = perfSummary.jobs.find((job) => job.language === 'python' && job.messages === 100000);
-const perfTypescript100k = perfSummary.jobs.find((job) => job.language === 'typescript' && job.messages === 100000);
-if (!perfPython10k || !perfTypescript10k || !perfPython100k || !perfTypescript100k) {
-  throw new Error('Missing performance observation');
-}
 const perfRows = [
   { label: 'Warm lexical search, top 8', python: perfPython10k.warm_search_p95_ms, typescript: perfTypescript10k.warm_search_p95_ms },
   { label: 'Process-cold first search', python: perfPython10k.process_cold_search_p95_ms, typescript: perfTypescript10k.process_cold_search_p95_ms },
@@ -112,14 +123,12 @@ const scaleRows = [
   { label: 'Search at concurrency 16', python: perfPython100k.concurrency.search_top8_ms['16'].p95, typescript: perfTypescript100k.concurrency.search_top8_ms['16'].p95 },
 ];
 
-const pythonInstall = `git clone ${repo}.git
-cd Chat-context-index
-git checkout ${hosted.source_sha}
-python3 -m venv .venv
-.venv/bin/python -m pip install -e ./packages/python
-.venv/bin/python examples/python/brand_memory.py`;
+const pythonInstall = `python3 -m venv .venv
+.venv/bin/python -m pip install chat-context-index==${verification.version}`;
 
-const typescriptInstall = `cd packages/typescript
+const typescriptInstall = `git clone ${repo}.git
+cd Chat-context-index/packages/typescript
+git checkout ${verification.tag}
 npm ci && npm run build && npm pack
 # then, in your application:
 npm install /path/to/chat-context-index-0.1.0.tgz`;
@@ -180,7 +189,7 @@ try {
     <title>chat-context-index 0.1.0 release status</title>
     <meta
       name="description"
-      content="Release status, evidence, and known limitations for the chat-context-index 0.1.0 candidate (Python and TypeScript)."
+      content="Release status, evidence, and known limitations for chat-context-index 0.1.0: the Python package is on PyPI; the TypeScript package is not yet published."
     />
   </head>
   <body>
@@ -193,18 +202,18 @@ try {
       </p>
       <div class="callout" role="note">
         <p>
-          <span class="pill blocked">Release blocked</span>
-          Measured candidate <code>{hosted.source_sha.slice(0, 8)}</code> passed hosted regression, all
-          {hosted.matrix_cells} package combinations, and an installed Python live-model smoke.
-          Its 10k-message hosted Linux run failed the filesystem-cold search target. The 100k measurements
-          completed, with filesystem-cold search p95 above five seconds in both runtimes.
-          Held-out quality and cost comparisons, reference performance, human review, developer adoption,
-          and registry setup remain open.
+          <span class="pill pass">Python {verification.version} on PyPI</span>
+          <code>pip install chat-context-index=={verification.version}</code> installs the Python package
+          (import name <code>cci</code>). It was published from tag
+          <a href={`${repo}/tree/${verification.tag}`}><code>{verification.tag}</code></a> at source
+          <code>{hosted.source_sha.slice(0, 8)}</code>, which passed hosted regression, all
+          {hosted.matrix_cells} package combinations, and every 10k-message hosted Linux performance target.
+          <a class="more" href={pypi.url}>PyPI</a> · <a href={verification.publication.release_run_url}>Release run</a>
         </p>
         <p>
-          No registry package is published. PyPI pending publishing is configured; npm sign-in was observed,
-          but 2FA, package ownership, and publishing setup remain incomplete. The
-          <a href={`${repo}/releases/tag/pre-release`}>GitHub prerelease</a> has no assets.
+          This is a preview. Held-out quality and cost comparisons, a live-model smoke of the published wheel,
+          reference-hardware performance, human review, and developer adoption remain open. The npm package is
+          not published yet: npm 2FA and a publishing token are still missing.
         </p>
       </div>
     </header>
@@ -243,7 +252,7 @@ try {
       <section data-section="gates">
         <h2>Release gates</h2>
         <p class="muted">
-          Mirrors <a href={`${blob}/docs/release-status.md`}>docs/release-status.md</a>. Retained candidate built from
+          Published build from
           <a href={`${repo}/commit/${hosted.source_sha}`}><code>{hosted.source_sha.slice(0, 7)}</code></a>;
           all {hosted.all_ci_jobs} jobs passed in <a href={hosted.run_url}>its merged-main CI run</a>.
           These results apply to that source and its recorded artifacts; later changes need their own validation.
@@ -280,7 +289,7 @@ try {
         <h3>Hosted package matrix</h3>
         <p class="muted">
           Each cell installs the wheel, sdist, and npm archive and runs {hosted.writer_reader_checks_per_cell}
-          writer/reader checks. <a href={hosted.run_url}>Verified candidate run</a> ·
+          writer/reader checks. <a href={hosted.run_url}>Verified CI run</a> ·
           <a href={candidateReport}>Retained evidence</a>
         </p>
         <div class="table">
@@ -355,14 +364,14 @@ try {
       <section data-section="performance">
         <h2>Performance</h2>
         <p class="muted">
-          Candidate <code>{hosted.source_sha.slice(0, 8)}</code>, installed from its verified wheel and npm archive,
+          Published source <code>{hosted.source_sha.slice(0, 8)}</code>, installed from its verified wheel and npm archive,
           was measured on GitHub-hosted Ubuntu with 10,000 and 100,000 messages. All four observed hosts had
           {perfPython10k.hardware.cpu_count} CPUs and approximately {(perfPython10k.hardware.memory_bytes / 2 ** 30).toFixed(2)} GiB RAM;
           CPU models varied between jobs. The fixed 4-CPU/8-GiB reference gate remains
           <code>{perfSummary.fixed_reference_gate}</code>.
           <a class="more" href={performanceRun}>Measurement run</a> · <a href={performanceReport}>Verified observations</a>
         </p>
-        <h3>10,000 messages: filesystem-cold target failed</h3>
+        <h3>10,000 messages: {hostedTargetsPassed ? 'all hosted targets passed' : 'hosted targets failed'}</h3>
         <div class="table">
           <table>
             <thead>
@@ -387,8 +396,11 @@ try {
         </div>
         <ul class="notes">
           <li>
-            Filesystem-cold first search failed in both runtimes: Python 638.076 ms and TypeScript 703.665 ms p95.
-            Each of the 20 cold trials used <code>sync</code> and <code>drop_caches=3</code> before a fresh process.
+            The earlier candidate <code>{perfSummary.previous_candidate.source_sha.slice(0, 8)}</code> failed filesystem-cold
+            first search at {ms(earlierColdSearch.python)} (Python) and {ms(earlierColdSearch.typescript)} (TypeScript) p95.
+            The compact search index in storage schema version 2 brought it under the 100 ms target.
+            Each of the 20 filesystem-cold trials ran <code>sync</code> and <code>drop_caches=3</code> before a fresh
+            process; the 20 process-cold trials started a fresh process without clearing the page cache.
           </li>
           <li>
             All four jobs recorded {perfSummary.measurement_scope.concurrency_errors_all_jobs} concurrency errors:
@@ -396,15 +408,14 @@ try {
             Zero errors does not imply the latency target passed.
           </li>
           <li>
-            All four measurement reports are complete. There is no full performance pass.
-            Earlier <a href={`${blob}/docs/benchmark-reproduction.md`}>local macOS results</a> remain historical.
+            All four measurement reports are complete. These are GitHub-hosted results, not the fixed
+            reference-hardware gate.
           </li>
         </ul>
         <h3>100,000 messages: completed scale observations</h3>
         <p class="note">
-          These measurements show substantial search latency. Both benchmark CLIs returned exit code 1 because
-          warm search exceeded their 100 ms threshold; the hosted workflow accepts complete 100k observations
-          without treating those latencies as a pass.
+          The 100 ms target applies only at 10,000 messages; these are observations. A first search after a
+          filesystem-cold start still takes several hundred milliseconds at this size.
         </p>
         <div class="table">
           <table>
@@ -422,9 +433,10 @@ try {
 
       <section data-section="quality">
         <h2>Retrieval quality</h2>
-        <h3>Measured candidate's Python live smoke <span class={`pill ${smoke.status === 'PASS' ? 'pass' : 'blocked'}`}>{smoke.status}</span></h3>
+        <h3>Earlier candidate's Python live smoke <span class={`pill ${smoke.status === 'PASS' ? 'pass' : 'blocked'}`}>{smoke.status}</span></h3>
         <p>
-          Candidate wheel <code class="hash">{smoke.wheel_sha256}</code> completed a development-fixture smoke with <code>{smoke.model}</code>,
+          Not yet repeated for the published wheel <code class="hash">{publishedWheel.sha256}</code>.
+          Earlier candidate wheel <code class="hash">{smoke.wheel_sha256}</code> completed a development-fixture smoke with <code>{smoke.model}</code>,
           then retrieved the expected original evidence through tree navigation after reopening SQLite:
           <q>{smoke.checks.evidence[0].excerpt}</q>
           <a class="more" href={smokeReport}>Recorded result</a>
@@ -467,7 +479,7 @@ try {
         </div>
         <p class="note">
           These September 24 development reports record a local Python source import without a frozen
-          commit or archive hash. Their scores are not attributed to candidate <code>{hosted.source_sha.slice(0, 8)}</code>.
+          commit or archive hash. Their scores are not attributed to published source <code>{hosted.source_sha.slice(0, 8)}</code>.
           <a href={`${blob}/evaluations/results/release-readiness/dev-recall-lexical-20260924.json`}>Lexical report</a> ·
           <a href={`${blob}/evaluations/results/release-readiness/dev-recall-tree-20260924.json`}>Tree report</a>.
           Development split only; this is iteration evidence, not release evidence. Tree mode uses a stub navigator
@@ -494,25 +506,29 @@ try {
         </div>
         <p class="note">
           The third trial and answer review stopped after repeated HTTP 429 responses. These results do not support a
-          lower-cost claim and must be rerun against the fixed evidence selection before release.
+          lower-cost claim. They must be rerun against the fixed evidence selection before any quality or cost claim
+          is made for 0.1.0 or a later release.
           <a href={`${blob}/evaluations/held_out/reports/README.md`}>Full report</a>
         </p>
       </section>
 
       <section data-section="install">
-        <h2>Try the measured candidate from source</h2>
-        <p>Registry installs will not work until the release gates close. Build locally instead.</p>
-        <h3>Python</h3>
+        <h2>Try it</h2>
+        <h3>Python, from PyPI</h3>
+        <p>
+          Install <code>chat-context-index</code> and import it as <code>cci</code>. The PyPI project named
+          <code>cci</code> is unrelated; do not install it.
+        </p>
         <Code code={pythonInstall} lang="bash" />
         <Code code={pythonUsage} lang="python" />
-        <h3>TypeScript</h3>
+        <h3>TypeScript, from source</h3>
+        <p>The npm package is not published yet. Build the archive from the <code>{verification.tag}</code> tag.</p>
         <Code code={typescriptInstall} lang="bash" />
         <Code code={typescriptUsage} lang="ts" />
         <p class="muted">
           Without a provider, retrieval uses local keyword search. For tree retrieval, build the index with an
-          explicitly supplied provider. Importing either package makes no model calls. More:
-          <a href={`${blob}/docs/quickstart-no-redis.md`}>local cache</a>,
-          <a href={`${blob}/docs/quickstart-redis.md`}>Redis cache</a>,
+          explicitly supplied provider and pass the same provider when retrieving or preparing context; otherwise
+          <code>auto</code> mode falls back to keyword search. Importing either package makes no model calls. Examples:
           <a href={`${blob}/examples/python/rag_chat.py`}>Python RAG chat</a>,
           <a href={`${blob}/examples/typescript/rag-chat.mjs`}>TypeScript RAG chat</a>.
         </p>
@@ -532,10 +548,11 @@ try {
       </section>
 
       <section data-section="artifacts">
-        <h2>Candidate artifacts</h2>
+        <h2>Release artifacts</h2>
         <p class="muted">
-          SHA-256 of the retained source <code>{hosted.source_sha.slice(0, 8)}</code> archives verified in every
-          hosted cell. These files are not published or approved; the hashes identify that tested build.
+          SHA-256 of the source <code>{hosted.source_sha.slice(0, 8)}</code> archives verified in every hosted cell
+          and approved for release. The wheel and source distribution are the files on
+          <a href={pypi.url}>PyPI</a>; the npm archive is not published.
         </p>
         <div class="table">
           <table>
@@ -697,7 +714,7 @@ try {
   h1 { font-size: clamp(2rem, 6vw, 2.9rem); line-height: 1.1; margin: 8px 0 12px; letter-spacing: -0.02em; }
   .version { color: var(--muted); font-weight: 500; }
   .lede { font-size: 1.15rem; color: var(--muted); max-width: 62ch; margin: 0 0 24px; }
-  .callout { border: 1px solid var(--border); border-left: 4px solid var(--blocked); background: var(--surface); border-radius: 8px; padding: 4px 20px; }
+  .callout { border: 1px solid var(--border); border-left: 4px solid var(--open); background: var(--surface); border-radius: 8px; padding: 4px 20px; }
   .toc { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--border); }
   .toc-list { position: relative; display: flex; gap: 20px; overflow-x: auto; scrollbar-width: none; font-size: 0.95rem; }
   .toc-list::-webkit-scrollbar { display: none; }

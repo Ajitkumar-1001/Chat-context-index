@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "status": "PUBLISHED_PYTHON_ONLY",
+  "verified_at_utc": "2026-09-25T05:33:12.430179+00:00",
+  "package": "chat-context-index",
+  "version": "0.1.0",
+  "tag": "v0.1.0",
+  "source_commit": "46ac4c2fc18df916da3afaf485fa75d4f3d02b51",
+  "ci_run_id": "36094205085",
+  "ci_run_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085",
+  "ci_event": "push",
+  "ci_conclusion": "success",
+  "jobs_passed": 21,
+  "package_matrix_jobs_passed": 16,
+  "writer_reader_checks_passed": 144,
+  "migration_checks_passed": 144,
+  "python_tests_passed": 556,
+  "node_tests_passed": 106,
+  "node_tests_failed": 0,
+  "conformance_job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107942956877",
+  "conformance_log_sha256": "9064e341c1833f05809221a4ec568f1e38aefd9cb583c61df00a6ccaa39cc796",
+  "canonical_package_report_sha256": "75bb3398ad12bf56180234921541a892fd74c2bcef7c3ed7d7bea39a9eef388b",
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "2c13e40073f0cc9bf3290449210a22e6a263d1e395316ba1a02233f00d64526e"
+    },
+    {
+      "filename": "chat_context_index-0.1.0.tar.gz",
+      "sha256": "1d191e282413cd692338db30d407787737950ad2a70a8d5a6a626558f372dc32"
+    },
+    {
+      "filename": "wheel-from-sdist/chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55"
+    }
+  ],
+  "matrix": [
+    {
+      "artifact_name": "packages-macos-15-py3.11-node22",
+      "status": "PASS",
+      "os": "macos-15",
+      "python": "3.11.9",
+      "node": "v22.23.2",
+      "machine": "arm64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284782",
+      "report_sha256": "5cd4b8bf3f8768199dcf28636bdac4fb5d1e12bd30d773d7b69652abbf33db6f",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-macos-15-py3.11-node24",
+      "status": "PASS",
+      "os": "macos-15",
+      "python": "3.11.9",
+      "node": "v24.20.0",
+      "machine": "arm64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284834",
+      "report_sha256": "b0d26410b340a868ff1b6332cf76ee1b57740c62a317d4d408c78fef29bdcad1",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-macos-15-py3.12-node22",
+      "status": "PASS",
+      "os": "macos-15",
+      "python": "3.12.10",
+      "node": "v22.23.2",
+      "machine": "arm64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284792",
+      "report_sha256": "ff1d3fa21c9ec0a47f1c982a3ed1e66ea08431e5d751b02d16dd47609d68d11b",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-macos-15-py3.12-node24",
+      "status": "PASS",
+      "os": "macos-15",
+      "python": "3.12.10",
+      "node": "v24.20.0",
+      "machine": "arm64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284716",
+      "report_sha256": "7dd235156c6dde30db5d39c344bbf490d72f7042d9c2f5bb9ad8b739d1c48eb5",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-macos-15-py3.13-node22",
+      "status": "PASS",
+      "os": "macos-15",
+      "python": "3.13.15",
+      "node": "v22.23.2",
+      "machine": "arm64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284749",
+      "report_sha256": "eceaf600842cdc61a371484fb0e276e422d4693ba34fbeef786472dcaf7f2d33",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-macos-15-py3.13-node24",
+      "status": "PASS",
+      "os": "macos-15",
+      "python": "3.13.15",
+      "node": "v24.20.0",
+      "machine": "arm64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284744",
+      "report_sha256": "157345d4235e9a190874ab5969e8c8231c262118e0fe975888efec20f1439a1e",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-macos-15-py3.14-node22",
+      "status": "PASS",
+      "os": "macos-15",
+      "python": "3.14.7",
+      "node": "v22.23.2",
+      "machine": "arm64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284906",
+      "report_sha256": "82f6c70ca91d4d2c3e2366545b34dbfdd5404c564076b96654c55b8431c2962f",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-macos-15-py3.14-node24",
+      "status": "PASS",
+      "os": "macos-15",
+      "python": "3.14.7",
+      "node": "v24.20.0",
+      "machine": "arm64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284856",
+      "report_sha256": "c7ca40b5050009a9cbd995fb242d62e09bf9d3c4bca4081c4dee2aa0792972fb",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-ubuntu-24.04-py3.11-node22",
+      "status": "PASS",
+      "os": "ubuntu-24.04",
+      "python": "3.11.16",
+      "node": "v22.23.2",
+      "machine": "x86_64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284715",
+      "report_sha256": "7a0f32fd382bc9272f6aeb572d2c230adec4d236bcd0ae69f2b1a76dc94b9d64",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-ubuntu-24.04-py3.11-node24",
+      "status": "PASS",
+      "os": "ubuntu-24.04",
+      "python": "3.11.16",
+      "node": "v24.21.0",
+      "machine": "x86_64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284789",
+      "report_sha256": "2db720484d4ce0c2fd9e9c40148f33fedba7c2b32e99adfd57c84aa59ea7fac1",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-ubuntu-24.04-py3.12-node22",
+      "status": "PASS",
+      "os": "ubuntu-24.04",
+      "python": "3.12.14",
+      "node": "v22.23.2",
+      "machine": "x86_64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284785",
+      "report_sha256": "75bb3398ad12bf56180234921541a892fd74c2bcef7c3ed7d7bea39a9eef388b",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-ubuntu-24.04-py3.12-node24",
+      "status": "PASS",
+      "os": "ubuntu-24.04",
+      "python": "3.12.14",
+      "node": "v24.21.0",
+      "machine": "x86_64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284740",
+      "report_sha256": "8db48b9935c4ee07daddfb3dbe782bd8fb23e343363ad05afa34bf08e38a4d40",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-ubuntu-24.04-py3.13-node22",
+      "status": "PASS",
+      "os": "ubuntu-24.04",
+      "python": "3.13.15",
+      "node": "v22.23.2",
+      "machine": "x86_64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284760",
+      "report_sha256": "c9bb15f67f91307177492d002d256f9bb77732ae2aaca3bc9ccafb3971b5a655",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-ubuntu-24.04-py3.13-node24",
+      "status": "PASS",
+      "os": "ubuntu-24.04",
+      "python": "3.13.15",
+      "node": "v24.21.0",
+      "machine": "x86_64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284731",
+      "report_sha256": "a87b3ef6e6e8f88ef153b8a8a1c5c12d963edc47ae8abe75f267ef5964bcac98",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-ubuntu-24.04-py3.14-node22",
+      "status": "PASS",
+      "os": "ubuntu-24.04",
+      "python": "3.14.7",
+      "node": "v22.23.2",
+      "machine": "x86_64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284746",
+      "report_sha256": "1d9f8538b7e1ead82cccccfe0e9511b3718b00d70a6d4597f132e815513b7475",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    },
+    {
+      "artifact_name": "packages-ubuntu-24.04-py3.14-node24",
+      "status": "PASS",
+      "os": "ubuntu-24.04",
+      "python": "3.14.7",
+      "node": "v24.21.0",
+      "machine": "x86_64",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085/job/107943284724",
+      "report_sha256": "efbc1578d96328d1240449dd5afe7c050cb1b5d22585236b0fecced9a5efb7dd",
+      "writer_reader_checks_passed": 9,
+      "migration_checks_passed": 9
+    }
+  ],
+  "release_approval": {
+    "status": "GRANTED",
+    "approved_source_sha": "46ac4c2fc18df916da3afaf485fa75d4f3d02b51",
+    "approval_manifest_sha256": "cd83c75be08d885b7ba3a18e6785b542d21716cba4b32d04fd770d0bc3218b5b",
+    "environment_reviewer_approval": "required and given before publication"
+  },
+  "publication": {
+    "release_run_id": "36097901586",
+    "release_run_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36097901586",
+    "pypi": {
+      "status": "PUBLISHED",
+      "url": "https://pypi.org/project/chat-context-index/0.1.0/",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36097901586/job/107954710631",
+      "files": [
+        {
+          "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+          "sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55",
+          "uploaded_at_utc": "2026-09-25T05:21:02.018255Z"
+        },
+        {
+          "filename": "chat_context_index-0.1.0.tar.gz",
+          "sha256": "1d191e282413cd692338db30d407787737950ad2a70a8d5a6a626558f372dc32",
+          "uploaded_at_utc": "2026-09-25T05:21:03.260789Z"
+        }
+      ],
+      "matches_approved_archives": true,
+      "publisher": "GitHub trusted publishing from release.yml, environment release"
+    },
+    "npm": {
+      "status": "NOT_PUBLISHED",
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36097901586/job/107954710526",
+      "reason": "Release job failed with ENEEDAUTH: npm 2FA and a publishing token are not configured. Nothing was published to npm."
+    }
+  },
+  "clean_install_from_pypi": {
+    "status": "PASS",
+    "platform": "macOS arm64, Python 3.12, new virtual environment outside the checkout",
+    "installed_wheel_sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55",
+    "checks": "tests/packaging/memory_consumer.py phases default, seed, and read in separate processes; deterministic provider, no model calls"
+  },
+  "live_smoke": {
+    "status": "NOT_RUN_FOR_THIS_BUILD",
+    "note": "The earlier installed-package live smoke applies only to candidate wheel 219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79."
+  },
+  "scope": "Hosted CI tests, exact archive hashes, installed-package memory and migration interoperability, registry publication identity, and a clean PyPI install. Not measured: live-model quality, token or cost savings, fixed reference-hardware performance, or independent developer adoption."
+}
