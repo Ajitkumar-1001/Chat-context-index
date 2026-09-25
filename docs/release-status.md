@@ -1,34 +1,37 @@
-# Release status — September 24, 2026 UTC
+# Release status — September 25, 2026 UTC
 
-Release is **blocked**. The updated release controls, security workflow, regression suite,
-and all 16 hosted package combinations passed on main commit
-`b3bb918be1edb21bddb735ad92b5a52d59deafb7`. The exact retained CI archives also passed the
-publication guard locally, without publishing. Reference performance, live quality/cost
-evidence, human review, developer adoption, and registry setup remain open. PyPI and npm returned 404 for
-version 0.1.0 at this check. A GitHub [prerelease](https://github.com/Ajitkumar-1001/Chat-context-index/releases/tag/pre-release)
-exists without assets; it did not run the tag-triggered registry release workflow.
+Release is **blocked**. The latest retained successful CI candidate is pull-request merge source
+`6dd96d7d2c712d152779733a2087a166f50b231e`, tested in
+[run 36064740436](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36064740436).
+It passed 430 Python tests, 88 Node tests, and all 16 package combinations. Its Python wheel is
+`219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79`.
+These retained results do not establish that newer main or preparation-branch changes have passed CI.
+The newer main run failed a checksum-only secret-scanner false positive; a targeted suppression
+is prepared and fresh validation remains pending.
 
-The [production-readiness execution record](../evaluations/results/production-readiness-20260924/README.md)
-tracks the current work, including protected releases, exact-artifact publication checks,
-security scanning, prepared reference/human validation, and a successful installed-package live
-smoke after two earlier incomplete attempts.
+The [candidate verification](../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-verification.json)
+binds those results to its source and archive hashes. The successful earlier live smoke applies
+only to wheel `a3286616…`; no live smoke is recorded for wheel `219fd1e7…`.
+No registry package has been published. The GitHub
+[prerelease](https://github.com/Ajitkumar-1001/Chat-context-index/releases/tag/pre-release) has no assets.
 
-| Gate | Current evidence |
+| Gate | Evidence and remaining work |
 | --- | --- |
-| Python regression | **266 passed** in the current hosted conformance job, including Redis, evaluator, performance-gate, and release-control checks |
-| TypeScript regression | **21 passed** in the current hosted native memory suite; TypeScript typecheck and package builds passed |
-| Static checks | Hosted Python lint/typecheck, TypeScript typecheck, and bounded evaluator static checks passed |
+| Python regression | **430 passed** for retained source `6dd96d7d`, including Redis, evaluator and release-control checks |
+| TypeScript regression | **88 passed** for the same retained source; TypeScript typecheck and package builds passed |
+| Static checks | Passed in retained run 36064740436; newer preparation changes require fresh hosted validation |
 | Cross-language retrieval | Shared fixture compares ordered `search()`, `retrieve()`, and prepared context output, including correction and duplicate cases |
 | Cache failure accounting | Python `stats()` reports Redis errors and SQLite fallback lookups/hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend |
-| Fresh local packages | Wheel, source distribution, and npm tarball rebuilt and installed outside the checkout after npm repository metadata changed; all nine writer/reader combinations, TypeScript consumer typecheck, package documentation, and default operation passed. [Current report](../evaluations/results/production-readiness-20260924/release-controls/package-memory.json) |
-| Hosted matrix | **Passed:** all 16 Python 3.11–3.14 / Node 22 and 24 / Ubuntu x64 and macOS arm64 package combinations passed with nine writer/reader checks each. [Current verification](../evaluations/results/production-readiness-20260924/hosted-verification.json), [merged-main run](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36043232899) |
-| CI artifacts and security | The retained wheel, sdist, npm tarball, and rebuilt wheel passed the source/run/version/checksum guard; publication archives were copied without rebuilding. Hosted secret and dependency scans passed. [Archive manifest](../evaluations/results/production-readiness-20260924/hosted-artifact-manifest.json), [scan evidence](../evaluations/results/production-readiness-20260924/hosted-verification.json) |
-| Reference performance | **Not run.** Updated installed packages meet the three warm single-request thresholds in [local macOS runs](benchmark-reproduction.md), but Python's process-cold first-search p95 was 112.6 ms and search latency grows at higher concurrency. The dedicated Linux x64 runner, filesystem-cold pass, and scale point remain outstanding |
-| Installed-package live smoke | **PASS:** the CI-verified Python wheel indexed the development fixture, preserved original records after reopen, and used tree navigation to retrieve the exact expected evidence. Eight calls reported **1,058 input / 301 output tokens**, with no errors or unknown usage; estimated cost **$0.0010699**, within the $0.04 cap. Earlier failed-call reservations remain intact. [Verified run](../evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json) |
-| Quality, cost, human review | **Not run for these artifacts.** Three frozen trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open |
-| Release protection | GitHub owner approval and tag-only deployment policy configured on `release`; active ruleset protects `v*` tags. Exact-archive workflow and final source-approval gate implemented; registry ownership/trusted publisher setup and final approval remain open |
+| Installed packages | The retained wheel, source distribution and npm archive passed nine writer/reader combinations, consumer typechecking and package checks. [Report](../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-evidence/package-memory.json) |
+| Hosted matrix | **16 cells / 144 writer-reader checks passed** for source `6dd96d7d`: Python 3.11–3.14, Node 22/24, Ubuntu x64 and macOS arm64. [Verification](../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-verification.json) |
+| CI artifacts and security | Retained run passed security scans and candidate inspection. Its artifact approval manifest remains **DRAFT_NOT_APPROVED**; publication requires independent approval of exact hashes |
+| Linux performance | **Not run for the newer candidate.** Hosted Linux benchmark preparation preserves warm/process-cold/filesystem-cold targets and full scale/concurrency trials. The original fixed 4-CPU/8-GiB reference gate has not been closed. Earlier [macOS measurements](benchmark-reproduction.md) are historical |
+| Installed-package live smoke | **Not run for wheel `219fd1e7…`.** Historical wheel `a3286616…` passed: eight calls, 1,058 input / 301 output tokens and $0.0010699 estimated cost. [Historical run](../evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json) |
+| Quality, cost, human review | Three frozen real-model trials, real-provider cache measurements, independent answer review, and two unfamiliar-developer integration trials remain open |
+| Registry setup and final approval | GitHub release protections configured. PyPI pending publisher configured for `Ajitkumar-1001/Chat-context-index`, `release.yml`, environment `release`; first OIDC publication remains untested. npm package lookup returns 404 and ownership/publisher identity remains unverified. Final source/artifact approval is unset |
+| Website availability | Vercel production deployment `6651358929` reported success, but its generated URL and the repository homepage redirect to Vercel login. Public availability remains unverified |
 
-The package report records fresh source and archive SHA-256 values. It tests deterministic
+The retained package report records its exact source and archive SHA-256 values. It tests deterministic
 memory behavior with no model calls, so it establishes installation and cross-runtime
 compatibility, not answer quality or token savings. The earlier
 [evidence-selection record](../evaluations/evidence-selection/README.md) and
@@ -55,6 +58,6 @@ python tests/packaging/verify_packages.py --report evaluations/results/package-m
 
 The CI matrix uses GitHub's published [`macos-15` arm64 and `ubuntu-24.04` x64 runner
 labels](https://github.com/actions/runner-images#available-images). Each job verifies its
-architecture. The current post-merge main run includes the release-hardening changes and
-passed all 21 jobs. Hosted package compatibility does not substitute for the dedicated
-reference Linux performance run.
+architecture. The retained pull-request merge run passed all 21 jobs. It is evidence for source
+`6dd96d7d`, not a claim that newer main changes are green. Hosted package compatibility
+does not establish the separate Linux performance gate.

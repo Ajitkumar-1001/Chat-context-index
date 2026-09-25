@@ -192,3 +192,141 @@ def test_client_cleanup_failure_cannot_publish_complete_accounting(release_files
     assert accounting["status"] == "INCOMPLETE"
     assert accounting["error_type"] == "RuntimeError"
     assert "PRIVATE" not in (f.out / "allocation-accounting.json").read_text()
+
+
+def block_capacity(f):
+    readiness = f.book.with_name("provider-readiness.json")
+    value = json.loads(readiness.read_text())
+    value["status"] = "BLOCKED"
+    readiness.write_text(json.dumps(value))
+    book = json.loads(f.book.read_text())
+    book["provider_readiness_sha256"] = GUARDS.digest(readiness)
+    f.book.write_text(json.dumps(book))
+    f.release["allocation_book_sha256"] = GUARDS.digest(f.book)
+    resave(f)
+
+
+@pytest.fixture
+def smoke_files(release_files):
+    f = release_files
+    fixture_path = f.root / "evaluations/fixtures/live-smoke.json"
+    fixture_path.parent.mkdir(parents=True)
+    # Visible development data only; never copy the held-out fixture.
+    shutil.copyfile(ROOT / "evaluations/fixtures/live-smoke.json", fixture_path)
+    f.release.update(kind="smoke", fixture="evaluations/fixtures/live-smoke.json",
+                     fixture_sha256=GUARDS.digest(fixture_path), limits={
+                         "max_calls": 10, "max_reserved_tokens": 100_000, "max_estimated_usd": 0.04,
+                         "max_output_tokens_per_call": 256, "max_input_bytes_per_call": 8000,
+                         "call_timeout_s": 1.0, "run_timeout_s": 240.0,
+                         "concurrency": 1, "minimum_request_interval_s": 5.0,
+                     })
+    f.outer["capacity_probe"] = True
+    block_capacity(f)
+    return f
+
+
+def test_bounded_smoke_preflight_does_not_assert_capacity_or_consume_claim(smoke_files):
+    f = smoke_files
+    prepared = prepare(f)
+    assert prepared.outer.capacity_probe and not prepared.ready
+    assert not prepared.claim.exists() and not f.out.exists()
+
+
+@pytest.mark.parametrize("kind", ["native", "cache"])
+def test_capacity_probe_cannot_bypass_readiness_for_other_kinds(release_files, kind):
+    f = release_files
+    f.release["kind"] = kind
+    f.outer["capacity_probe"] = True
+    block_capacity(f)
+    with pytest.raises(ValueError, match="capacity_probe_requires_development_smoke"):
+        prepare(f)
+    assert not f.out.exists()
+
+
+@pytest.mark.parametrize("kind", ["native", "cache"])
+def test_existing_native_cache_plans_still_require_capacity(release_files, kind):
+    f = release_files
+    f.release["kind"] = kind
+    block_capacity(f)
+    prepared = prepare(f)
+    assert not prepared.outer.capacity_probe
+    with pytest.raises(ValueError, match="capacity_not_verified"):
+        asyncio.run(MODULE.execute(prepared))
+    assert not prepared.claim.exists() and not f.out.exists()
+
+
+@pytest.mark.parametrize("field,value", [("split", "held_out"), ("trials", 3)])
+def test_smoke_probe_rejects_non_development_protocol(smoke_files, field, value):
+    f = smoke_files
+    f.release[field] = value
+    resave(f)
+    with pytest.raises(ValueError, match="one development trial"):
+        prepare(f)
+    assert not f.out.exists()
+
+
+@pytest.mark.parametrize("field,value", [
+    ("max_calls", 11), ("max_reserved_tokens", 100_001), ("max_estimated_usd", 0.041),
+    ("max_output_tokens_per_call", 257), ("max_input_bytes_per_call", 8001),
+    ("call_timeout_s", 61.0), ("run_timeout_s", 241.0),
+    ("concurrency", 2), ("minimum_request_interval_s", 4.9),
+])
+def test_smoke_probe_cannot_expand_its_envelope(smoke_files, field, value):
+    f = smoke_files
+    f.release["limits"][field] = value
+    resave(f)
+    with pytest.raises(ValueError, match="smoke_envelope"):
+        prepare(f)
+    assert not f.out.exists()
+
+
+def test_smoke_probe_requires_original_development_fixture(smoke_files):
+    f = smoke_files
+    alias = f.root / "other-fixture.json"
+    shutil.copyfile(f.root / f.release["fixture"], alias)
+    f.release["fixture"] = str(alias)
+    resave(f)
+    with pytest.raises(ValueError, match="original_development_fixture"):
+        prepare(f)
+
+
+def test_smoke_without_explicit_probe_still_requires_capacity(smoke_files):
+    f = smoke_files
+    f.outer["capacity_probe"] = False
+    resave(f)
+    prepared = prepare(f)
+    with pytest.raises(ValueError, match="capacity_not_verified"):
+        asyncio.run(MODULE.execute(prepared))
+    assert not prepared.claim.exists() and not f.out.exists()
+
+
+@pytest.mark.parametrize("failure", [None, "timeout", "model"])
+def test_smoke_uses_hardened_dispatch_and_preserves_blocked_capacity(smoke_files, monkeypatch, failure):
+    f = smoke_files
+    install_mock(monkeypatch, failure)
+    # Pacing is covered by the shared ledger tests; keep this integration offline and fast.
+    async def no_pacing(*args):
+        return None
+    monkeypatch.setattr(GUARDS.runner.comparison.asyncio, "sleep", no_pacing)
+    prepared = prepare(f)
+    result = asyncio.run(MODULE.execute(prepared))
+    accounting = json.loads((f.out / "allocation-accounting.json").read_text())
+    report = json.loads((f.out / "report.json").read_text())
+    assert prepared.claim.is_dir() and not accounting["allocation_reusable"]
+    assert not accounting["provider_capacity_verified_before_run"]
+    assert accounting["capacity_probe"]
+    assert json.loads(f.book.with_name("provider-readiness.json").read_text())["status"] == "BLOCKED"
+    assert not report["quality_pass"] and not report["lower_cost_claim"]
+    if failure:
+        assert result == 1 and accounting["status"] == "INCOMPLETE"
+        assert accounting["calls"] == 1 and accounting["reserved_tokens"] > 0
+        assert accounting["calls_with_unknown_usage"] == (1 if failure == "timeout" else 0)
+    else:
+        assert result == 0 and accounting["status"] == "COMPLETE"
+        assert report["checks"]["expected_original_evidence_retrieved"]
+        assert report["checks"]["reopen_preserved_originals"]
+        assert report["checks"]["lexical_evidence_count"] == 0
+        assert report["checks"]["unchanged_index_calls"] == 0
+        assert accounting["calls_with_unknown_usage"] == 0
+    with pytest.raises(FileExistsError):
+        MODULE.prepare(f.plan_path, f.wheel, f.book, f.root / "retry", f.settings)

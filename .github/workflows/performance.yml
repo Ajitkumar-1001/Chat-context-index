@@ -1,0 +1,85 @@
+name: Hosted Linux performance
+
+# This measures the actual hosted VM. It does not replace the unchanged 4-CPU/8-GiB
+# reference gate or authorize publication. No credentials for model providers are used.
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Full source SHA of a successful main push CI run (not a pull-request run)
+        required: true
+        type: string
+      candidate_run_id:
+        description: Successful main push CI run that retained release-candidate-SHA
+        required: true
+        type: string
+      allow_page_cache_drop:
+        description: Permit page-cache eviction inside each fresh benchmark VM
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  benchmark:
+    name: ${{ matrix.language }} / ${{ matrix.messages }} messages
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, typescript]
+        messages: [10000, 100000]
+    env:
+      CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+      ALLOW_PAGE_CACHE_DROP: ${{ inputs.allow_page_cache_drop }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: tooling
+          persist-credentials: false
+      - name: Validate candidate identifiers and cache-eviction request
+        run: |
+          [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$CANDIDATE_RUN_ID" =~ ^[0-9]+$ ]]
+          test "$ALLOW_PAGE_CACHE_DROP" = true
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Retain candidate CI run identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p evidence
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CANDIDATE_RUN_ID" --jq '{id,head_sha,status,conclusion,path,repository:{full_name:.repository.full_name}}' > evidence/candidate-run.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-candidate-${{ inputs.candidate_sha }}
+          run-id: ${{ inputs.candidate_run_id }}
+          github-token: ${{ github.token }}
+          path: candidate
+      - name: Measure exact installed archives on this VM
+        run: |
+          python tooling/benchmarks/run_hosted_benchmark.py \
+            --candidate candidate --source source --ci-run evidence/candidate-run.json \
+            --sha "$CANDIDATE_SHA" --run-id "$CANDIDATE_RUN_ID" --repository "$GITHUB_REPOSITORY" \
+            --language '${{ matrix.language }}' --messages '${{ matrix.messages }}' \
+            --work-dir "$RUNNER_TEMP" --out-dir evidence/measurements --allow-drop-page-cache
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hosted-performance-${{ matrix.language }}-${{ matrix.messages }}-${{ github.run_id }}
+          path: evidence/
+          if-no-files-found: error

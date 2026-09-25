@@ -1,0 +1,4 @@
+# Confirmed false positive: this historical value is the SHA-256 of the empty
+# artifact-secrets.json findings report, not a credential. Keep full-history and
+# default-rule scanning enabled; exclude only this commit/path/rule/line finding.
+0bf5ac1e6ea8339e3dfb8d7c71fc3a301b709d03:evaluations/results/production-readiness-20260924/execution/follow-up-hosted-verification.json:generic-api-key:24

@@ -1,7 +1,9 @@
-"""Guard the unchanged native/cache release evaluator with exclusive allocation checks.
+"""Guard the unchanged release evaluator with exclusive allocation checks.
 
 The outer plan pins the original release plan plus both guard sources. Default
 preflight makes no requests or writes; --execute consumes its canonical claim once.
+An explicit capacity_probe permits only a bounded development smoke while provider
+readiness is blocked. It cannot establish sustained capacity or release quality.
 """
 
 from __future__ import annotations
@@ -35,6 +37,7 @@ class Plan(shared.runner.StrictModel):
     release_plan: str
     release_plan_sha256: str
     guard_source_hashes: dict[str, str]
+    capacity_probe: bool = False
 
 
 @dataclass(frozen=True)
@@ -64,8 +67,21 @@ def prepare(plan_path: Path, wheel: Path, book: Path, output: Path, settings: ob
     if hashlib.sha256(release_raw).hexdigest() != outer.release_plan_sha256:
         raise ValueError("frozen_release_plan_changed")
     plan = shared.runner.Plan.model_validate_json(release_raw)
-    if plan.kind not in ("native", "cache"):
-        raise ValueError("guard_requires_native_or_cache_plan")
+    if outer.capacity_probe and plan.kind != "smoke":
+        raise ValueError("capacity_probe_requires_development_smoke")
+    if plan.kind == "smoke":
+        limits = plan.limits
+        if (
+            limits.max_calls > 10 or limits.max_reserved_tokens > 100_000
+            or limits.max_estimated_usd > 0.04 or limits.max_output_tokens_per_call > 256
+            or limits.max_input_bytes_per_call > 8000 or limits.call_timeout_s > 60
+            or limits.run_timeout_s > 240 or limits.concurrency != 1
+            or limits.minimum_request_interval_s < 5
+        ):
+            raise ValueError("capacity_check_exceeds_smoke_envelope")
+        if (ROOT / plan.fixture).resolve() != (ROOT / "evaluations/fixtures/live-smoke.json").resolve():
+            raise ValueError("smoke_requires_original_development_fixture")
+        shared.runner.smoke.read_fixture(ROOT / plan.fixture)
     if plan.limits.concurrency != 1:
         raise ValueError("guard_requires_serial_dispatch")
     minimum = (plan.limits.max_calls - 1) * plan.limits.minimum_request_interval_s
@@ -92,13 +108,14 @@ async def execute(prepared: Prepared) -> int:
     current = prepare(prepared.plan_path, prepared.wheel, prepared.book, prepared.output, prepared.settings)
     if current.plan_sha256 != prepared.plan_sha256:
         raise ValueError("outer_plan_changed_after_preflight")
-    if not current.ready:
+    if not current.ready and not current.outer.capacity_probe:
         raise ValueError("provider_capacity_not_verified")
     plan, output = current.plan, current.output
     shared.runner.claim_run(output, current.claim, plan)
     shared.runner.comparison.write_report(output / "allocation-binding.json", {
         "schema_version": 1, "allocation_id": plan.allocation_id,
         "outer_plan": current.outer.model_dump(), "outer_plan_sha256": current.plan_sha256,
+        "provider_capacity_verified_before_run": current.ready,
         "package": current.provenance,
     })
     ledgers = []
@@ -146,6 +163,8 @@ async def execute(prepared: Prepared) -> int:
         )
         accounting = {
             "schema_version": 1, "status": "COMPLETE" if complete else "INCOMPLETE",
+            "capacity_probe": current.outer.capacity_probe,
+            "provider_capacity_verified_before_run": current.ready,
             "allocation_id": plan.allocation_id, "allocation_reusable": False,
             "outer_plan_sha256": current.plan_sha256,
             "release_plan_sha256": current.outer.release_plan_sha256,
@@ -183,7 +202,10 @@ def main() -> int:
         prepared = prepare(args.plan, args.wheel, args.allocation_book, args.out, settings)
         if not args.execute:
             print(json.dumps({"status": "PREFLIGHT_PASS", "provider_calls": 0,
-                              "execution_ready": prepared.ready, "package": prepared.provenance}))
+                              "execution_ready": prepared.ready or prepared.outer.capacity_probe,
+                              "capacity_probe": prepared.outer.capacity_probe,
+                              "provider_capacity_verified": prepared.ready,
+                              "package": prepared.provenance}))
             return 0
         return asyncio.run(execute(prepared))
     except (Exception, KeyboardInterrupt) as exc:  # noqa: BLE001 - Sanitize CLI/provider failures.
