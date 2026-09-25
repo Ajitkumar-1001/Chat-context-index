@@ -1,0 +1,1731 @@
+{
+  "schema_version": 1,
+  "status": "COMPLETE_HOSTED_TARGETS_PASSED",
+  "claim_scope": "observed GitHub-hosted hardware only",
+  "fixed_reference_gate": "NOT_QUALIFIED",
+  "fixed_reference_hardware_criteria_changed": false,
+  "source_sha": "46ac4c2fc18df916da3afaf485fa75d4f3d02b51",
+  "tooling_commit": "46ac4c2fc18df916da3afaf485fa75d4f3d02b51",
+  "ci_run_id": "36094205085",
+  "ci_run_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085",
+  "performance_run_id": "36094491463",
+  "performance_run_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094491463",
+  "performance_run_conclusion": "success",
+  "performance_run_finished_at": "2026-09-25T04:32:39Z",
+  "canonical_package_report_sha256": "75bb3398ad12bf56180234921541a892fd74c2bcef7c3ed7d7bea39a9eef388b",
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "2c13e40073f0cc9bf3290449210a22e6a263d1e395316ba1a02233f00d64526e"
+    },
+    {
+      "filename": "chat_context_index-0.1.0.tar.gz",
+      "sha256": "1d191e282413cd692338db30d407787737950ad2a70a8d5a6a626558f372dc32"
+    },
+    {
+      "filename": "wheel-from-sdist/chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55"
+    }
+  ],
+  "measurement_scope": {
+    "cold_trials_per_mode_per_job": 20,
+    "filesystem_cold_method": "sync and drop_caches=3 before each isolated child on its fresh hosted VM",
+    "concurrency_errors_all_jobs": 0,
+    "ten_thousand_targets": "p95 <= 100 ms search (warm, process-cold, filesystem-cold), <= 500 ms batch ingest, <= 2000 ms open",
+    "hundred_thousand": "observation only; no latency threshold applied"
+  },
+  "previous_candidate": {
+    "source_sha": "e762f7bd0033e3ae8326f647f14c901438c74220",
+    "performance_run_id": "36083318975",
+    "ten_thousand_filesystem_cold_search_p95_ms": {
+      "python": 638.0763419999766,
+      "typescript": 703.664987
+    }
+  },
+  "jobs": [
+    {
+      "language": "python",
+      "messages": 10000,
+      "status": "PASS_HOSTED_OBSERVATION",
+      "failures": [],
+      "job_id": 107943748456,
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094491463/job/107943748456",
+      "job_conclusion": "success",
+      "artifact_name": "hosted-performance-python-10000-36094491463",
+      "installed_archive": "chat_context_index-0.1.0-py3-none-any.whl",
+      "installed_archive_sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55",
+      "installed_archive_contents_verified": true,
+      "fixture_sha256": "8a88a11bce715e54fbf78333089ffb7889e84adad7d213040782a79576c65f61",
+      "hardware": {
+        "runner_environment": "github-hosted",
+        "runner_image_version": "20260920.314.1",
+        "cpu_count": 4,
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "memory_bytes": 16766414848
+      },
+      "warm": {
+        "lexical_search_top8_ms": {
+          "p50": 13.1552329999991,
+          "p95": 13.939441000005104,
+          "pass": true,
+          "threshold_p95_ms": 100,
+          "trials": 1000
+        },
+        "batch_ingest_100_ms": {
+          "p50": 38.60683199999926,
+          "p95": 49.678464000002975,
+          "pass": true,
+          "threshold_p95_ms": 500,
+          "trials": 100
+        },
+        "store_open_ms": {
+          "p50": 1.4030239999982541,
+          "p95": 1.619468000001234,
+          "pass": true,
+          "threshold_p95_ms": 2000,
+          "trials": 20
+        }
+      },
+      "cold": {
+        "process_cold": {
+          "first_search_top8_ms": {
+            "p50": 15.823300999997514,
+            "p95": 16.36947299999747,
+            "trials": 20
+          },
+          "import_ms": {
+            "p50": 34.03004100000828,
+            "p95": 34.433934999995586,
+            "trials": 20
+          },
+          "peak_rss_bytes_max": 40005632,
+          "raw_trials": [
+            {
+              "first_search_ms": 15.743082000000186,
+              "import_ms": 34.2194950000021,
+              "observed_messages": 10000,
+              "open_ms": 1.9920849999977008,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.94847500000185,
+              "import_ms": 34.36673000000212,
+              "observed_messages": 10000,
+              "open_ms": 2.004388999992557,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.538238999994292,
+              "import_ms": 33.9290019999936,
+              "observed_messages": 10000,
+              "open_ms": 2.036498000009601,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.941842999993128,
+              "import_ms": 33.88340600000106,
+              "observed_messages": 10000,
+              "open_ms": 1.9728800000109459,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.823300999997514,
+              "import_ms": 34.06146899999385,
+              "observed_messages": 10000,
+              "open_ms": 2.088795999995341,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.939308000000096,
+              "import_ms": 34.54946099999745,
+              "observed_messages": 10000,
+              "open_ms": 1.9018170000038026,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.406762999987222,
+              "import_ms": 33.865442999996276,
+              "observed_messages": 10000,
+              "open_ms": 2.1376270000104114,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.668271999999206,
+              "import_ms": 34.433934999995586,
+              "observed_messages": 10000,
+              "open_ms": 2.001263000011022,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 16.36947299999747,
+              "import_ms": 34.03360700001201,
+              "observed_messages": 10000,
+              "open_ms": 2.1784340000010616,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.886017999989122,
+              "import_ms": 33.93737700000088,
+              "observed_messages": 10000,
+              "open_ms": 2.09686200000192,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.553676999999766,
+              "import_ms": 34.21258100000557,
+              "observed_messages": 10000,
+              "open_ms": 1.8167969999893785,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 16.33357500000443,
+              "import_ms": 34.03004100000828,
+              "observed_messages": 10000,
+              "open_ms": 2.0234039999991182,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.694600999992758,
+              "import_ms": 33.665628000008496,
+              "observed_messages": 10000,
+              "open_ms": 1.8633349999959137,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.80080899999814,
+              "import_ms": 33.918071000002215,
+              "observed_messages": 10000,
+              "open_ms": 1.9012360000090212,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.858647999991149,
+              "import_ms": 34.03981799999656,
+              "observed_messages": 10000,
+              "open_ms": 2.037310000005732,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.805478000004314,
+              "import_ms": 33.41608199998802,
+              "observed_messages": 10000,
+              "open_ms": 1.8936609999968823,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.5270569999999,
+              "import_ms": 33.9020410000046,
+              "observed_messages": 10000,
+              "open_ms": 1.8626039999958266,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.984142999997175,
+              "import_ms": 34.1212799999937,
+              "observed_messages": 10000,
+              "open_ms": 1.8854059999995343,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 15.683279000000994,
+              "import_ms": 33.63009199999567,
+              "observed_messages": 10000,
+              "open_ms": 1.9018469999991794,
+              "ru_maxrss": 38940
+            },
+            {
+              "first_search_ms": 16.804926999995473,
+              "import_ms": 33.655029000001946,
+              "observed_messages": 10000,
+              "open_ms": 2.0454349999994292,
+              "ru_maxrss": 39068
+            }
+          ],
+          "store_open_ms": {
+            "p50": 2.001263000011022,
+            "p95": 2.1376270000104114,
+            "trials": 20
+          },
+          "total_messages": 10000
+        },
+        "filesystem_cold": {
+          "first_search_top8_ms": {
+            "p50": 47.765827999995736,
+            "p95": 52.22931500000527,
+            "trials": 20
+          },
+          "import_ms": {
+            "p50": 49.9518759999944,
+            "p95": 52.93334200000288,
+            "trials": 20
+          },
+          "raw_trials": [
+            {
+              "first_search_ms": 49.63854100000731,
+              "import_ms": 50.41449099999795,
+              "observed_messages": 10000,
+              "open_ms": 2.4964280000006056,
+              "ru_maxrss": 39068
+            },
+            {
+              "first_search_ms": 47.40040200000806,
+              "import_ms": 51.33205699999621,
+              "observed_messages": 10000,
+              "open_ms": 2.5373139999942396,
+              "ru_maxrss": 39068
+            },
+            {
+              "first_search_ms": 44.115251000008016,
+              "import_ms": 53.168711999987295,
+              "observed_messages": 10000,
+              "open_ms": 2.571348999993006,
+              "ru_maxrss": 39068
+            },
+            {
+              "first_search_ms": 47.326943999991045,
+              "import_ms": 50.82975699998826,
+              "observed_messages": 10000,
+              "open_ms": 2.5445490000066684,
+              "ru_maxrss": 39068
+            },
+            {
+              "first_search_ms": 47.114008999997736,
+              "import_ms": 52.93334200000288,
+              "observed_messages": 10000,
+              "open_ms": 2.5680320000134316,
+              "ru_maxrss": 39068
+            },
+            {
+              "first_search_ms": 48.52867799999672,
+              "import_ms": 48.867548000004035,
+              "observed_messages": 10000,
+              "open_ms": 2.534119000003443,
+              "ru_maxrss": 39068
+            },
+            {
+              "first_search_ms": 47.765827999995736,
+              "import_ms": 48.36750300000858,
+              "observed_messages": 10000,
+              "open_ms": 2.471030999998902,
+              "ru_maxrss": 39068
+            },
+            {
+              "first_search_ms": 43.76480599999866,
+              "import_ms": 47.95570299999952,
+              "observed_messages": 10000,
+              "open_ms": 2.5437769999996362,
+              "ru_maxrss": 39068
+            },
+            {
+              "first_search_ms": 49.95825899999318,
+              "import_ms": 49.9518759999944,
+              "observed_messages": 10000,
+              "open_ms": 2.4596700000074634,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 47.407997999997065,
+              "import_ms": 51.67086000000154,
+              "observed_messages": 10000,
+              "open_ms": 2.4660140000065667,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 52.22931500000527,
+              "import_ms": 48.842930999995815,
+              "observed_messages": 10000,
+              "open_ms": 2.4586790000000747,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 49.858328999988544,
+              "import_ms": 49.31124600000203,
+              "observed_messages": 10000,
+              "open_ms": 2.628407000003108,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 47.910733999998456,
+              "import_ms": 50.5833259999946,
+              "observed_messages": 10000,
+              "open_ms": 2.6401989999982334,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 50.31944200000282,
+              "import_ms": 48.532128999994484,
+              "observed_messages": 10000,
+              "open_ms": 2.8716689999868095,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 45.634651000000304,
+              "import_ms": 50.0433649999934,
+              "observed_messages": 10000,
+              "open_ms": 2.5665919999937614,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 52.74509999999566,
+              "import_ms": 47.89442600001337,
+              "observed_messages": 10000,
+              "open_ms": 2.722242000004371,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 46.833090000006905,
+              "import_ms": 49.484389999989276,
+              "observed_messages": 10000,
+              "open_ms": 2.5899749999922506,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 45.93286099999716,
+              "import_ms": 48.40202500000146,
+              "observed_messages": 10000,
+              "open_ms": 2.4943859999950746,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 48.66862400000116,
+              "import_ms": 49.526979999996,
+              "observed_messages": 10000,
+              "open_ms": 2.589123000007021,
+              "ru_maxrss": 39196
+            },
+            {
+              "first_search_ms": 45.500527999990936,
+              "import_ms": 50.65812599998765,
+              "observed_messages": 10000,
+              "open_ms": 2.6371229999995194,
+              "ru_maxrss": 39196
+            }
+          ],
+          "store_open_ms": {
+            "p50": 2.5665919999937614,
+            "p95": 2.722242000004371,
+            "trials": 20
+          },
+          "total_messages": 10000
+        }
+      },
+      "warm_search_p95_ms": 13.939441000005104,
+      "process_cold_search_p95_ms": 16.36947299999747,
+      "filesystem_cold_search_p95_ms": 52.22931500000527,
+      "concurrency": {
+        "ingest_100_ms": {
+          "16": {
+            "errors": 0,
+            "p50": 359.61552999999924,
+            "p95": 630.4006550000025,
+            "throughput_messages_per_s": 2405.457609869497,
+            "trials": 32
+          },
+          "4": {
+            "errors": 0,
+            "p50": 99.69652400000939,
+            "p95": 150.13125999999488,
+            "throughput_messages_per_s": 2666.8886473656407,
+            "trials": 32
+          }
+        },
+        "search_top8_ms": {
+          "1": {
+            "errors": 0,
+            "p50": 13.1552329999991,
+            "p95": 13.939441000005104,
+            "throughput_per_s": 77.20038966612587,
+            "trials": 1000
+          },
+          "16": {
+            "errors": 0,
+            "p50": 107.34391900000162,
+            "p95": 203.05594799999938,
+            "throughput_per_s": 77.13039231083194,
+            "trials": 1000
+          },
+          "4": {
+            "errors": 0,
+            "p50": 30.088575000000617,
+            "p95": 53.39942700000222,
+            "throughput_per_s": 77.00615721935385,
+            "trials": 1000
+          }
+        }
+      },
+      "resources": {
+        "peak_rss_bytes": 45903872
+      },
+      "store_bytes_after_generation": 47315664,
+      "evidence_sha256": {
+        "manifest.json": "14ded3bfc4affce048a580557ce1c234b7fc7c0e971b9bfb155a21d7f7504673",
+        "benchmark.json": "0fdced0a0a5570d57eaf248ef5ea57a1f69633f9bd5b86fbd4142d595fe5f1f8"
+      }
+    },
+    {
+      "language": "python",
+      "messages": 100000,
+      "status": "PASS_HOSTED_OBSERVATION",
+      "failures": [],
+      "job_id": 107943748338,
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094491463/job/107943748338",
+      "job_conclusion": "success",
+      "artifact_name": "hosted-performance-python-100000-36094491463",
+      "installed_archive": "chat_context_index-0.1.0-py3-none-any.whl",
+      "installed_archive_sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55",
+      "installed_archive_contents_verified": true,
+      "fixture_sha256": "39b27e35194fdf34990710b6b0359f1c0e58b2d5cd5c5c2a842ee172975a44cf",
+      "hardware": {
+        "runner_environment": "github-hosted",
+        "runner_image_version": "20260920.314.1",
+        "cpu_count": 4,
+        "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+        "memory_bytes": 16766414848
+      },
+      "warm": {
+        "lexical_search_top8_ms": {
+          "p50": 57.337794000005715,
+          "p95": 59.70992400000341,
+          "pass": true,
+          "threshold_p95_ms": 100,
+          "trials": 1000
+        },
+        "batch_ingest_100_ms": {
+          "p50": 15.642495999998118,
+          "p95": 30.15645300001779,
+          "pass": true,
+          "threshold_p95_ms": 500,
+          "trials": 1000
+        },
+        "store_open_ms": {
+          "p50": 0.7332370000199262,
+          "p95": 1.0424629999761237,
+          "pass": true,
+          "threshold_p95_ms": 2000,
+          "trials": 20
+        }
+      },
+      "cold": {
+        "process_cold": {
+          "first_search_top8_ms": {
+            "p50": 64.0073060000077,
+            "p95": 65.88047799999686,
+            "trials": 20
+          },
+          "import_ms": {
+            "p50": 20.14755900000864,
+            "p95": 20.42290399998592,
+            "trials": 20
+          },
+          "peak_rss_bytes_max": 45678592,
+          "raw_trials": [
+            {
+              "first_search_ms": 63.10620400000744,
+              "import_ms": 19.99882699999489,
+              "observed_messages": 100000,
+              "open_ms": 1.1525479999932031,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 62.6811320000229,
+              "import_ms": 20.03404100003081,
+              "observed_messages": 100000,
+              "open_ms": 1.130175000014333,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 63.736624000000575,
+              "import_ms": 20.11745599997994,
+              "observed_messages": 100000,
+              "open_ms": 1.1794589999567506,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 63.475990999961596,
+              "import_ms": 19.864494999978888,
+              "observed_messages": 100000,
+              "open_ms": 1.16268400000763,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 64.19043900001498,
+              "import_ms": 19.796181999993223,
+              "observed_messages": 100000,
+              "open_ms": 1.2088830000038797,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 65.88047799999686,
+              "import_ms": 20.22949500002369,
+              "observed_messages": 100000,
+              "open_ms": 1.2327599999935046,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 64.16536099999348,
+              "import_ms": 20.222706000026847,
+              "observed_messages": 100000,
+              "open_ms": 1.235604000044077,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 63.56645099998559,
+              "import_ms": 20.248761999994258,
+              "observed_messages": 100000,
+              "open_ms": 1.3112979999618801,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 36.94345399998156,
+              "import_ms": 20.50478899997188,
+              "observed_messages": 100000,
+              "open_ms": 1.2231750000069042,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 63.41935900002227,
+              "import_ms": 19.907015999990563,
+              "observed_messages": 100000,
+              "open_ms": 1.1566050000055839,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 63.84116499998527,
+              "import_ms": 20.193048000010094,
+              "observed_messages": 100000,
+              "open_ms": 1.1760639999920386,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 64.0073060000077,
+              "import_ms": 19.934557999988556,
+              "observed_messages": 100000,
+              "open_ms": 1.1895740000227306,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 64.79775799999743,
+              "import_ms": 20.048750000000837,
+              "observed_messages": 100000,
+              "open_ms": 1.1836350000180573,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 64.13147199998548,
+              "import_ms": 20.053668000002745,
+              "observed_messages": 100000,
+              "open_ms": 1.2060290000022178,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 63.92769600000747,
+              "import_ms": 20.15255700001717,
+              "observed_messages": 100000,
+              "open_ms": 1.187089999973523,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 64.87798900002417,
+              "import_ms": 20.180529000015213,
+              "observed_messages": 100000,
+              "open_ms": 1.1870700000145007,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 64.61770599997863,
+              "import_ms": 20.42290399998592,
+              "observed_messages": 100000,
+              "open_ms": 1.1626739999996971,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 64.41387900002837,
+              "import_ms": 20.19538100000773,
+              "observed_messages": 100000,
+              "open_ms": 1.241802999970787,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 63.09186500004671,
+              "import_ms": 20.14755900000864,
+              "observed_messages": 100000,
+              "open_ms": 1.1979770000039025,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 69.74667299999737,
+              "import_ms": 20.049972000037997,
+              "observed_messages": 100000,
+              "open_ms": 1.2157429999888336,
+              "ru_maxrss": 44608
+            }
+          ],
+          "store_open_ms": {
+            "p50": 1.1895740000227306,
+            "p95": 1.241802999970787,
+            "trials": 20
+          },
+          "total_messages": 100000
+        },
+        "filesystem_cold": {
+          "first_search_top8_ms": {
+            "p50": 340.71200800002543,
+            "p95": 355.3376890000095,
+            "trials": 20
+          },
+          "import_ms": {
+            "p50": 34.3487999999752,
+            "p95": 38.16848200000322,
+            "trials": 20
+          },
+          "raw_trials": [
+            {
+              "first_search_ms": 342.9407650000371,
+              "import_ms": 34.60634900000059,
+              "observed_messages": 100000,
+              "open_ms": 1.9182839999984935,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 335.18945899999153,
+              "import_ms": 34.129159000030995,
+              "observed_messages": 100000,
+              "open_ms": 1.7660739999882935,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 355.3376890000095,
+              "import_ms": 34.78781199999048,
+              "observed_messages": 100000,
+              "open_ms": 1.861017000010179,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 342.6843729999973,
+              "import_ms": 34.59082500000932,
+              "observed_messages": 100000,
+              "open_ms": 2.034749000017655,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 341.84316900001477,
+              "import_ms": 48.407315000019935,
+              "observed_messages": 100000,
+              "open_ms": 2.0489609999572167,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 340.71200800002543,
+              "import_ms": 38.16848200000322,
+              "observed_messages": 100000,
+              "open_ms": 2.4926400000140347,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 357.36359499998116,
+              "import_ms": 34.60116499996957,
+              "observed_messages": 100000,
+              "open_ms": 1.9507829999838577,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 341.4408830000184,
+              "import_ms": 34.3487999999752,
+              "observed_messages": 100000,
+              "open_ms": 1.8749479999655705,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 308.99374699998816,
+              "import_ms": 36.18930699997236,
+              "observed_messages": 100000,
+              "open_ms": 2.5677929999687876,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 338.4266169999819,
+              "import_ms": 34.23871699999381,
+              "observed_messages": 100000,
+              "open_ms": 1.8609470000114925,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 340.65995900004964,
+              "import_ms": 34.01549000000159,
+              "observed_messages": 100000,
+              "open_ms": 1.868417999958183,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 335.6701780000435,
+              "import_ms": 34.353870000018105,
+              "observed_messages": 100000,
+              "open_ms": 1.928700000007666,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 331.85384699999076,
+              "import_ms": 33.690368999998555,
+              "observed_messages": 100000,
+              "open_ms": 1.8339459999765495,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 330.3042590000018,
+              "import_ms": 33.473852000042825,
+              "observed_messages": 100000,
+              "open_ms": 2.2931390000167085,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 338.8797679999698,
+              "import_ms": 33.736329000021215,
+              "observed_messages": 100000,
+              "open_ms": 1.8306019999840828,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 346.66784500001313,
+              "import_ms": 34.3423829999665,
+              "observed_messages": 100000,
+              "open_ms": 1.9087599999920712,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 346.23971500002426,
+              "import_ms": 33.67788000002747,
+              "observed_messages": 100000,
+              "open_ms": 1.994547999970564,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 336.2575219999826,
+              "import_ms": 34.22217100001035,
+              "observed_messages": 100000,
+              "open_ms": 1.8348180000202774,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 330.1436339999668,
+              "import_ms": 33.65011900001491,
+              "observed_messages": 100000,
+              "open_ms": 1.8757990000040081,
+              "ru_maxrss": 44608
+            },
+            {
+              "first_search_ms": 345.76687100002346,
+              "import_ms": 34.481312000025355,
+              "observed_messages": 100000,
+              "open_ms": 1.9463259999952243,
+              "ru_maxrss": 44608
+            }
+          ],
+          "store_open_ms": {
+            "p50": 1.9182839999984935,
+            "p95": 2.4926400000140347,
+            "trials": 20
+          },
+          "total_messages": 100000
+        }
+      },
+      "warm_search_p95_ms": 59.70992400000341,
+      "process_cold_search_p95_ms": 65.88047799999686,
+      "filesystem_cold_search_p95_ms": 355.3376890000095,
+      "concurrency": {
+        "ingest_100_ms": {
+          "16": {
+            "errors": 0,
+            "p50": 162.08924699998306,
+            "p95": 265.5956659999674,
+            "throughput_messages_per_s": 5397.455582427892,
+            "trials": 32
+          },
+          "4": {
+            "errors": 0,
+            "p50": 43.4665349999932,
+            "p95": 74.40284000000474,
+            "throughput_messages_per_s": 5762.395574205245,
+            "trials": 32
+          }
+        },
+        "search_top8_ms": {
+          "1": {
+            "errors": 0,
+            "p50": 57.337794000005715,
+            "p95": 59.70992400000341,
+            "throughput_per_s": 17.81627614190086,
+            "trials": 1000
+          },
+          "16": {
+            "errors": 0,
+            "p50": 455.6701409999846,
+            "p95": 858.6850960000447,
+            "throughput_per_s": 18.23494796716952,
+            "trials": 1000
+          },
+          "4": {
+            "errors": 0,
+            "p50": 128.52471000002197,
+            "p95": 236.12716100001307,
+            "throughput_per_s": 17.546289831196837,
+            "trials": 1000
+          }
+        }
+      },
+      "resources": {
+        "peak_rss_bytes": 122560512
+      },
+      "store_bytes_after_generation": 447420840,
+      "evidence_sha256": {
+        "manifest.json": "0e7d6ebbd3eee2c5570f202ffc2fc5f17d0e60a735d72be244aec82e0b1bd2ec",
+        "benchmark.json": "e37eddb18141e5b20933bea516ae14740a17756a9c1375ffe2b85a34fd0a7d47"
+      }
+    },
+    {
+      "language": "typescript",
+      "messages": 10000,
+      "status": "PASS_HOSTED_OBSERVATION",
+      "failures": [],
+      "job_id": 107943748436,
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094491463/job/107943748436",
+      "job_conclusion": "success",
+      "artifact_name": "hosted-performance-typescript-10000-36094491463",
+      "installed_archive": "chat-context-index-0.1.0.tgz",
+      "installed_archive_sha256": "2c13e40073f0cc9bf3290449210a22e6a263d1e395316ba1a02233f00d64526e",
+      "installed_archive_contents_verified": true,
+      "fixture_sha256": "8a88a11bce715e54fbf78333089ffb7889e84adad7d213040782a79576c65f61",
+      "hardware": {
+        "runner_environment": "github-hosted",
+        "runner_image_version": "20260920.314.1",
+        "cpu_count": 4,
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "memory_bytes": 16766414848
+      },
+      "warm": {
+        "lexical_search_top8_ms": {
+          "p50": 10.193896999999197,
+          "p95": 11.203370000000177,
+          "trials": 1000,
+          "errors": 0,
+          "throughput_per_s": 98.7768331305937,
+          "threshold_p95_ms": 100,
+          "pass": true
+        },
+        "batch_ingest_100_ms": {
+          "p50": 40.562484999999924,
+          "p95": 49.09373800000003,
+          "trials": 100,
+          "threshold_p95_ms": 500,
+          "pass": true
+        },
+        "store_open_ms": {
+          "p50": 46.003231000002415,
+          "p95": 46.77435200000036,
+          "trials": 20,
+          "threshold_p95_ms": 2000,
+          "pass": true
+        }
+      },
+      "cold": {
+        "process_cold": {
+          "import_ms": {
+            "p50": 23.409853999999996,
+            "p95": 25.445098,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 54.78674,
+            "p95": 56.013875,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 18.275183999999996,
+            "p95": 19.527114999999995,
+            "trials": 20
+          },
+          "max_rss_kib": 81252,
+          "total_messages": 10000,
+          "raw_trials": [
+            {
+              "import_ms": 23.25798,
+              "open_ms": 54.81861,
+              "first_search_ms": 18.108473000000004,
+              "max_rss_kib": 81088,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 22.921982000000003,
+              "open_ms": 58.035113,
+              "first_search_ms": 18.55828299999999,
+              "max_rss_kib": 80904,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 25.361832,
+              "open_ms": 54.390871,
+              "first_search_ms": 17.748991000000004,
+              "max_rss_kib": 80728,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.097039,
+              "open_ms": 54.48684,
+              "first_search_ms": 18.302004999999994,
+              "max_rss_kib": 80908,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.409853999999996,
+              "open_ms": 54.78674,
+              "first_search_ms": 18.132487999999995,
+              "max_rss_kib": 81000,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 22.993476,
+              "open_ms": 54.790567,
+              "first_search_ms": 19.527114999999995,
+              "max_rss_kib": 80876,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 24.95344,
+              "open_ms": 55.57468299999999,
+              "first_search_ms": 18.150031000000013,
+              "max_rss_kib": 80852,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 24.965251000000002,
+              "open_ms": 56.013875,
+              "first_search_ms": 19.59495100000001,
+              "max_rss_kib": 80744,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.425433,
+              "open_ms": 54.176731,
+              "first_search_ms": 18.147655,
+              "max_rss_kib": 80952,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.148144000000002,
+              "open_ms": 54.01587,
+              "first_search_ms": 18.125664999999998,
+              "max_rss_kib": 80856,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.768352999999998,
+              "open_ms": 53.060984999999995,
+              "first_search_ms": 19.033161000000007,
+              "max_rss_kib": 80504,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.113539,
+              "open_ms": 54.895343999999994,
+              "first_search_ms": 18.65456300000001,
+              "max_rss_kib": 81128,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 25.445098,
+              "open_ms": 55.829178999999996,
+              "first_search_ms": 19.275774999999996,
+              "max_rss_kib": 80840,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 22.965602999999998,
+              "open_ms": 53.265316000000006,
+              "first_search_ms": 18.023443999999998,
+              "max_rss_kib": 81088,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.365961,
+              "open_ms": 54.16132100000001,
+              "first_search_ms": 18.592587999999992,
+              "max_rss_kib": 81004,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.061002,
+              "open_ms": 53.339445,
+              "first_search_ms": 18.275183999999996,
+              "max_rss_kib": 80852,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 25.420703,
+              "open_ms": 55.378336999999995,
+              "first_search_ms": 17.65876200000001,
+              "max_rss_kib": 81124,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 24.943571000000002,
+              "open_ms": 54.132578,
+              "first_search_ms": 18.195645999999996,
+              "max_rss_kib": 81252,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 23.099884,
+              "open_ms": 53.674541000000005,
+              "first_search_ms": 19.20240799999999,
+              "max_rss_kib": 81144,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 26.180092000000002,
+              "open_ms": 55.89571399999999,
+              "first_search_ms": 18.121667000000016,
+              "max_rss_kib": 81080,
+              "observed_messages": 10000
+            }
+          ]
+        },
+        "filesystem_cold": {
+          "import_ms": {
+            "p50": 33.34066,
+            "p95": 33.80534899999999,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 58.55094499999999,
+            "p95": 67.572837,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 49.945493,
+            "p95": 54.025302999999994,
+            "trials": 20
+          },
+          "total_messages": 10000,
+          "raw_trials": [
+            {
+              "import_ms": 31.003528000000003,
+              "open_ms": 56.980157999999996,
+              "first_search_ms": 49.10912800000001,
+              "max_rss_kib": 78612,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.413997,
+              "open_ms": 59.951896000000005,
+              "first_search_ms": 46.64784499999999,
+              "max_rss_kib": 78852,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.347503,
+              "open_ms": 59.154464000000004,
+              "first_search_ms": 52.905097,
+              "max_rss_kib": 78836,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 32.290059,
+              "open_ms": 59.24776899999999,
+              "first_search_ms": 50.115971000000016,
+              "max_rss_kib": 78836,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 32.37551500000001,
+              "open_ms": 67.97168299999998,
+              "first_search_ms": 49.813395000000014,
+              "max_rss_kib": 78728,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 32.37783999999999,
+              "open_ms": 57.740289000000004,
+              "first_search_ms": 51.902462000000014,
+              "max_rss_kib": 78836,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 32.135476,
+              "open_ms": 58.599948000000005,
+              "first_search_ms": 48.50521899999998,
+              "max_rss_kib": 78732,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 32.091574,
+              "open_ms": 58.20827499999999,
+              "first_search_ms": 47.813456,
+              "max_rss_kib": 78468,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.672471,
+              "open_ms": 58.02736600000001,
+              "first_search_ms": 51.73991799999999,
+              "max_rss_kib": 78844,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.358073000000005,
+              "open_ms": 58.11967899999999,
+              "first_search_ms": 57.715061000000006,
+              "max_rss_kib": 79608,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 31.863317,
+              "open_ms": 57.780604999999994,
+              "first_search_ms": 47.854793000000015,
+              "max_rss_kib": 79080,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.34066,
+              "open_ms": 58.544904,
+              "first_search_ms": 48.574098000000006,
+              "max_rss_kib": 79400,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 34.199816999999996,
+              "open_ms": 58.777299,
+              "first_search_ms": 50.48440000000001,
+              "max_rss_kib": 78664,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.575109,
+              "open_ms": 58.994956,
+              "first_search_ms": 51.106403,
+              "max_rss_kib": 79376,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 31.626043,
+              "open_ms": 67.572837,
+              "first_search_ms": 50.525217,
+              "max_rss_kib": 79224,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.80534899999999,
+              "open_ms": 58.051341,
+              "first_search_ms": 49.233481,
+              "max_rss_kib": 78764,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.450556000000006,
+              "open_ms": 59.474802999999994,
+              "first_search_ms": 48.354307000000006,
+              "max_rss_kib": 78640,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 31.483036000000002,
+              "open_ms": 58.55094499999999,
+              "first_search_ms": 49.945493,
+              "max_rss_kib": 78608,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 33.649347,
+              "open_ms": 57.915788000000006,
+              "first_search_ms": 48.71819699999999,
+              "max_rss_kib": 79484,
+              "observed_messages": 10000
+            },
+            {
+              "import_ms": 32.957744000000005,
+              "open_ms": 57.66680099999999,
+              "first_search_ms": 54.025302999999994,
+              "max_rss_kib": 78908,
+              "observed_messages": 10000
+            }
+          ]
+        }
+      },
+      "warm_search_p95_ms": 11.203370000000177,
+      "process_cold_search_p95_ms": 19.527114999999995,
+      "filesystem_cold_search_p95_ms": 54.025302999999994,
+      "concurrency": {
+        "search_top8_ms": {
+          "1": {
+            "p50": 10.193896999999197,
+            "p95": 11.203370000000177,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 98.7768331305937
+          },
+          "4": {
+            "p50": 26.68162200000006,
+            "p95": 41.41564799999833,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 98.38847059383177
+          },
+          "16": {
+            "p50": 82.47450799999933,
+            "p95": 155.08179199999722,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 100.95405754794928
+          }
+        },
+        "ingest_100_ms": {
+          "4": {
+            "p50": 100.7899150000012,
+            "p95": 154.9518739999985,
+            "trials": 32,
+            "errors": 0,
+            "throughput_messages_per_s": 2568.165208026149
+          },
+          "16": {
+            "p50": 315.8298549999963,
+            "p95": 548.7489290000012,
+            "trials": 32,
+            "errors": 0,
+            "throughput_messages_per_s": 2723.78343147207
+          }
+        }
+      },
+      "resources": {
+        "max_rss_kib": 207500
+      },
+      "store_bytes_after_generation": 47315664,
+      "evidence_sha256": {
+        "manifest.json": "09576afb48305cf9c80b27c68b23ef718c90429566163a0d05f6442403788454",
+        "benchmark.json": "4fa15f73d8d411288e6c6070c420935faf2b49c1b926ec18b8a42194f9d90495"
+      }
+    },
+    {
+      "language": "typescript",
+      "messages": 100000,
+      "status": "PASS_HOSTED_OBSERVATION",
+      "failures": [],
+      "job_id": 107943748606,
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094491463/job/107943748606",
+      "job_conclusion": "success",
+      "artifact_name": "hosted-performance-typescript-100000-36094491463",
+      "installed_archive": "chat-context-index-0.1.0.tgz",
+      "installed_archive_sha256": "2c13e40073f0cc9bf3290449210a22e6a263d1e395316ba1a02233f00d64526e",
+      "installed_archive_contents_verified": true,
+      "fixture_sha256": "39b27e35194fdf34990710b6b0359f1c0e58b2d5cd5c5c2a842ee172975a44cf",
+      "hardware": {
+        "runner_environment": "github-hosted",
+        "runner_image_version": "20260920.314.1",
+        "cpu_count": 4,
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "memory_bytes": 16766418944
+      },
+      "warm": {
+        "lexical_search_top8_ms": {
+          "p50": 83.26131299999543,
+          "p95": 86.50616499999887,
+          "trials": 1000,
+          "errors": 0,
+          "throughput_per_s": 12.265999873247598,
+          "threshold_p95_ms": 100,
+          "pass": true
+        },
+        "batch_ingest_100_ms": {
+          "p50": 38.36206900000252,
+          "p95": 51.39061600000059,
+          "trials": 1000,
+          "threshold_p95_ms": 500,
+          "pass": true
+        },
+        "store_open_ms": {
+          "p50": 45.54520799999591,
+          "p95": 46.329524000000674,
+          "trials": 20,
+          "threshold_p95_ms": 2000,
+          "pass": true
+        }
+      },
+      "cold": {
+        "process_cold": {
+          "import_ms": {
+            "p50": 24.580700999999998,
+            "p95": 25.406314000000002,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 54.865874999999996,
+            "p95": 56.479901,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 103.85506799999999,
+            "p95": 104.945692,
+            "trials": 20
+          },
+          "max_rss_kib": 162416,
+          "total_messages": 100000,
+          "raw_trials": [
+            {
+              "import_ms": 24.916164000000002,
+              "open_ms": 55.327180999999996,
+              "first_search_ms": 102.95213199999999,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 23.700327,
+              "open_ms": 53.355819999999994,
+              "first_search_ms": 104.601144,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 24.80071,
+              "open_ms": 56.079744999999996,
+              "first_search_ms": 103.01755299999999,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 24.049295,
+              "open_ms": 55.460899000000005,
+              "first_search_ms": 103.01055000000001,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 25.406314000000002,
+              "open_ms": 54.710867,
+              "first_search_ms": 105.26172,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 25.371018999999997,
+              "open_ms": 54.403136,
+              "first_search_ms": 103.82451,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 24.198009999999996,
+              "open_ms": 54.555018,
+              "first_search_ms": 103.85980700000002,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 25.211251999999998,
+              "open_ms": 54.876445,
+              "first_search_ms": 104.732467,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 24.766847,
+              "open_ms": 56.793644,
+              "first_search_ms": 64.36524299999999,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 23.370023,
+              "open_ms": 54.065408999999995,
+              "first_search_ms": 102.91070400000001,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 23.01282,
+              "open_ms": 54.78264,
+              "first_search_ms": 102.25164099999999,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 23.144325,
+              "open_ms": 54.396893999999996,
+              "first_search_ms": 102.84279800000002,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 24.761878000000003,
+              "open_ms": 56.479901,
+              "first_search_ms": 104.88524100000001,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 25.679402,
+              "open_ms": 56.361250999999996,
+              "first_search_ms": 104.85690800000002,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 24.580700999999998,
+              "open_ms": 54.89696800000001,
+              "first_search_ms": 104.45376900000001,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 23.267733000000003,
+              "open_ms": 54.147471,
+              "first_search_ms": 104.02500299999998,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 23.990865999999997,
+              "open_ms": 55.156906,
+              "first_search_ms": 104.945692,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 24.200285000000004,
+              "open_ms": 54.865874999999996,
+              "first_search_ms": 103.85506799999999,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 25.011251,
+              "open_ms": 54.42772099999999,
+              "first_search_ms": 103.645869,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 23.137782,
+              "open_ms": 54.227089,
+              "first_search_ms": 103.75921000000001,
+              "max_rss_kib": 162416,
+              "observed_messages": 100000
+            }
+          ]
+        },
+        "filesystem_cold": {
+          "import_ms": {
+            "p50": 32.746614,
+            "p95": 37.188901,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 59.84747,
+            "p95": 61.793896000000004,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 381.862259,
+            "p95": 399.04817999999995,
+            "trials": 20
+          },
+          "total_messages": 100000,
+          "raw_trials": [
+            {
+              "import_ms": 31.636482,
+              "open_ms": 57.73595400000001,
+              "first_search_ms": 391.056799,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 32.592144000000005,
+              "open_ms": 59.070305,
+              "first_search_ms": 390.15450200000004,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 37.188901,
+              "open_ms": 59.026627000000005,
+              "first_search_ms": 402.219562,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 35.963145,
+              "open_ms": 60.46758,
+              "first_search_ms": 384.23472300000003,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 33.005953000000005,
+              "open_ms": 60.106480000000005,
+              "first_search_ms": 378.897114,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 33.02606,
+              "open_ms": 60.00975100000001,
+              "first_search_ms": 378.868177,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 31.715275999999996,
+              "open_ms": 57.744043000000005,
+              "first_search_ms": 374.067145,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 33.118272000000005,
+              "open_ms": 59.61291299999999,
+              "first_search_ms": 369.547662,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 31.386655,
+              "open_ms": 57.657122,
+              "first_search_ms": 330.296093,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 32.32276399999999,
+              "open_ms": 61.215419000000004,
+              "first_search_ms": 368.081058,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 31.313610000000004,
+              "open_ms": 57.87252099999999,
+              "first_search_ms": 392.926173,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 35.070467,
+              "open_ms": 59.655422,
+              "first_search_ms": 382.751119,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 31.315575,
+              "open_ms": 60.923439,
+              "first_search_ms": 368.82283,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 37.82234199999999,
+              "open_ms": 60.05026600000001,
+              "first_search_ms": 376.725519,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 32.746614,
+              "open_ms": 61.793896000000004,
+              "first_search_ms": 386.335638,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 32.456134,
+              "open_ms": 57.330616000000006,
+              "first_search_ms": 379.767969,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 34.631083999999994,
+              "open_ms": 59.84747,
+              "first_search_ms": 381.862259,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 32.278653999999996,
+              "open_ms": 60.082888000000004,
+              "first_search_ms": 399.04817999999995,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 31.775209000000004,
+              "open_ms": 63.157979999999995,
+              "first_search_ms": 397.392424,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            },
+            {
+              "import_ms": 33.142427999999995,
+              "open_ms": 59.310443,
+              "first_search_ms": 380.05487300000004,
+              "max_rss_kib": 162228,
+              "observed_messages": 100000
+            }
+          ]
+        }
+      },
+      "warm_search_p95_ms": 86.50616499999887,
+      "process_cold_search_p95_ms": 104.945692,
+      "filesystem_cold_search_p95_ms": 399.04817999999995,
+      "concurrency": {
+        "search_top8_ms": {
+          "1": {
+            "p50": 83.26131299999543,
+            "p95": 86.50616499999887,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 12.265999873247598
+          },
+          "4": {
+            "p50": 176.12196000000404,
+            "p95": 333.11052600000403,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 12.35754409091247
+          },
+          "16": {
+            "p50": 666.9912679999834,
+            "p95": 1254.1337049999856,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 12.376820237300599
+          }
+        },
+        "ingest_100_ms": {
+          "4": {
+            "p50": 109.99012000003131,
+            "p95": 164.10898000001907,
+            "trials": 32,
+            "errors": 0,
+            "throughput_messages_per_s": 2477.396409353036
+          },
+          "16": {
+            "p50": 328.89281400002073,
+            "p95": 572.7884729999932,
+            "trials": 32,
+            "errors": 0,
+            "throughput_messages_per_s": 2624.7515864353227
+          }
+        }
+      },
+      "resources": {
+        "max_rss_kib": 399272
+      },
+      "store_bytes_after_generation": 447420840,
+      "evidence_sha256": {
+        "manifest.json": "23857d293867eca8db1da4a03b09f631f610dd839649967a1c603316832a17a2",
+        "benchmark.json": "a6064df0aae08831b86a1f32c743da7f2cb854266995c2d72457bcfd970b786b"
+      }
+    }
+  ]
+}

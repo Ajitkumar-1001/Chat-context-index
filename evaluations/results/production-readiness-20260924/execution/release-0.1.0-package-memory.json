@@ -1,0 +1,239 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-09-25T04:25:31.470576+00:00",
+  "method": "Fresh wheel/sdist-derived-wheel/npm installs outside checkout; separate seed/read processes; deterministic provider",
+  "python": "3.12.14",
+  "node": "v22.23.2",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "typescript_consumer_typecheck": "PASS",
+  "machine": "x86_64",
+  "ci": {
+    "GITHUB_SHA": "46ac4c2fc18df916da3afaf485fa75d4f3d02b51",
+    "GITHUB_RUN_ID": "36094205085",
+    "GITHUB_RUN_ATTEMPT": "1",
+    "GITHUB_REPOSITORY": "Ajitkumar-1001/Chat-context-index",
+    "RUNNER_ARCH": "X64"
+  },
+  "sdist_installed_content_matches_wheel": "PASS",
+  "default_cache_without_optional_dependencies_or_credentials": "PASS",
+  "package_documentation_and_license": "PASS",
+  "source_sha256": {
+    "python": "530c9fee53fad7bdd72bdcc9322c9ad345735a31701c82a16c762cb7235498ad",
+    "typescript": "9c6f75b9077a36e76f72ee6836a3abef7b55b7ce6fabadbeec4049e452b5ee5c"
+  },
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "2c13e40073f0cc9bf3290449210a22e6a263d1e395316ba1a02233f00d64526e"
+    },
+    {
+      "filename": "chat_context_index-0.1.0.tar.gz",
+      "sha256": "1d191e282413cd692338db30d407787737950ad2a70a8d5a6a626558f372dc32"
+    },
+    {
+      "filename": "wheel-from-sdist/chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "411e7b8ee432baf6d38e8af4cc75ee9b1d718e4bd29d87ec08f8f3351e544b55"
+    }
+  ],
+  "checks": [
+    {
+      "writer": "python",
+      "reader": "python",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python",
+      "reader": "typescript",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python_sdist",
+      "reader": "python",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python_sdist",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "python_sdist",
+      "reader": "typescript",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "python",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    },
+    {
+      "writer": "typescript",
+      "reader": "typescript",
+      "status": "PASS",
+      "source_sequences": [
+        1,
+        8,
+        9
+      ]
+    }
+  ],
+  "schema_v1_migration": "PASS",
+  "migration_checks": [
+    {
+      "migrator": "python",
+      "reader": "python",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    },
+    {
+      "migrator": "python",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    },
+    {
+      "migrator": "python",
+      "reader": "typescript",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    },
+    {
+      "migrator": "python_sdist",
+      "reader": "python",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    },
+    {
+      "migrator": "python_sdist",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    },
+    {
+      "migrator": "python_sdist",
+      "reader": "typescript",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    },
+    {
+      "migrator": "typescript",
+      "reader": "python",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    },
+    {
+      "migrator": "typescript",
+      "reader": "python_sdist",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    },
+    {
+      "migrator": "typescript",
+      "reader": "typescript",
+      "status": "PASS",
+      "source_sequences": [
+        41,
+        20,
+        5
+      ]
+    }
+  ],
+  "not_measured": [
+    "real-model retrieval quality",
+    "answer correctness",
+    "model tokens or cost"
+  ],
+  "sanitization": {
+    "removed_fields": [
+      "checks[].package_path"
+    ],
+    "reason": "Transient CI installation paths omitted from this public copy; result, source, archive, and runtime fields are unchanged."
+  },
+  "source_report_sha256": "75bb3398ad12bf56180234921541a892fd74c2bcef7c3ed7d7bea39a9eef388b"
+}
