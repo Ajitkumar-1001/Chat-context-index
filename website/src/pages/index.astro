@@ -3,6 +3,7 @@ import { Code } from 'astro:components';
 // Only public evidence files are imported; the page is rebuilt from them.
 import verification from '../../../evaluations/results/production-readiness-20260924/execution/release-0.1.0-verification.json';
 import packages from '../../../evaluations/results/production-readiness-20260924/execution/release-0.1.0-package-memory.json';
+import githubPackages from '../../../evaluations/results/production-readiness-20260924/execution/github-packages-npm-0.1.0-verification.json';
 import smoke from '../../../evaluations/results/production-readiness-20260924/execution/live-smoke-candidate-004-summary.json';
 import perfSummary from '../../../evaluations/results/production-readiness-20260924/execution/hosted-performance-36094491463-summary.json';
 import recallLexical from '../../../evaluations/results/release-readiness/dev-recall-lexical-20260924.json';
@@ -27,7 +28,10 @@ if (
   perfSummary.ci_run_id !== verification.ci_run_id ||
   JSON.stringify(perfSummary.artifacts) !== JSON.stringify(verification.artifacts) ||
   pypi.files.length !== 2 ||
-  pypi.files.some((file) => approvedHash(file.filename) !== file.sha256)
+  pypi.files.some((file) => approvedHash(file.filename) !== file.sha256) ||
+  githubPackages.source_commit !== verification.source_commit ||
+  githubPackages.candidate_run_id !== verification.publication.release_run_id ||
+  githubPackages.approved_archive.sha256 !== approvedHash(githubPackages.approved_archive.filename)
 ) throw new Error('Published evidence source, run, or archive mismatch');
 // The live smoke predates this build; it is shown as earlier-candidate evidence only.
 if (packages.artifacts.some((artifact) => artifact.sha256 === smoke.wheel_sha256)) {
@@ -90,7 +94,8 @@ const gates: { name: string; status: Status; evidence: string; href?: string }[]
   { name: 'Quality, cost, and human review', status: 'open', evidence: 'Three frozen held-out trials, real-provider cache measurements, and answer review remain open; sustained capacity and the next paid allocation are unverified. Two developer-adoption bundles were prepared for the earlier candidate e762f7bd and must be rebuilt with the published archives; no participants have run them yet.' },
   { name: 'Website public availability', status: 'blocked', evidence: 'Vercel production deployments report success, but their URLs and the repository homepage redirect to Vercel login; public access is unverified.' },
   { name: 'PyPI publication', status: 'pass', evidence: `chat-context-index ${verification.version} was published from tag ${verification.tag} through GitHub trusted publishing, after the protected release environment was approved. Both PyPI files match the approved SHA-256 values.`, href: pypi.url },
-  { name: 'npm publication', status: 'blocked', evidence: 'Not published. The release job stopped with ENEEDAUTH because npm 2FA and a publishing token are not configured. Once a token is configured, re-running that job (with release-environment approval, within GitHub’s re-run window) can publish the same approved archive.', href: npmRelease.job_url },
+  { name: 'GitHub Packages publication', status: 'pass', evidence: `${githubPackages.package} ${githubPackages.version} was published from the approved npm archive by a manual workflow: release controls passed against the owner’s approval, only the package name changed, and a fresh install from the registry recalled a stored message. Installing needs a read:packages token even though the package is public.`, href: githubPackages.publish_run_url },
+  { name: 'npmjs publication', status: 'blocked', evidence: 'Not published. The release job stopped with ENEEDAUTH because npm 2FA and a publishing token are not configured. Once a token is configured, re-running that job (with release-environment approval, within GitHub’s re-run window) can publish the same approved archive.', href: npmRelease.job_url },
 ];
 
 const cells = hosted.cells;
@@ -126,12 +131,10 @@ const scaleRows = [
 const pythonInstall = `python3 -m venv .venv
 .venv/bin/python -m pip install chat-context-index==${verification.version}`;
 
-const typescriptInstall = `git clone ${repo}.git
-cd Chat-context-index/packages/typescript
-git checkout ${verification.tag}
-npm ci && npm run build && npm pack
-# then, in your application:
-npm install /path/to/chat-context-index-0.1.0.tgz`;
+const typescriptRegistry = `@ajitkumar-1001:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=\${GITHUB_PACKAGES_TOKEN}`;
+
+const typescriptInstall = `npm install chat-context-index@npm:${githubPackages.package}@${githubPackages.version}`;
 
 const pythonUsage = `import asyncio
 
@@ -189,7 +192,7 @@ try {
     <title>chat-context-index 0.1.0 release status</title>
     <meta
       name="description"
-      content="Release status, evidence, and known limitations for chat-context-index 0.1.0: the Python package is on PyPI; the TypeScript package is not yet published."
+      content="Release status, evidence, and known limitations for chat-context-index 0.1.0: the Python package is on PyPI and the TypeScript package is on GitHub Packages; npmjs publication is pending."
     />
   </head>
   <body>
@@ -211,9 +214,15 @@ try {
           <a class="more" href={pypi.url}>PyPI</a> · <a href={verification.publication.release_run_url}>Release run</a>
         </p>
         <p>
+          <span class="pill pass">TypeScript {githubPackages.version} on GitHub Packages</span>
+          The same CI-tested npm archive, published as <code>{githubPackages.package}</code> because GitHub’s npm
+          registry only accepts owner-scoped names; nothing else in it changed.
+          <a class="more" href={githubPackages.package_url}>GitHub Packages</a> · <a href={githubPackages.publish_run_url}>Publish run</a>
+        </p>
+        <p>
           This is a preview. Held-out quality and cost comparisons, a live-model smoke of the published wheel,
-          reference-hardware performance, human review, and developer adoption remain open. The npm package is
-          not published yet: npm 2FA and a publishing token are still missing.
+          reference-hardware performance, human review, and developer adoption remain open. The package is not
+          on npmjs yet: npm 2FA and a publishing token are still missing.
         </p>
       </div>
     </header>
@@ -521,8 +530,16 @@ try {
         </p>
         <Code code={pythonInstall} lang="bash" />
         <Code code={pythonUsage} lang="python" />
-        <h3>TypeScript, from source</h3>
-        <p>The npm package is not published yet. Build the archive from the <code>{verification.tag}</code> tag.</p>
+        <h3>TypeScript, from GitHub Packages</h3>
+        <p>
+          GitHub’s npm registry requires a classic personal access token with <code>read:packages</code>, even for
+          public packages. Set <code>GITHUB_PACKAGES_TOKEN</code> to that token and add these lines to your
+          project’s <code>.npmrc</code>:
+        </p>
+        <Code code={typescriptRegistry} lang="ini" />
+        <p>
+          Then install it under its npmjs name, so imports stay <code>chat-context-index</code>. It is not on npmjs yet.
+        </p>
         <Code code={typescriptInstall} lang="bash" />
         <Code code={typescriptUsage} lang="ts" />
         <p class="muted">
@@ -552,7 +569,9 @@ try {
         <p class="muted">
           SHA-256 of the source <code>{hosted.source_sha.slice(0, 8)}</code> archives verified in every hosted cell
           and approved for release. The wheel and source distribution are the files on
-          <a href={pypi.url}>PyPI</a>; the npm archive is not published.
+          <a href={pypi.url}>PyPI</a>. The npm archive is on <a href={githubPackages.package_url}>GitHub Packages</a>
+          with only its package name changed (published SHA-1 <code>{githubPackages.published_archive.shasum.slice(0, 8)}</code>);
+          it is not on npmjs.
         </p>
         <div class="table">
           <table>
