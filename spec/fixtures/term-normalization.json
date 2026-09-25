@@ -1,0 +1,438 @@
+{
+ "description": "Shared term normalization contract (plan-eng-review D10). Each word's query_terms and the FTS expression for its first key must be identical in Python and TypeScript. Generic suffix rules only; no word-specific cases (D4).",
+ "cases": [
+  {
+   "word": "a",
+   "query_terms": [],
+   "fts_expression": null
+  },
+  {
+   "word": "go",
+   "query_terms": [
+    "go"
+   ],
+   "fts_expression": "\"go\""
+  },
+  {
+   "word": "use",
+   "query_terms": [
+    "use"
+   ],
+   "fts_expression": "(\"use\" OR \"usee\" OR \"uses\" OR \"usees\" OR \"useed\" OR \"useing\" OR \"used\")"
+  },
+  {
+   "word": "used",
+   "query_terms": [
+    "use"
+   ],
+   "fts_expression": "(\"use\" OR \"usee\" OR \"uses\" OR \"usees\" OR \"useed\" OR \"useing\" OR \"used\")"
+  },
+  {
+   "word": "uses",
+   "query_terms": [
+    "use"
+   ],
+   "fts_expression": "(\"use\" OR \"usee\" OR \"uses\" OR \"usees\" OR \"useed\" OR \"useing\" OR \"used\")"
+  },
+  {
+   "word": "using",
+   "query_terms": [
+    "using"
+   ],
+   "fts_expression": "(\"using\" OR \"usinge\" OR \"usings\" OR \"usinges\" OR \"usinged\" OR \"usinging\" OR \"usingged\" OR \"usingging\")"
+  },
+  {
+   "word": "owed",
+   "query_terms": [
+    "owe"
+   ],
+   "fts_expression": "(\"owe\" OR \"owee\" OR \"owes\" OR \"owees\" OR \"oweed\" OR \"oweing\" OR \"owed\")"
+  },
+  {
+   "word": "shed",
+   "query_terms": [
+    "she"
+   ],
+   "fts_expression": "(\"she\" OR \"shee\" OR \"shes\" OR \"shees\" OR \"sheed\" OR \"sheing\" OR \"shed\")"
+  },
+  {
+   "word": "need",
+   "query_terms": [
+    "need"
+   ],
+   "fts_expression": "(\"need\" OR \"neede\" OR \"needs\" OR \"needes\" OR \"needed\" OR \"needing\" OR \"needded\" OR \"needding\")"
+  },
+  {
+   "word": "needed",
+   "query_terms": [
+    "need"
+   ],
+   "fts_expression": "(\"need\" OR \"neede\" OR \"needs\" OR \"needes\" OR \"needed\" OR \"needing\" OR \"needded\" OR \"needding\")"
+  },
+  {
+   "word": "cats",
+   "query_terms": [
+    "cat"
+   ],
+   "fts_expression": "(\"cat\" OR \"cate\" OR \"cats\" OR \"cates\" OR \"cated\" OR \"cating\" OR \"catted\" OR \"catting\")"
+  },
+  {
+   "word": "bus",
+   "query_terms": [
+    "bus"
+   ],
+   "fts_expression": "(\"bus\" OR \"buse\" OR \"buses\" OR \"bused\" OR \"busing\" OR \"bussed\" OR \"bussing\")"
+  },
+  {
+   "word": "buses",
+   "query_terms": [
+    "bus"
+   ],
+   "fts_expression": "(\"bus\" OR \"buse\" OR \"buses\" OR \"bused\" OR \"busing\" OR \"bussed\" OR \"bussing\")"
+  },
+  {
+   "word": "class",
+   "query_terms": [
+    "class"
+   ],
+   "fts_expression": "(\"class\" OR \"classe\" OR \"classes\" OR \"classsed\" OR \"classsing\")"
+  },
+  {
+   "word": "status",
+   "query_terms": [
+    "status"
+   ],
+   "fts_expression": "(\"status\" OR \"statuse\" OR \"statuses\" OR \"statused\" OR \"statusing\" OR \"statussed\" OR \"statussing\")"
+  },
+  {
+   "word": "this",
+   "query_terms": [],
+   "fts_expression": null
+  },
+  {
+   "word": "file",
+   "query_terms": [
+    "fil"
+   ],
+   "fts_expression": "(\"fil\" OR \"file\" OR \"fils\" OR \"files\" OR \"filed\" OR \"filing\" OR \"filled\" OR \"filling\")"
+  },
+  {
+   "word": "files",
+   "query_terms": [
+    "fil"
+   ],
+   "fts_expression": "(\"fil\" OR \"file\" OR \"fils\" OR \"files\" OR \"filed\" OR \"filing\" OR \"filled\" OR \"filling\")"
+  },
+  {
+   "word": "move",
+   "query_terms": [
+    "mov"
+   ],
+   "fts_expression": "(\"mov\" OR \"move\" OR \"movs\" OR \"moves\" OR \"moved\" OR \"moving\" OR \"movved\" OR \"movving\")"
+  },
+  {
+   "word": "moving",
+   "query_terms": [
+    "mov"
+   ],
+   "fts_expression": "(\"mov\" OR \"move\" OR \"movs\" OR \"moves\" OR \"moved\" OR \"moving\" OR \"movved\" OR \"movving\")"
+  },
+  {
+   "word": "moved",
+   "query_terms": [
+    "mov"
+   ],
+   "fts_expression": "(\"mov\" OR \"move\" OR \"movs\" OR \"moves\" OR \"moved\" OR \"moving\" OR \"movved\" OR \"movving\")"
+  },
+  {
+   "word": "city",
+   "query_terms": [
+    "city"
+   ],
+   "fts_expression": "(\"city\" OR \"citye\" OR \"citys\" OR \"cityes\" OR \"cityed\" OR \"citying\" OR \"cities\" OR \"citied\")"
+  },
+  {
+   "word": "cities",
+   "query_terms": [
+    "city"
+   ],
+   "fts_expression": "(\"city\" OR \"citye\" OR \"citys\" OR \"cityes\" OR \"cityed\" OR \"citying\" OR \"cities\" OR \"citied\")"
+  },
+  {
+   "word": "study",
+   "query_terms": [
+    "study"
+   ],
+   "fts_expression": "(\"study\" OR \"studye\" OR \"studys\" OR \"studyes\" OR \"studyed\" OR \"studying\" OR \"studies\" OR \"studied\")"
+  },
+  {
+   "word": "studied",
+   "query_terms": [
+    "study"
+   ],
+   "fts_expression": "(\"study\" OR \"studye\" OR \"studys\" OR \"studyes\" OR \"studyed\" OR \"studying\" OR \"studies\" OR \"studied\")"
+  },
+  {
+   "word": "deploy",
+   "query_terms": [
+    "deploy"
+   ],
+   "fts_expression": "(\"deploy\" OR \"deploye\" OR \"deploys\" OR \"deployes\" OR \"deployed\" OR \"deploying\" OR \"deploies\" OR \"deploied\")"
+  },
+  {
+   "word": "deploying",
+   "query_terms": [
+    "deploy"
+   ],
+   "fts_expression": "(\"deploy\" OR \"deploye\" OR \"deploys\" OR \"deployes\" OR \"deployed\" OR \"deploying\" OR \"deploies\" OR \"deploied\")"
+  },
+  {
+   "word": "deployed",
+   "query_terms": [
+    "deploy"
+   ],
+   "fts_expression": "(\"deploy\" OR \"deploye\" OR \"deploys\" OR \"deployes\" OR \"deployed\" OR \"deploying\" OR \"deploies\" OR \"deploied\")"
+  },
+  {
+   "word": "release",
+   "query_terms": [
+    "releas"
+   ],
+   "fts_expression": "(\"release\" OR \"releases\" OR \"released\" OR \"releasing\" OR \"releassed\" OR \"releassing\")"
+  },
+  {
+   "word": "releases",
+   "query_terms": [
+    "releas"
+   ],
+   "fts_expression": "(\"release\" OR \"releases\" OR \"released\" OR \"releasing\" OR \"releassed\" OR \"releassing\")"
+  },
+  {
+   "word": "plan",
+   "query_terms": [
+    "plan"
+   ],
+   "fts_expression": "(\"plan\" OR \"plane\" OR \"plans\" OR \"planes\" OR \"planed\" OR \"planing\" OR \"planned\" OR \"planning\")"
+  },
+  {
+   "word": "planned",
+   "query_terms": [
+    "plan"
+   ],
+   "fts_expression": "(\"plan\" OR \"plane\" OR \"plans\" OR \"planes\" OR \"planed\" OR \"planing\" OR \"planned\" OR \"planning\")"
+  },
+  {
+   "word": "planning",
+   "query_terms": [
+    "plan"
+   ],
+   "fts_expression": "(\"plan\" OR \"plane\" OR \"plans\" OR \"planes\" OR \"planed\" OR \"planing\" OR \"planned\" OR \"planning\")"
+  },
+  {
+   "word": "stop",
+   "query_terms": [
+    "stop"
+   ],
+   "fts_expression": "(\"stop\" OR \"stope\" OR \"stops\" OR \"stopes\" OR \"stoped\" OR \"stoping\" OR \"stopped\" OR \"stopping\")"
+  },
+  {
+   "word": "stopped",
+   "query_terms": [
+    "stop"
+   ],
+   "fts_expression": "(\"stop\" OR \"stope\" OR \"stops\" OR \"stopes\" OR \"stoped\" OR \"stoping\" OR \"stopped\" OR \"stopping\")"
+  },
+  {
+   "word": "choose",
+   "query_terms": [
+    "choos"
+   ],
+   "fts_expression": "(\"choose\" OR \"chooses\" OR \"choosed\" OR \"choosing\" OR \"choossed\" OR \"choossing\")"
+  },
+  {
+   "word": "chose",
+   "query_terms": [
+    "chos"
+   ],
+   "fts_expression": "(\"chose\" OR \"choses\" OR \"chosed\" OR \"chosing\" OR \"chossed\" OR \"chossing\")"
+  },
+  {
+   "word": "chosen",
+   "query_terms": [
+    "chosen"
+   ],
+   "fts_expression": "(\"chosen\" OR \"chosene\" OR \"chosens\" OR \"chosenes\" OR \"chosened\" OR \"chosening\" OR \"chosenned\" OR \"chosenning\")"
+  },
+  {
+   "word": "theme",
+   "query_terms": [
+    "them"
+   ],
+   "fts_expression": "(\"them\" OR \"theme\" OR \"thems\" OR \"themes\" OR \"themed\" OR \"theming\" OR \"themmed\" OR \"themming\")"
+  },
+  {
+   "word": "themes",
+   "query_terms": [
+    "them"
+   ],
+   "fts_expression": "(\"them\" OR \"theme\" OR \"thems\" OR \"themes\" OR \"themed\" OR \"theming\" OR \"themmed\" OR \"themming\")"
+  },
+  {
+   "word": "selected",
+   "query_terms": [
+    "select"
+   ],
+   "fts_expression": "(\"select\" OR \"selecte\" OR \"selects\" OR \"selectes\" OR \"selected\" OR \"selecting\" OR \"selectted\" OR \"selectting\")"
+  },
+  {
+   "word": "service",
+   "query_terms": [
+    "servic"
+   ],
+   "fts_expression": "(\"servic\" OR \"service\" OR \"servics\" OR \"services\" OR \"serviced\" OR \"servicing\" OR \"servicced\" OR \"serviccing\")"
+  },
+  {
+   "word": "services",
+   "query_terms": [
+    "servic"
+   ],
+   "fts_expression": "(\"servic\" OR \"service\" OR \"servics\" OR \"services\" OR \"serviced\" OR \"servicing\" OR \"servicced\" OR \"serviccing\")"
+  },
+  {
+   "word": "database",
+   "query_terms": [
+    "databas"
+   ],
+   "fts_expression": "(\"database\" OR \"databases\" OR \"databased\" OR \"databasing\" OR \"databassed\" OR \"databassing\")"
+  },
+  {
+   "word": "Redis",
+   "query_terms": [
+    "redis"
+   ],
+   "fts_expression": "(\"redis\" OR \"redise\" OR \"redises\" OR \"redised\" OR \"redising\" OR \"redissed\" OR \"redissing\")"
+  },
+  {
+   "word": "SQLite",
+   "query_terms": [
+    "sqlit"
+   ],
+   "fts_expression": "(\"sqlit\" OR \"sqlite\" OR \"sqlits\" OR \"sqlites\" OR \"sqlited\" OR \"sqliting\" OR \"sqlitted\" OR \"sqlitting\")"
+  },
+  {
+   "word": "PostgreSQL",
+   "query_terms": [
+    "postgresql"
+   ],
+   "fts_expression": "(\"postgresql\" OR \"postgresqle\" OR \"postgresqls\" OR \"postgresqles\" OR \"postgresqled\" OR \"postgresqling\" OR \"postgresqlled\" OR \"postgresqlling\")"
+  },
+  {
+   "word": "Café",
+   "query_terms": [
+    "caf"
+   ],
+   "fts_expression": "(\"caf\" OR \"cafe\" OR \"cafs\" OR \"cafes\" OR \"cafed\" OR \"cafing\" OR \"caffed\" OR \"caffing\")"
+  },
+  {
+   "word": "Reykjavík",
+   "query_terms": [
+    "reykjavik"
+   ],
+   "fts_expression": "(\"reykjavik\" OR \"reykjavike\" OR \"reykjaviks\" OR \"reykjavikes\" OR \"reykjaviked\" OR \"reykjaviking\" OR \"reykjavikked\" OR \"reykjavikking\")"
+  },
+  {
+   "word": "v2",
+   "query_terms": [
+    "v2"
+   ],
+   "fts_expression": "\"v2\""
+  },
+  {
+   "word": "2pm",
+   "query_terms": [
+    "2pm"
+   ],
+   "fts_expression": "\"2pm\""
+  },
+  {
+   "word": "3000",
+   "query_terms": [
+    "3000"
+   ],
+   "fts_expression": "\"3000\""
+  },
+  {
+   "word": "hoping",
+   "query_terms": [
+    "hop"
+   ],
+   "fts_expression": "(\"hop\" OR \"hope\" OR \"hops\" OR \"hopes\" OR \"hoped\" OR \"hoping\" OR \"hopped\" OR \"hopping\")"
+  },
+  {
+   "word": "hoped",
+   "query_terms": [
+    "hop"
+   ],
+   "fts_expression": "(\"hop\" OR \"hope\" OR \"hops\" OR \"hopes\" OR \"hoped\" OR \"hoping\" OR \"hopped\" OR \"hopping\")"
+  },
+  {
+   "word": "hope",
+   "query_terms": [
+    "hop"
+   ],
+   "fts_expression": "(\"hop\" OR \"hope\" OR \"hops\" OR \"hopes\" OR \"hoped\" OR \"hoping\" OR \"hopped\" OR \"hopping\")"
+  },
+  {
+   "word": "running",
+   "query_terms": [
+    "run"
+   ],
+   "fts_expression": "(\"run\" OR \"rune\" OR \"runs\" OR \"runes\" OR \"runed\" OR \"runing\" OR \"runned\" OR \"running\")"
+  },
+  {
+   "word": "boxes",
+   "query_terms": [
+    "box"
+   ],
+   "fts_expression": "(\"box\" OR \"boxe\" OR \"boxs\" OR \"boxes\" OR \"boxed\" OR \"boxing\" OR \"boxxed\" OR \"boxxing\")"
+  },
+  {
+   "word": "wishes",
+   "query_terms": [
+    "wish"
+   ],
+   "fts_expression": "(\"wish\" OR \"wishe\" OR \"wishs\" OR \"wishes\" OR \"wished\" OR \"wishing\" OR \"wishhed\" OR \"wishhing\")"
+  },
+  {
+   "word": "going",
+   "query_terms": [
+    "going"
+   ],
+   "fts_expression": "(\"going\" OR \"goinge\" OR \"goings\" OR \"goinges\" OR \"goinged\" OR \"goinging\" OR \"goingged\" OR \"goingging\")"
+  },
+  {
+   "word": "Which",
+   "query_terms": [],
+   "fts_expression": null
+  },
+  {
+   "word": "the",
+   "query_terms": [],
+   "fts_expression": null
+  },
+  {
+   "word": "naïve",
+   "query_terms": [
+    "naiv"
+   ],
+   "fts_expression": "(\"naiv\" OR \"naive\" OR \"naivs\" OR \"naives\" OR \"naived\" OR \"naiving\" OR \"naivved\" OR \"naivving\")"
+  },
+  {
+   "word": "über",
+   "query_terms": [
+    "uber"
+   ],
+   "fts_expression": "(\"uber\" OR \"ubere\" OR \"ubers\" OR \"uberes\" OR \"ubered\" OR \"ubering\" OR \"uberred\" OR \"uberring\")"
+  }
+ ]
+}

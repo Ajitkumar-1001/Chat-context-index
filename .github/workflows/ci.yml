@@ -25,6 +25,9 @@ jobs:
         working-directory: packages/python
       - run: mypy src/cci --ignore-missing-imports
         working-directory: packages/python
+      - name: Published Markdown list and links
+        run: pytest ../../tests/packaging/test_markdown_publication.py -v
+        working-directory: packages/python
 
   typescript-typecheck:
     runs-on: ubuntu-latest

@@ -1,6 +1,7 @@
 {
   "goal": "Complete docs/release-execution-plan.md through verified production release and delivery",
   "status": "ENGINEERING_DELIVERED_EXTERNAL_INPUTS_REQUIRED",
+  "status": "ENGINEERING_VERIFICATION_IN_PROGRESS_EXTERNAL_INPUTS_PENDING",
   "done": [
     "Artifact approval binding merged in PR #8; 57 focused tests and four real-CI-bundle integration checks passed.",
     "Artifact approval milestone passed all 21 hosted CI jobs, including 16 package combinations, at 4b9a26b2a98cfdb805d7b5e592df193d8f974ce0 (run 36062294482).",
@@ -11,6 +12,9 @@
     "Evaluation safeguards merged in PR #10; the 21 CI jobs passed for head 1dbb412dfc71aca993fb4585f23eb1569ac7e144."
   ],
   "doing": null,
+    "Independent review findings have regression coverage; original evaluators and fixture remain unchanged."
+  ],
+  "doing": "Final configured lint and hosted CI for the guarded evaluation follow-up.",
   "blocked": [
     {
       "priority": "P0",
@@ -31,6 +35,7 @@
       "priority": "P0",
       "gate": "Registry publishing",
       "reason": "PyPI pending publisher is configured and persisted; npm ownership/authentication/trusted publishing remain unverified. Actual PyPI OIDC publication and final release approval remain pending."
+      "reason": "npm session unauthenticated; registry ownership/trusted publishers unverified"
     },
     {
       "priority": "P0",
@@ -39,6 +44,10 @@
     }
   ],
   "next": "Supply the pending evaluation allowance/capacity, dedicated runner, human participants, and registry/hosting access; then freeze and evaluate the new candidate.",
+      "reason": "No hosting target supplied or found; GitHub Pages not configured"
+    }
+  ],
+  "next": "Retain the new candidate identity after hosted CI; execute dependent gates when external inputs arrive.",
   "deferred": [],
   "publication_performed": false,
   "new_model_calls": 0,
@@ -53,4 +62,6 @@
   "evaluation_guard_pr_state": "MERGED",
   "evaluation_guard_pr_merged_at": "2026-09-24T22:19:12Z",
   "website_note": "GitHub PR checks now show a Vercel integration; production URL and deployment have not been verified in this task."
+  "pull_request": null,
+  "merged_artifact_guard_pull_request": "https://github.com/Ajitkumar-1001/Chat-context-index/pull/8"
 }

@@ -135,6 +135,8 @@ class EvidenceUnit:
     unit_id: str
     message_index: int  # index into the history's messages list (0-based)
     acceptable_span: dict  # {"start": int, "end": int} — codepoint offsets into that message's text
+    # Other messages with identical text; the same span is acceptable in each (SC-011 clarification).
+    verbatim_copy_indexes: list = field(default_factory=list)
 
 
 @dataclass
@@ -325,7 +327,17 @@ def build_fixture(seed: int = SEED) -> dict:
             "message_count": len(messages),
             "messages": [asdict(m) for m in messages],
         })
-        all_queries.extend(_build_queries(rng, label, split, state, num_answerable, num_absent))
+        queries = _build_queries(rng, label, split, state, num_answerable, num_absent)
+        # Mechanical, text-only annotation that consumes no randomness: every word-for-word copy of
+        # an annotated message is also acceptable evidence (SC-011 as clarified 2026-09-23).
+        for query in queries:
+            for unit in query.required_evidence_units:
+                target = messages[unit["message_index"]].content
+                unit["verbatim_copy_indexes"] = [
+                    i for i, m in enumerate(messages)
+                    if i != unit["message_index"] and isinstance(m.content, str) and m.content == target
+                ]
+        all_queries.extend(queries)
 
     for i in range(NUM_DEV_HISTORIES):
         make_history(f"dev-h{i + 1:02d}", "dev", num_answerable=QUERIES_PER_HISTORY, num_absent=0)

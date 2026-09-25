@@ -24,7 +24,6 @@ from .context_assembly import EvidenceBlock, render_evidence_context
 from .errors import VersionConflict
 from .io_worker import fetchone
 from .provider import CallBudget, MemoizedProvider
-from .relevance import query_terms, relevance
 from .search import Diagnostic, LexicalCandidate, linked_corrections, search
 from .store import HistoryStore
 
@@ -81,6 +80,15 @@ class Usage:
     stage_ms: dict[str, float] = field(default_factory=dict)
     input_tokens: int | None = None
     output_tokens: int | None = None
+
+
+def evidence_id(rank: int) -> str:
+    """Evidence IDs encode retrieval priority; `evidence_rank` is the only parser."""
+    return f"ev_{rank}"
+
+
+def evidence_rank(evidence_id: str) -> int:
+    return int(evidence_id.removeprefix("ev_"))
 
 
 def usage_from_budget(budget: CallBudget) -> Usage:
@@ -147,6 +155,35 @@ async def retrieve(
     deadline_s: float | None = None,
     _budget: CallBudget | None = None,
 ) -> RetrievalResult:
+    result, _ = await retrieve_with_links(
+        store, query, mode, max_selected_chunks, provider=provider, deadline_s=deadline_s, _budget=_budget,
+    )
+    return result
+
+
+CandidateKey = tuple[str, str]
+
+
+def _candidate_key(candidate: LexicalCandidate | Evidence) -> CandidateKey:
+    return (candidate.message_id, candidate.source_pointer)
+
+
+async def retrieve_with_links(
+    store: HistoryStore,
+    query: str,
+    mode: str = "auto",
+    max_selected_chunks: int | None = None,
+    *,
+    provider: MemoizedProvider | None = None,
+    deadline_s: float | None = None,
+    _budget: CallBudget | None = None,
+) -> tuple[RetrievalResult, dict[CandidateKey, list[CandidateKey]]]:
+    """`retrieve()` plus which returned evidence is a later mention linked to which source.
+
+    Priority (plan-eng-review D17): each lexical hit is followed by its linked later mention, then
+    tree-only candidates follow in navigator order. `max_selected_chunks` bounds the lexical and
+    linked items only (D5); tree candidates keep their chunk and excerpt-budget bounds.
+    """
     limit = store.config.max_selected_chunks if max_selected_chunks is None else max_selected_chunks
     if mode not in ("auto", "tree", "lexical") or not 1 <= limit <= 5000:
         raise ValueError("require a valid retrieval mode and 1 <= max_selected_chunks <= 5000")
@@ -159,7 +196,7 @@ async def retrieve(
         async with store.connection:
             snapshot = await _capture_snapshot(store)
             search_result = await search(store, query, limit=limit)
-            corrections, correction_limited = await linked_corrections(
+            pairs, link_limited = await linked_corrections(
                 store, search_result.candidates, query, snapshot.snapshot_max_seq, limit,
             )
             tree_exists = await _has_tree(store)
@@ -167,10 +204,21 @@ async def retrieve(
     index_degraded = not tree_exists
     actual_mode = "lexical"
     diagnostics = list(search_result.diagnostics)
-    candidates = list(search_result.candidates) + corrections
-    correction_keys = {(c.message_id, c.source_pointer) for c in corrections}
+    # Links follow the source text, so every verbatim copy of a superseded statement (including a
+    # newer copy that outranks the linked one) carries the later mention with it.
+    linked_by_text: dict[str, list[LexicalCandidate]] = {}
+    for source, linked in pairs:
+        linked_by_text.setdefault(source.content_hash, []).append(linked)
+    lexical: dict[CandidateKey, LexicalCandidate] = {}
+    linked_to: dict[CandidateKey, list[LexicalCandidate]] = {}
+    for hit in search_result.candidates:
+        lexical.setdefault(_candidate_key(hit), hit)
+        for linked in linked_by_text.get(hit.content_hash, []):
+            linked_to.setdefault(_candidate_key(hit), []).append(linked)
+            lexical.setdefault(_candidate_key(linked), linked)
     selected_chunks = []
-    limited = len(search_result.candidates) >= limit or correction_limited
+    tree_candidates: list[LexicalCandidate] = []
+    limited = len(search_result.candidates) >= limit or link_limited or len(lexical) > limit
     if mode != "lexical" and provider is not None and tree_exists and query.strip():
         from .tree_retrieval import navigate_tree
 
@@ -181,8 +229,6 @@ async def retrieve(
         index_degraded = bool(tree_diagnostics)
         limited |= tree_limited
         actual_mode = mode if selected_chunks or not tree_diagnostics else "lexical"
-        # Lexical evidence remains available for the unindexed tail and routing misses.
-        candidates = tree_candidates + candidates
     elif mode == "tree" and tree_exists and provider is None:
         diagnostics.append(Diagnostic("tree_provider_missing", "retrieve"))
         index_degraded = True
@@ -193,31 +239,28 @@ async def retrieve(
     if current.cache_generation != snapshot.cache_generation:
         raise VersionConflict("history was cleared between snapshot capture and result emission")
     if selected_chunks and current.index_revision != snapshot.index_revision:
-        candidates = list(search_result.candidates) + corrections
+        tree_candidates = []
         selected_chunks = []
         actual_mode = "lexical"
         index_degraded = True
         diagnostics.append(Diagnostic("tree_revision_changed", "retrieve"))
 
-    unique: dict[tuple[str, str], LexicalCandidate] = {}
-    terms = query_terms(query)
-    candidates.sort(key=lambda candidate: (
-        -int((candidate.message_id, candidate.source_pointer) in correction_keys),
-        -relevance(candidate.excerpt, terms), -candidate.seq,
-    ))
-    for candidate in candidates:
-        unique.setdefault((candidate.message_id, candidate.source_pointer), candidate)
-    limited |= len(unique) > limit
+    # Lexical items first (a duplicate keeps its query-centered lexical excerpt), then tree-only
+    # items; a lexical item past the limit returns only if a selected chunk contains it.
+    ordered = dict(list(lexical.items())[:limit])
+    for candidate in tree_candidates if selected_chunks else []:
+        key = _candidate_key(candidate)
+        ordered.setdefault(key, lexical.get(key, candidate))
     evidence = [
         Evidence(
-            evidence_id=f"ev_{i + 1}",
+            evidence_id=evidence_id(i + 1),
             message_id=c.message_id,
             seq=c.seq,
             source_pointer=c.source_pointer,
             excerpt=c.excerpt,
             content_hash=c.content_hash,
         )
-        for i, c in enumerate(list(unique.values())[:limit])
+        for i, c in enumerate(ordered.values())
     ]
     bounded: list[Evidence] = []
     for item in evidence:
@@ -226,13 +269,18 @@ async def retrieve(
         ])) <= store.config.max_evidence_text_scalars:
             bounded.append(item)
     omitted = len(evidence) - len(bounded)
+    returned = {_candidate_key(e) for e in bounded}
+    links = {
+        source: [k for k in (_candidate_key(c) for c in linked) if k in returned]
+        for source, linked in linked_to.items() if source in returned
+    }
     evidence = sorted(bounded, key=lambda e: e.seq)
 
     status = "ok" if evidence else "empty"
     if status == "empty" and not diagnostics:
         diagnostics = [Diagnostic(code="no_matching_evidence", stage="retrieve")]
 
-    return RetrievalResult(
+    result = RetrievalResult(
         contract_version=CONTRACT_VERSION,
         history_id=store.history_id,
         status=status,
@@ -241,7 +289,7 @@ async def retrieve(
         routing=Routing(
             requested_mode=mode,
             actual_mode=actual_mode,
-            candidate_count=len(unique),
+            candidate_count=len(ordered),
             selected_chunk_ids=selected_chunks,
         ),
         coverage=Coverage(
@@ -252,3 +300,4 @@ async def retrieve(
         diagnostics=diagnostics,
         usage=usage_from_budget(budget),
     )
+    return result, {source: keys for source, keys in links.items() if keys}

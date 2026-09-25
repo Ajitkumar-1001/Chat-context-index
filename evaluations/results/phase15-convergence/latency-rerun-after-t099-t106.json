@@ -1,0 +1,250 @@
+{
+  "environment": {
+    "apsw_version": "3.53.4.0",
+    "artifact": "t099",
+    "cache_backend": "sqlite",
+    "cci_module_path": "<scratch>/venv-t099/lib/python3.12/site-packages/cci/__init__.py",
+    "cpu_count": 14,
+    "dedicated_linux_runner": false,
+    "filesystem_cold": "NOT RUN",
+    "label": "macOS-arm64-phase15-t099-rerun",
+    "machine": "arm64",
+    "physical_memory_bytes": 25769803776,
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "sqlite_library_version": "3.53.4"
+  },
+  "fixture": {
+    "batch_size": 100,
+    "seed": 7,
+    "total_messages": 10000
+  },
+  "fixture_stats": {
+    "generation_s": 1.5502582909539342,
+    "message_bytes_avg": 892.9357,
+    "message_bytes_max": 1657,
+    "reference_fixture": true,
+    "store_bytes_after_generation": 45603104
+  },
+  "paths": {
+    "prepare_context_lexical_ms": {
+      "by_concurrency": {
+        "1": {
+          "errors": 0,
+          "p50": 47.80308320187032,
+          "p95": 56.823707884177566,
+          "throughput_per_s": 20.359589543551817,
+          "trials": 1000
+        }
+      },
+      "process_cold_first_call_ms": {
+        "p50": 51.84450000524521,
+        "p95": 57.63174989260733,
+        "trials": 20
+      }
+    },
+    "retrieve_lexical_ms": {
+      "by_concurrency": {
+        "1": {
+          "errors": 0,
+          "p50": 43.096709065139294,
+          "p95": 53.03549999371171,
+          "throughput_per_s": 22.38575843702623,
+          "trials": 1000
+        }
+      },
+      "process_cold_first_call_ms": {
+        "p50": 50.34004198387265,
+        "p95": 55.85729191079736,
+        "trials": 20
+      }
+    }
+  },
+  "process_cold": {
+    "first_search_top8_ms": {
+      "p50": 46.98512493632734,
+      "p95": 56.53187492862344,
+      "trials": 20
+    },
+    "import_ms": {
+      "p50": 24.502458982169628,
+      "p95": 26.767542120069265,
+      "trials": 20
+    },
+    "peak_rss_bytes_max": 33751040,
+    "raw_trials": [
+      {
+        "first_search_ms": 46.15120799280703,
+        "import_ms": 32.205625204369426,
+        "observed_messages": 10000,
+        "open_ms": 1.4574169181287289,
+        "ru_maxrss": 33554432
+      },
+      {
+        "first_search_ms": 47.24662494845688,
+        "import_ms": 23.96637503989041,
+        "observed_messages": 10000,
+        "open_ms": 1.3622501865029335,
+        "ru_maxrss": 33456128
+      },
+      {
+        "first_search_ms": 49.264041939750314,
+        "import_ms": 24.323957972228527,
+        "observed_messages": 10000,
+        "open_ms": 1.3780000153928995,
+        "ru_maxrss": 33275904
+      },
+      {
+        "first_search_ms": 45.47866713255644,
+        "import_ms": 24.478208040818572,
+        "observed_messages": 10000,
+        "open_ms": 1.3001668266952038,
+        "ru_maxrss": 33226752
+      },
+      {
+        "first_search_ms": 50.23154220543802,
+        "import_ms": 23.679125122725964,
+        "observed_messages": 10000,
+        "open_ms": 1.3325409963726997,
+        "ru_maxrss": 33423360
+      },
+      {
+        "first_search_ms": 56.53187492862344,
+        "import_ms": 24.84641713090241,
+        "observed_messages": 10000,
+        "open_ms": 4.305833019316196,
+        "ru_maxrss": 33619968
+      },
+      {
+        "first_search_ms": 46.467874897643924,
+        "import_ms": 26.767542120069265,
+        "observed_messages": 10000,
+        "open_ms": 1.2217920739203691,
+        "ru_maxrss": 33439744
+      },
+      {
+        "first_search_ms": 50.597666995599866,
+        "import_ms": 24.051709100604057,
+        "observed_messages": 10000,
+        "open_ms": 1.5072908718138933,
+        "ru_maxrss": 33701888
+      },
+      {
+        "first_search_ms": 48.455415992066264,
+        "import_ms": 24.48020805604756,
+        "observed_messages": 10000,
+        "open_ms": 1.2963749468326569,
+        "ru_maxrss": 33538048
+      },
+      {
+        "first_search_ms": 54.89012482576072,
+        "import_ms": 24.671291932463646,
+        "observed_messages": 10000,
+        "open_ms": 1.371833961457014,
+        "ru_maxrss": 33718272
+      },
+      {
+        "first_search_ms": 46.68099991977215,
+        "import_ms": 24.408415891230106,
+        "observed_messages": 10000,
+        "open_ms": 1.36841693893075,
+        "ru_maxrss": 33456128
+      },
+      {
+        "first_search_ms": 46.98512493632734,
+        "import_ms": 23.644542088732123,
+        "observed_messages": 10000,
+        "open_ms": 1.329708145931363,
+        "ru_maxrss": 33538048
+      },
+      {
+        "first_search_ms": 46.59733292646706,
+        "import_ms": 24.024041835218668,
+        "observed_messages": 10000,
+        "open_ms": 1.3375841081142426,
+        "ru_maxrss": 33488896
+      },
+      {
+        "first_search_ms": 46.11391597427428,
+        "import_ms": 24.755374994128942,
+        "observed_messages": 10000,
+        "open_ms": 1.3163748662918806,
+        "ru_maxrss": 33570816
+      },
+      {
+        "first_search_ms": 45.445207972079515,
+        "import_ms": 24.692042032256722,
+        "observed_messages": 10000,
+        "open_ms": 1.3524589594453573,
+        "ru_maxrss": 33439744
+      },
+      {
+        "first_search_ms": 67.57712503895164,
+        "import_ms": 25.167958112433553,
+        "observed_messages": 10000,
+        "open_ms": 1.3652921188622713,
+        "ru_maxrss": 33751040
+      },
+      {
+        "first_search_ms": 51.36933410540223,
+        "import_ms": 24.502458982169628,
+        "observed_messages": 10000,
+        "open_ms": 1.4693329576402903,
+        "ru_maxrss": 33718272
+      },
+      {
+        "first_search_ms": 46.869958052411675,
+        "import_ms": 26.000708807259798,
+        "observed_messages": 10000,
+        "open_ms": 1.3140419032424688,
+        "ru_maxrss": 33554432
+      },
+      {
+        "first_search_ms": 46.50304187089205,
+        "import_ms": 24.52866709791124,
+        "observed_messages": 10000,
+        "open_ms": 1.4079581014811993,
+        "ru_maxrss": 33619968
+      },
+      {
+        "first_search_ms": 46.03108298033476,
+        "import_ms": 23.933166870847344,
+        "observed_messages": 10000,
+        "open_ms": 1.253125024959445,
+        "ru_maxrss": 33554432
+      }
+    ],
+    "store_open_ms": {
+      "p50": 1.3622501865029335,
+      "p95": 1.5072908718138933,
+      "trials": 20
+    },
+    "total_messages": 10000
+  },
+  "resources": {
+    "peak_rss_bytes": 37814272
+  },
+  "results": {
+    "batch_ingest_100_ms": {
+      "p50": 10.007834061980247,
+      "p95": 18.514875089749694,
+      "pass": true,
+      "threshold_p95_ms": 500,
+      "trials": 100
+    },
+    "lexical_search_top8_ms": {
+      "p50": 41.83762497268617,
+      "p95": 54.722415981814265,
+      "pass": true,
+      "threshold_p95_ms": 100,
+      "trials": 1000
+    },
+    "store_open_ms": {
+      "p50": 0.7976670749485493,
+      "p95": 1.1795840691775084,
+      "pass": true,
+      "threshold_p95_ms": 2000,
+      "trials": 20
+    }
+  }
+}

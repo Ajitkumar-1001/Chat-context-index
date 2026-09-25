@@ -4,12 +4,11 @@
  */
 
 import { VersionConflict } from "./errors.js";
-import { Diagnostic, linkedCorrections, search } from "./search.js";
+import { Diagnostic, LexicalCandidate, linkedCorrections, search } from "./search.js";
 import { HistoryStore } from "./store.js";
 import { BoundedProvider, CallBudget } from "./provider.js";
 import { renderEvidenceContext } from "./contextAssembly.js";
 import { navigateTree } from "./treeRetrieval.js";
-import { queryTerms, relevance } from "./relevance.js";
 
 export const CONTRACT_VERSION = 1;
 
@@ -61,6 +60,17 @@ export interface Usage {
   stageMs: Record<string, number>;
   inputTokens?: number | null;
   outputTokens?: number | null;
+}
+
+/** Evidence IDs encode retrieval priority; evidenceRank is the only parser. */
+export function evidenceId(rank: number): string {
+  return `ev_${rank}`;
+}
+
+export function evidenceRank(id: string): number {
+  const rank = Number(id.startsWith("ev_") ? id.slice(3) : id);
+  if (!Number.isInteger(rank)) throw new RangeError(`invalid evidence id: ${id}`);
+  return rank;
 }
 
 export function usageFromBudget(budget: CallBudget): Usage {
@@ -123,6 +133,25 @@ export async function retrieve(
   maxSelectedChunks?: number,
   options: { provider?: BoundedProvider; deadlineS?: number; budget?: CallBudget } = {},
 ): Promise<RetrievalResult> {
+  return (await retrieveWithLinks(store, query, mode, maxSelectedChunks, options)).result;
+}
+
+type Keyed = { messageId: string; sourcePointer: string };
+const candidateKey = (c: Keyed) => JSON.stringify([c.messageId, c.sourcePointer]);
+
+/**
+ * retrieve() plus which returned evidence is a later mention linked to which source; mirrors
+ * retrieve.py retrieve_with_links. Priority (plan-eng-review D17): each lexical hit, then its
+ * linked later mention, then tree-only candidates in navigator order. maxSelectedChunks bounds
+ * lexical and linked items only (D5); tree candidates keep their chunk and excerpt-budget bounds.
+ */
+export async function retrieveWithLinks(
+  store: HistoryStore,
+  query: string,
+  mode = "auto",
+  maxSelectedChunks?: number,
+  options: { provider?: BoundedProvider; deadlineS?: number; budget?: CallBudget } = {},
+): Promise<{ result: RetrievalResult; links: Map<string, string[]> }> {
   const limit = maxSelectedChunks ?? store.config.maxSelectedChunks;
   if (!["auto", "tree", "lexical"].includes(mode) || !Number.isInteger(limit) || limit < 1 || limit > 5000) {
     throw new RangeError("require a valid retrieval mode and 1 <= maxSelectedChunks <= 5000");
@@ -130,7 +159,7 @@ export async function retrieve(
   const deadlineAtMs = Date.now() + (options.deadlineS ?? store.config.requestDeadlineRetrieveS) * 1000;
   const budget = options.budget ?? new CallBudget(store.config.providerAttemptLimitRetrieve);
 
-  const [snapshot, searchResult, corrections, treeExists] = await store.withLock(async () => {
+  const [snapshot, searchResult, linking, treeExists] = await store.withLock(async () => {
     const snap = await captureSnapshot(store);
     const sr = await search(store, query, limit);
     const linked = await linkedCorrections(store, sr.candidates, query, snap.snapshotMaxSeq, limit);
@@ -140,15 +169,28 @@ export async function retrieve(
 
   let indexDegraded = !treeExists;
   let actualMode = "lexical";
-
   let diagnostics = [...searchResult.diagnostics];
-  let candidates = [...searchResult.candidates, ...corrections.candidates];
-  const correctionKeys = new Set(corrections.candidates.map(c => JSON.stringify([c.messageId, c.sourcePointer])));
+  // Links follow the source text, so every verbatim copy of a superseded statement (including a
+  // newer copy that outranks the linked one) carries the later mention with it.
+  const linkedByText = new Map<string, LexicalCandidate[]>();
+  for (const [source, linked] of linking.pairs) {
+    linkedByText.set(source.contentHash, [...(linkedByText.get(source.contentHash) ?? []), linked]);
+  }
+  const lexical = new Map<string, LexicalCandidate>();
+  const linkedTo = new Map<string, LexicalCandidate[]>();
+  for (const hit of searchResult.candidates) {
+    if (!lexical.has(candidateKey(hit))) lexical.set(candidateKey(hit), hit);
+    for (const linked of linkedByText.get(hit.contentHash) ?? []) {
+      linkedTo.set(candidateKey(hit), [...(linkedTo.get(candidateKey(hit)) ?? []), linked]);
+      if (!lexical.has(candidateKey(linked))) lexical.set(candidateKey(linked), linked);
+    }
+  }
   let selectedChunks: string[] = [];
-  let limited = searchResult.candidates.length >= limit || corrections.limited;
+  let treeCandidates: LexicalCandidate[] = [];
+  let limited = searchResult.candidates.length >= limit || linking.limited || lexical.size > limit;
   if (mode !== "lexical" && options.provider && treeExists && query.trim()) {
     const tree = await navigateTree(store, query, snapshot, options.provider, budget, deadlineAtMs, limit);
-    candidates = [...tree.candidates, ...candidates];
+    treeCandidates = tree.candidates;
     selectedChunks = tree.selected;
     diagnostics.push(...tree.diagnostics);
     indexDegraded = tree.diagnostics.length > 0;
@@ -164,23 +206,19 @@ export async function retrieve(
     throw new VersionConflict("history was cleared between snapshot capture and result emission");
   }
   if (selectedChunks.length && current.indexRevision !== snapshot.indexRevision) {
-    candidates = [...searchResult.candidates, ...corrections.candidates]; selectedChunks = []; actualMode = "lexical";
+    treeCandidates = []; selectedChunks = []; actualMode = "lexical";
     indexDegraded = true;
     diagnostics.push({ code: "tree_revision_changed", stage: "retrieve", retryable: false });
   }
-  const unique = new Map<string, typeof candidates[number]>();
-  const terms = queryTerms(query);
-  candidates = candidates.map(candidate => ({ candidate, score: relevance(candidate.excerpt, terms),
-    correction: correctionKeys.has(JSON.stringify([candidate.messageId, candidate.sourcePointer])) }))
-    .sort((a, b) => Number(b.correction) - Number(a.correction) || b.score - a.score || b.candidate.seq - a.candidate.seq)
-    .map(({ candidate }) => candidate);
-  for (const c of candidates) {
-    const key = JSON.stringify([c.messageId, c.sourcePointer]);
-    if (!unique.has(key)) unique.set(key, c);
+  // Lexical items first (a duplicate keeps its query-centered lexical excerpt), then tree-only
+  // items; a lexical item past the limit returns only if a selected chunk contains it.
+  const ordered = new Map([...lexical.entries()].slice(0, limit));
+  for (const candidate of selectedChunks.length ? treeCandidates : []) {
+    const k = candidateKey(candidate);
+    if (!ordered.has(k)) ordered.set(k, lexical.get(k) ?? candidate);
   }
-  limited ||= unique.size > limit;
-  const evidence: Evidence[] = [...unique.values()].slice(0, limit).map((c, i) => ({
-    evidenceId: `ev_${i + 1}`,
+  const evidence: Evidence[] = [...ordered.values()].map((c, i) => ({
+    evidenceId: evidenceId(i + 1),
     messageId: c.messageId,
     seq: c.seq,
     sourcePointer: c.sourcePointer,
@@ -192,6 +230,12 @@ export async function retrieve(
     if (Array.from(renderEvidenceContext([...bounded, item])).length <= store.config.maxEvidenceTextScalars) bounded.push(item);
   }
   const omitted = evidence.length - bounded.length;
+  const returned = new Set(bounded.map(candidateKey));
+  const links = new Map<string, string[]>();
+  for (const [source, linked] of linkedTo) {
+    const keys = linked.map(candidateKey).filter(k => returned.has(k));
+    if (returned.has(source) && keys.length) links.set(source, keys);
+  }
   bounded.sort((a, b) => a.seq - b.seq);
 
   const status = bounded.length > 0 ? "ok" : "empty";
@@ -199,13 +243,13 @@ export async function retrieve(
     diagnostics = [{ code: "no_matching_evidence", stage: "retrieve", retryable: false }];
   }
 
-  return {
+  const result: RetrievalResult = {
     contractVersion: CONTRACT_VERSION,
     historyId: store.historyId,
     status,
     snapshot,
     evidence: bounded,
-    routing: { requestedMode: mode, actualMode, candidateCount: unique.size, selectedChunkIds: selectedChunks },
+    routing: { requestedMode: mode, actualMode, candidateCount: ordered.size, selectedChunkIds: selectedChunks },
     coverage: {
       coverageLimited: limited || omitted > 0,
       indexDegraded,
@@ -214,4 +258,5 @@ export async function retrieve(
     diagnostics,
     usage: usageFromBudget(budget),
   };
+  return { result, links };
 }

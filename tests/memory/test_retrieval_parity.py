@@ -20,7 +20,7 @@ from cci.provider import (
     ProviderRequest,
     ProviderResponse,
 )
-from cci.retrieve import retrieve
+from cci.retrieve import evidence_rank, retrieve
 from cci.search import search
 from cci.store import HistoryStore
 
@@ -54,6 +54,7 @@ def _python_results(tmp_path: Path) -> dict:
                     store, fixture["query"], mode=mode, provider=provider,
                     recent_messages=fixture.get("recent_messages", 0),
                     max_messages=fixture["max_messages"],
+                    **({"max_chars": fixture["max_chars"]} if "max_chars" in fixture else {}),
                 )
                 messages = await store.get_messages(1, len(fixture["messages"]))
                 rendered = context.text
@@ -161,7 +162,7 @@ def test_exact_python_typescript_retrieval_parity(tmp_path: Path) -> None:
         assert [e["seq"] for e in evidence] == fixture["expected_retrieval"], fixture["id"]
         assert [e["seq"] for e in result["context"]["items"]] == fixture["expected_context"], fixture["id"]
         if "expected_priority" in fixture:
-            assert [e["seq"] for e in sorted(evidence, key=lambda e: int(e["evidenceId"].split("_")[1]))] == fixture["expected_priority"]
+            assert [e["seq"] for e in sorted(evidence, key=lambda e: evidence_rank(e["evidenceId"]))] == fixture["expected_priority"]
         if "expected_pointer" in fixture:
             assert evidence[0]["sourcePointer"] == fixture["expected_pointer"]
         if "expected_contains" in fixture:
@@ -170,4 +171,6 @@ def test_exact_python_typescript_retrieval_parity(tmp_path: Path) -> None:
             assert result["retrieval"]["routing"]["candidateCount"] == fixture["expected_candidate_count"]
         if "expected_selected_spans" in fixture:
             assert result["retrieval"]["routing"]["selectedChunkIds"] == fixture["expected_selected_spans"]
+        for seq, text in fixture.get("expected_excerpts", {}).items():
+            assert text in next(e["excerpt"] for e in evidence if e["seq"] == int(seq)), fixture["id"]
         assert all(len(e["excerpt"]) <= 200 for e in evidence)

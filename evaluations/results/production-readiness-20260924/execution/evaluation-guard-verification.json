@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "status": "OFFLINE_AND_HOSTED_GUARDS_PASS",
+  "status": "OFFLINE_GUARDS_PASS_HOSTED_CI_PENDING",
   "source_sha256": {
     "evaluations/run_allocated_comparison.py": "5b55c07723eb5b777302332de0267cfd7186ccfd7d45bb7487686d0f7bfd625d",
     "evaluations/run_allocated_release.py": "df6e649bf17394487e4845c4d2917babc48df89e1cf2896e35151b714745d3e1",
@@ -16,6 +17,7 @@
     "test_record": "combined-guard-tests.xml",
     "note": "Final committed sources passed hosted CI; local test records are retained separately.",
     "hosted_ci_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36064740436"
+    "note": "Only line wrapping changed after the combined local test; hosted CI will verify the final committed source."
   },
   "regressions": [
     "Canonical claims remain single-use through symlink aliases.",

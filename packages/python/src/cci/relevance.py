@@ -1,7 +1,8 @@
 """Local query matching and original-text windows; no model calls or generated evidence."""
 
 from collections import Counter
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator, Mapping, Sequence
+from functools import lru_cache
 from unicodedata import category, normalize
 
 _STOP_WORDS = frozenset(
@@ -25,16 +26,19 @@ def _words(text: str) -> Iterator[tuple[int, int, str]]:
             start = None
 
 
+@lru_cache(maxsize=65_536)
 def _key(word: str) -> str:
-    """A small, deterministic inflection key shared with the TypeScript implementation."""
-    if word in ("chosen", "chose"):
-        return "choos"
-    if word in ("used", "using"):
-        return "use"
+    """A small, deterministic inflection key shared with the TypeScript implementation.
+
+    Rules are generic suffix rules only; `spec/fixtures/term-normalization.json` pins them.
+    """
     if len(word) < 4 or not word.isascii() or not word.isalpha():
         return word
     if len(word) == 4:
         if word.endswith("e") or (word.endswith("s") and not word.endswith(("ss", "us", "is"))):
+            return word[:-1]
+        # ponytail: "used" -> "use" also maps "shed" -> "she"; FTS5 porter stemming if collisions matter.
+        if word.endswith("ed") and word[1] not in "aeiou":
             return word[:-1]
         return word
     if word.endswith("ies"):
@@ -75,15 +79,46 @@ def fts_term_expression(key: str) -> str:
     forms = [key, key + "e", key + "s", key + "es", key + "ed", key + "ing"]
     if key and key[-1] not in "aeiouy":
         forms.extend((key + key[-1] + "ed", key + key[-1] + "ing"))
-    if key == "choos":
-        forms.extend(("chosen", "chose"))
-    if key == "use":
-        forms.extend(("used", "using"))
+    if key.endswith("e"):
+        forms.append(key + "d")
     if key.endswith("y"):
         forms.extend((key[:-1] + "ies", key[:-1] + "ied"))
     return "(" + " OR ".join(
         '"' + form.replace('"', '""') + '"' for form in dict.fromkeys(forms) if _key(form) == key
     ) + ")"
+
+
+def text_keys(text: str) -> set[str]:
+    return {_key(word) for _, _, word in _words(text)}
+
+
+def best_anchor(text: str, query_keys: set[str], hit_counts: Mapping[str, int]) -> str | None:
+    """The most name-like non-query key in `text` that is rare among the current hits.
+
+    Eligible (plan-eng-review D16): not a stop word, key of 3+ characters, not a query key, and in
+    at most 2 current hits. Rank: inner capitals, digits, or a mid-sentence capital (2) over a
+    sentence-initial capital (1) over lowercase (0); then fewer hits; then later position.
+    """
+    best: tuple[tuple[int, int, int], str] | None = None
+    previous_end = 0
+    for start, end, word in _words(text):
+        gap = text[previous_end:start].strip()
+        at_sentence_start = previous_end == 0 or (gap != "" and gap[-1] in ".!?:;")
+        previous_end = end
+        key = _key(word)
+        hits = hit_counts.get(key, 0)
+        if word in _STOP_WORDS or len(key) < 3 or key in query_keys or hits > 2:
+            continue
+        raw = text[start:end]
+        upper = [category(c) == "Lu" for c in raw]
+        has_digit = any(category(c).startswith("N") for c in raw)
+        if any(upper[1:]) or has_digit or (upper[0] and not at_sentence_start):
+            score = 2
+        else:
+            score = 1 if upper[0] else 0
+        if best is None or (score, -hits, start) > best[0]:
+            best = ((score, -hits, start), key)
+    return best[1] if best else None
 
 
 def relevance(text: str, terms: Sequence[str]) -> int:

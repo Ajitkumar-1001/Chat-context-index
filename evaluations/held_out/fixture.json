@@ -79534,7 +79534,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79557,7 +79558,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79580,7 +79582,8 @@
           "acceptable_span": {
             "start": 17,
             "end": 27
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79601,7 +79604,11 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": [
+            111,
+            278
+          ]
         }
       ],
       "answer_rubric": {
@@ -79624,7 +79631,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79647,7 +79655,10 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": [
+            322
+          ]
         }
       ],
       "answer_rubric": {
@@ -79670,7 +79681,8 @@
           "acceptable_span": {
             "start": 46,
             "end": 52
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79691,7 +79703,13 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": [
+            14,
+            19,
+            149,
+            224
+          ]
         }
       ],
       "answer_rubric": {
@@ -79712,7 +79730,8 @@
           "acceptable_span": {
             "start": 17,
             "end": 27
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79733,7 +79752,10 @@
           "acceptable_span": {
             "start": 36,
             "end": 43
-          }
+          },
+          "verbatim_copy_indexes": [
+            45
+          ]
         }
       ],
       "answer_rubric": {
@@ -79754,7 +79776,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 44
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79777,7 +79800,8 @@
           "acceptable_span": {
             "start": 0,
             "end": 5
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79798,7 +79822,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79821,7 +79846,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79844,7 +79870,11 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": [
+            5,
+            312
+          ]
         }
       ],
       "answer_rubric": {
@@ -79867,7 +79897,8 @@
           "acceptable_span": {
             "start": 36,
             "end": 43
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79888,7 +79919,8 @@
           "acceptable_span": {
             "start": 28,
             "end": 32
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79909,7 +79941,8 @@
           "acceptable_span": {
             "start": 43,
             "end": 45
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79930,7 +79963,8 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79953,7 +79987,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79976,7 +80011,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 44
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -79999,7 +80035,10 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": [
+            181
+          ]
         }
       ],
       "answer_rubric": {
@@ -80022,7 +80061,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80045,7 +80085,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80066,7 +80107,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80089,7 +80131,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80112,7 +80155,8 @@
           "acceptable_span": {
             "start": 36,
             "end": 43
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80133,7 +80177,12 @@
           "acceptable_span": {
             "start": 18,
             "end": 24
-          }
+          },
+          "verbatim_copy_indexes": [
+            78,
+            109,
+            199
+          ]
         }
       ],
       "answer_rubric": {
@@ -80156,7 +80205,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80179,7 +80229,8 @@
           "acceptable_span": {
             "start": 43,
             "end": 45
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80200,7 +80251,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80223,7 +80275,8 @@
           "acceptable_span": {
             "start": 28,
             "end": 32
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80244,7 +80297,8 @@
           "acceptable_span": {
             "start": 36,
             "end": 43
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80265,7 +80319,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80288,7 +80343,8 @@
           "acceptable_span": {
             "start": 23,
             "end": 29
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80311,7 +80367,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80334,7 +80391,8 @@
           "acceptable_span": {
             "start": 17,
             "end": 27
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80355,7 +80413,8 @@
           "acceptable_span": {
             "start": 23,
             "end": 29
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80378,7 +80437,11 @@
           "acceptable_span": {
             "start": 42,
             "end": 44
-          }
+          },
+          "verbatim_copy_indexes": [
+            234,
+            267
+          ]
         }
       ],
       "answer_rubric": {
@@ -80401,7 +80464,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80424,7 +80488,8 @@
           "acceptable_span": {
             "start": 17,
             "end": 27
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80445,7 +80510,8 @@
           "acceptable_span": {
             "start": 28,
             "end": 32
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80466,7 +80532,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80489,7 +80556,10 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": [
+            32
+          ]
         }
       ],
       "answer_rubric": {
@@ -80510,7 +80580,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80533,7 +80604,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80556,7 +80628,8 @@
           "acceptable_span": {
             "start": 18,
             "end": 24
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80579,7 +80652,8 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80602,7 +80676,10 @@
           "acceptable_span": {
             "start": 43,
             "end": 45
-          }
+          },
+          "verbatim_copy_indexes": [
+            233
+          ]
         }
       ],
       "answer_rubric": {
@@ -80623,7 +80700,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80646,7 +80724,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80669,7 +80748,8 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80692,7 +80772,10 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": [
+            317
+          ]
         }
       ],
       "answer_rubric": {
@@ -80715,7 +80798,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 44
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80738,7 +80822,8 @@
           "acceptable_span": {
             "start": 23,
             "end": 29
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80761,7 +80846,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80784,7 +80870,11 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": [
+            282,
+            405
+          ]
         }
       ],
       "answer_rubric": {
@@ -80807,7 +80897,11 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": [
+            137,
+            202
+          ]
         }
       ],
       "answer_rubric": {
@@ -80830,7 +80924,8 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80853,7 +80948,8 @@
           "acceptable_span": {
             "start": 18,
             "end": 24
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80876,7 +80972,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80899,7 +80996,8 @@
           "acceptable_span": {
             "start": 30,
             "end": 41
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80920,7 +81018,8 @@
           "acceptable_span": {
             "start": 46,
             "end": 52
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80941,7 +81040,8 @@
           "acceptable_span": {
             "start": 17,
             "end": 27
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80971,7 +81071,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -80994,7 +81095,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81017,7 +81119,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81040,7 +81143,8 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81072,7 +81176,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 44
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81095,7 +81200,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81118,7 +81224,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81141,7 +81248,11 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": [
+            44,
+            423
+          ]
         }
       ],
       "answer_rubric": {
@@ -81173,7 +81284,8 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81196,7 +81308,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81219,7 +81332,8 @@
           "acceptable_span": {
             "start": 23,
             "end": 29
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81242,7 +81356,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81274,7 +81389,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 44
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81297,7 +81413,10 @@
           "acceptable_span": {
             "start": 17,
             "end": 27
-          }
+          },
+          "verbatim_copy_indexes": [
+            232
+          ]
         }
       ],
       "answer_rubric": {
@@ -81318,7 +81437,10 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": [
+            187
+          ]
         }
       ],
       "answer_rubric": {
@@ -81341,7 +81463,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81373,7 +81496,10 @@
           "acceptable_span": {
             "start": 18,
             "end": 24
-          }
+          },
+          "verbatim_copy_indexes": [
+            366
+          ]
         }
       ],
       "answer_rubric": {
@@ -81396,7 +81522,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81419,7 +81546,8 @@
           "acceptable_span": {
             "start": 73,
             "end": 84
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81442,7 +81570,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 44
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81474,7 +81603,8 @@
           "acceptable_span": {
             "start": 41,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81497,7 +81627,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 51
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81520,7 +81651,8 @@
           "acceptable_span": {
             "start": 46,
             "end": 52
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81541,7 +81673,8 @@
           "acceptable_span": {
             "start": 42,
             "end": 47
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81573,7 +81706,8 @@
           "acceptable_span": {
             "start": 43,
             "end": 45
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81594,7 +81728,8 @@
           "acceptable_span": {
             "start": 54,
             "end": 60
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81617,7 +81752,8 @@
           "acceptable_span": {
             "start": 18,
             "end": 24
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
@@ -81640,7 +81776,8 @@
           "acceptable_span": {
             "start": 23,
             "end": 29
-          }
+          },
+          "verbatim_copy_indexes": []
         }
       ],
       "answer_rubric": {
