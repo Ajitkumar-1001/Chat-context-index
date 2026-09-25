@@ -1,0 +1,90 @@
+{
+  "as_of_utc": "2026-09-25T02:29:27.897915+00:00",
+  "status": "BLOCKED_NOT_RELEASE_READY",
+  "candidate_sha": "e762f7bd0033e3ae8326f647f14c901438c74220",
+  "ci_run_id": "36082860041",
+  "performance_run_id": "36083318975",
+  "ci": {
+    "jobs_passed": 21,
+    "python_tests_passed": 511,
+    "node_tests_passed": 88,
+    "matrix_cells_passed": 16,
+    "interoperability_checks_passed": 144
+  },
+  "live_smoke": {
+    "allocation": "smoke-candidate-004",
+    "status": "PASS",
+    "successful_calls": 8,
+    "input_tokens": 1066,
+    "output_tokens": 308,
+    "estimated_usd": 0.0010898,
+    "unknown_usage": 0
+  },
+  "performance": {
+    "all_four_runs_complete": true,
+    "ten_thousand_filesystem_cold_target": "FAIL",
+    "hundred_thousand_scale_observations": "COMPLETE",
+    "reference_hardware_gate": "NOT_QUALIFIED",
+    "public_summary_sha256": "3106930adb0c4233836a8b828fbae798be85215477ce6df5b6382ea098ba1e7e"
+  },
+  "open_items": [
+    {
+      "item": "Cold-search implementation",
+      "state": "PENDING_USER_STORAGE_CONTRACT_APPROVAL",
+      "proposal": "docs/cold-search-index-proposal.md",
+      "recommendation": "Compact persistent metadata index with explicit migration; remeasure installed packages on Linux."
+    },
+    {
+      "item": "Real-model quality and cache trials",
+      "state": "PENDING_ADDITIONAL_BUDGET_AND_VERIFIED_PROVIDER_CAPACITY",
+      "recommendation": "After fixing runtime, verify same-key project capacity and allocate three frozen trials within approved caps."
+    },
+    {
+      "item": "Performance hardware criterion",
+      "state": "PENDING_USER_DECISION",
+      "recommendation": "Accept observed GitHub-hosted profile with unchanged latency/completeness targets, or supply original reserved reference host."
+    },
+    {
+      "item": "Independent answer and developer reviews",
+      "state": "ACTUAL_HUMANS_REQUIRED",
+      "recommendation": "Use prepared protocols and candidate-bound trial bundles; retain real attestations."
+    },
+    {
+      "item": "npm bootstrap",
+      "state": "SIGNED_IN_2FA_INCOMPLETE_PACKAGE_UNPUBLISHED",
+      "recommendation": "Owner finishes browser 2FA; prepare initial publication and package-level trusted publisher only after final release approval."
+    },
+    {
+      "item": "Public website URL",
+      "state": "UNVERIFIED_VERCEL_SIGN_IN_REQUIRED",
+      "recommendation": "Check the existing project Domains view with an authenticated owner session; do not disable protections blindly."
+    },
+    {
+      "item": "Final release approval",
+      "state": "NOT_GRANTED",
+      "recommendation": "Approve exact final source/archive hashes only after all preceding gates pass."
+    }
+  ],
+  "publication_performed": false,
+  "original_checkout_preserved": true,
+  "documentation_update": {
+    "pull_request": "https://github.com/Ajitkumar-1001/Chat-context-index/pull/14",
+    "head_sha": "5b78fa55fa925d1523a7fa4cf4a17aa3ba5e8b8a",
+    "status": "MERGED",
+    "merge_sha": "09587634c430ac3b0ca5e3a6e48c8e29a5127548",
+    "pr_ci_jobs_passed": 21,
+    "main_ci_run_id": "36087024065",
+    "main_ci_status": "SUCCESS",
+    "local_website_check_build": "PASS_ZERO_DIAGNOSTICS",
+    "markdown_tests_passed": 2,
+    "staged_secret_scan": "PASS_ZERO_FINDINGS",
+    "main_ci_jobs_passed": 21,
+    "production_deployment": {
+      "id": 6652516101,
+      "status": "SUCCESS",
+      "url": "https://website-8r7vhu67y-ajits-projects-b59ab691.vercel.app",
+      "public_response_title": "Login \u2013 Vercel",
+      "public_content_verified": false
+    }
+  }
+}
