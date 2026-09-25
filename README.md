@@ -43,6 +43,9 @@ The host keeps its document retriever, model, and agent framework. ContIndex sup
 
 ## Quick start
 
+Existing schema-version-1 histories require an explicit, backed-up migration before opening
+with these SDKs. New histories use schema version 2. See [migration and recovery](docs/backup-and-migration.md).
+
 From the repository root, using Python 3.11–3.14:
 
 ```bash

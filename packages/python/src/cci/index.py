@@ -28,6 +28,7 @@ from .io_worker import fetchall, fetchone
 from .models import Chunk, Node, NodeChunk
 from .provider import CallBudget, MemoizedProvider, ProviderRequest
 from .retrieve import Usage, usage_from_budget
+from .search_metadata import assert_search_metadata
 from .store import HistoryStore, map_storage_error
 from .tree import plan_hierarchy
 
@@ -138,6 +139,7 @@ async def index(
     # AsyncConnection is unsafe).
     async with store.write_lock:
         async with store.connection:
+            await assert_search_metadata(store.connection)
             history_revision, index_revision, index_committed_seq = await _read_revisions(store)
             cache_generation = await _read_cache_generation(store)
             cursor = await store.connection.execute(
@@ -276,6 +278,7 @@ async def index(
         try:
             async with store.write_lock:
                 async with store.connection:
+                    await assert_search_metadata(store.connection)
                     current_history_revision, current_index_revision, _ = await _read_revisions(store)
                     if (
                         current_history_revision != history_revision

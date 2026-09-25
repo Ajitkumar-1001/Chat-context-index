@@ -68,6 +68,9 @@ def candidate(tmp_path):
               "sdist_installed_content_matches_wheel": "PASS",
               "default_cache_without_optional_dependencies_or_credentials": "PASS",
               "package_documentation_and_license": "PASS", "typescript_consumer_typecheck": "PASS",
+              "schema_v1_migration": "PASS",
+              "migration_checks": [{"migrator": writer, "reader": reader, "status": "PASS"}
+                                   for writer in runtimes for reader in runtimes],
               "checks": [{"writer": writer, "reader": reader, "status": "PASS"}
                          for writer in runtimes for reader in runtimes],
               "artifacts": [{"filename": str(path.relative_to(artifacts)),
@@ -101,6 +104,26 @@ def test_publish_copies_verified_archives_without_rebuilding(candidate):
             assert path.read_bytes() == (source / "verified-artifacts" / path.name).read_bytes()
     assert len(list((output / "python").iterdir())) == 2
     assert len(list((output / "npm").iterdir())) == 1
+
+
+@pytest.mark.parametrize("mutation", ["missing", "failed", "incomplete", "duplicate", "failed_cell"])
+def test_schema_migration_evidence_is_required(candidate, mutation):
+    report_path = candidate[3]
+    report = json.loads(report_path.read_text())
+    if mutation == "missing":
+        del report["schema_v1_migration"]
+    elif mutation == "failed":
+        report["schema_v1_migration"] = "FAIL"
+    elif mutation == "incomplete":
+        report["migration_checks"].pop()
+    elif mutation == "duplicate":
+        report["migration_checks"][-1] = report["migration_checks"][0]
+    else:
+        report["migration_checks"][0]["status"] = "FAIL"
+    report_path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="migration"):
+        verify(candidate)
+    assert not candidate[2].exists()
 
 
 @pytest.mark.parametrize("options", [{"sha": "b" * 40}, {"run_id": "456"}, {"tag": "v0.2.0"}])

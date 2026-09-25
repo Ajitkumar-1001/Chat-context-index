@@ -24,9 +24,11 @@ import apsw
 from .cache import RedisMemoCache
 from .cache_key import scope_digest
 from .errors import BudgetExceeded, InputValidationError
+from .search_metadata import assert_search_metadata, immediate_transaction
 from .store import HistoryStore, map_storage_error
 
 _CLEARED_TABLES = (
+    "lexical_message_meta",
     "messages",
     "message_fts",
     "summary_fts",
@@ -91,7 +93,8 @@ async def clear_history(store: HistoryStore, expected_history_id: str) -> ClearR
         async with store.write_lock:
             connection = store.connection
             try:
-                async with connection:
+                async with immediate_transaction(connection):
+                    await assert_search_metadata(connection)
                     cursor = await connection.execute(
                         "SELECT cache_generation FROM store_meta WHERE id = 1"
                     )
@@ -103,6 +106,7 @@ async def clear_history(store: HistoryStore, expected_history_id: str) -> ClearR
                     await connection.execute(
                         "UPDATE store_meta SET cache_generation = cache_generation + 1, "
                         "history_revision = history_revision + 1, "
+                        "search_metadata_revision = search_metadata_revision + 1, "
                         "index_revision = index_revision + 1, "
                         "index_committed_seq = 0, index_pending_seq = 0 WHERE id = 1"
                     )

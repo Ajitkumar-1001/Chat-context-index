@@ -7,10 +7,11 @@
 
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { InputValidationError, StoreNotEmpty } from "./errors.js";
+import { InputValidationError, StoreNotEmpty, VersionConflict } from "./errors.js";
 import { EXPORT_FORMAT_VERSION } from "./export.js";
 import { HistoryStore } from "./store.js";
 import { mapStorageError } from "./ioWorker.js";
+import { insertSearchMetadata, requireSearchMetadata } from "./searchMetadata.js";
 
 const IMPORT_BATCH_SIZE = 500;
 const REQUIRED_MESSAGE_FIELDS = [
@@ -95,10 +96,19 @@ export async function importHistory(store: HistoryStore, srcPath: string): Promi
   try {
     await store.withLock(async () => {
       const io = store.connection;
+      let expectedRevision: number | undefined;
       try {
-        for (let batchStart = 0; batchStart < records.length; batchStart += IMPORT_BATCH_SIZE) {
+        for (let batchStart = 0; batchStart < Math.max(records.length, 1); batchStart += IMPORT_BATCH_SIZE) {
           const batch = records.slice(batchStart, batchStart + IMPORT_BATCH_SIZE);
           await io.exec("BEGIN IMMEDIATE");
+          const revision = await requireSearchMetadata(io);
+          if (expectedRevision !== undefined && revision !== expectedRevision) {
+            throw new VersionConflict("history changed between import batches");
+          }
+          if (batchStart === 0) {
+            const count = await io.get<{ cnt: number }>("SELECT count(*) AS cnt FROM messages WHERE history_id = ?", [store.historyId]);
+            if (count!.cnt > 0) throw new StoreNotEmpty("import target became non-empty before its first transaction");
+          }
           let maxSeq = 0;
           for (const record of batch) {
             const payloadStr = JSON.stringify(record.original_payload);
@@ -124,20 +134,23 @@ export async function importHistory(store: HistoryStore, srcPath: string): Promi
               ],
             );
             if (textProjection != null) {
-              await io.run("INSERT INTO message_fts (message_id, history_id, text) VALUES (?, ?, ?)", [
+              const fts = await io.run("INSERT INTO message_fts (message_id, history_id, text) VALUES (?, ?, ?)", [
                 record.message_id,
                 store.historyId,
                 textProjection,
               ]);
+              await insertSearchMetadata(io, fts.lastInsertRowid, record.message_id as string, store.historyId, record.seq as number);
             }
             maxSeq = Math.max(maxSeq, record.seq as number);
             imported++;
           }
-          await io.run(
+          if (batch.length) await io.run(
             "UPDATE store_meta SET history_revision = history_revision + 1, " +
+              "search_metadata_revision = search_metadata_revision + 1, " +
               "seq_high_water_mark = MAX(seq_high_water_mark, ?) WHERE id = 1",
             [maxSeq],
           );
+          expectedRevision = revision + (batch.length ? 1 : 0);
           await io.exec("COMMIT");
         }
       } catch (err) {

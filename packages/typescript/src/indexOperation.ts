@@ -16,6 +16,7 @@ import { Usage, emptyUsage, usageFromBudget } from "./retrieve.js";
 import { HistoryStore } from "./store.js";
 import { mapStorageError } from "./ioWorker.js";
 import { TreeNode, planHierarchy } from "./tree.js";
+import { requireSearchMetadata } from "./searchMetadata.js";
 
 export interface Coverage {
   startSeq: number | null;
@@ -86,23 +87,32 @@ export async function indexOperation(
   const deadlineAtMs = nowMs() + (deadlineS ?? store.config.requestDeadlineIndexS) * 1000;
 
   const [historyRevision, indexRevision, indexCommittedSeq, seqHighWaterMark, rows, previous, oldLeaves, generation] = await store.withLock(async () => {
-    const [hr, ir, ics] = await readRevisions(store);
-    const hwRow = await store.connection.get<{ seq_high_water_mark: number; cache_generation: number }>("SELECT seq_high_water_mark, cache_generation FROM store_meta WHERE id = 1");
-    const shw = hwRow?.seq_high_water_mark ?? 0;
-    const pendingStart = rebuild ? 1 : ics + 1;
-    const pendingEnd = shw;
-    const fetchedRows =
-      pendingStart <= pendingEnd
-        ? await store.connection.all<{ seq: number; text_projection: string | null }>(
-            "SELECT seq, text_projection FROM messages WHERE history_id = ? AND seq >= ? AND seq <= ? ORDER BY seq",
-            [store.historyId, pendingStart, pendingEnd],
-          )
-        : [];
-    const previous = rebuild ? [] : await store.connection.all<TreeNode>("SELECT * FROM nodes WHERE history_id = ?", [store.historyId]);
-    const links = await store.connection.all<{ node_id: string }>(
-      "SELECT DISTINCT nc.node_id FROM node_chunks nc JOIN nodes n ON n.node_id = nc.node_id WHERE n.history_id = ?", [store.historyId]);
-    const leafIds = new Set(links.map(l => l.node_id));
-    return [hr, ir, ics, shw, fetchedRows, previous, previous.filter(n => leafIds.has(n.node_id)), hwRow!.cache_generation] as const;
+    const io = store.connection;
+    await io.exec("BEGIN");
+    try {
+      await requireSearchMetadata(io);
+      const [hr, ir, ics] = await readRevisions(store);
+      const hwRow = await store.connection.get<{ seq_high_water_mark: number; cache_generation: number }>("SELECT seq_high_water_mark, cache_generation FROM store_meta WHERE id = 1");
+      const shw = hwRow?.seq_high_water_mark ?? 0;
+      const pendingStart = rebuild ? 1 : ics + 1;
+      const pendingEnd = shw;
+      const fetchedRows =
+        pendingStart <= pendingEnd
+          ? await store.connection.all<{ seq: number; text_projection: string | null }>(
+              "SELECT seq, text_projection FROM messages WHERE history_id = ? AND seq >= ? AND seq <= ? ORDER BY seq",
+              [store.historyId, pendingStart, pendingEnd],
+            )
+          : [];
+      const previous = rebuild ? [] : await store.connection.all<TreeNode>("SELECT * FROM nodes WHERE history_id = ?", [store.historyId]);
+      const links = await store.connection.all<{ node_id: string }>(
+        "SELECT DISTINCT nc.node_id FROM node_chunks nc JOIN nodes n ON n.node_id = nc.node_id WHERE n.history_id = ?", [store.historyId]);
+      const leafIds = new Set(links.map(l => l.node_id));
+      await io.exec("COMMIT");
+      return [hr, ir, ics, shw, fetchedRows, previous, previous.filter(n => leafIds.has(n.node_id)), hwRow!.cache_generation] as const;
+    } catch (error) {
+      await io.exec("ROLLBACK").catch(() => undefined);
+      throw error;
+    }
   });
 
   const pendingStart = rebuild ? 1 : indexCommittedSeq + 1;
@@ -181,6 +191,7 @@ export async function indexOperation(
         const io = store.connection;
         await io.exec("BEGIN IMMEDIATE");
         try {
+          await requireSearchMetadata(io);
           const [currentHistoryRevision, currentIndexRevision] = await readRevisions(store);
           const currentGeneration = await io.get<{ cache_generation: number }>("SELECT cache_generation FROM store_meta WHERE id = 1");
           if (currentHistoryRevision !== historyRevision || currentIndexRevision !== indexRevision || currentGeneration!.cache_generation !== generation) {

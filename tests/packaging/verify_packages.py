@@ -10,11 +10,13 @@ import json
 import os
 import platform
 import shutil
+import sqlite3
 import subprocess
 import sys
 import tarfile
 import tempfile
 import zipfile
+from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -53,11 +55,66 @@ def wheel_payload(path: Path) -> dict[str, bytes]:
                 if not name.endswith("/RECORD")}
 
 
+def create_v1_history(path):
+    """A frozen prior format with FTS rowids deliberately different from message sequences."""
+    with closing(sqlite3.connect(path)) as db, db:
+        db.executescript((ROOT / "spec/fixtures/storage-v1.sql").read_text())
+        db.execute("INSERT INTO store_meta (id, history_id, store_instance_id, schema_version, "
+                   "history_revision, index_revision, cache_generation, seq_high_water_mark) "
+                   "VALUES (1, 't_migration', 'si_migration', 1, 7, 2, 3, 40)")
+        for identity, seq, content, fts_rowid in (
+            ("m_v1_first", 5, "Remember the cafés in Oslo.", 3),
+            ("m_v1_tool", 9, None, None),
+            ("m_v1_later", 20, "The current launch is Oslo.", 7),
+        ):
+            payload = {"role": "assistant" if content is None else "user", "content": content}
+            if content is None:
+                payload["tool_calls"] = [{"id": "call_v1", "type": "function",
+                                          "function": {"name": "lookup", "arguments": "{}"}}]
+            raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            db.execute("INSERT INTO messages (message_id, seq, history_id, source_id, external_id, "
+                       "role, original_payload, text_projection, payload_hash, created_at) "
+                       "VALUES (?, ?, 't_migration', 'prior-store', ?, ?, ?, ?, ?, 1234)",
+                       (identity, seq, identity, payload["role"], raw, content,
+                        hashlib.sha256(raw.encode()).hexdigest()))
+            if content is not None:
+                db.execute("INSERT INTO message_fts(rowid, message_id, history_id, text) VALUES (?, ?, ?, ?)",
+                           (fts_rowid, identity, "t_migration", content))
+        db.execute("INSERT INTO ingest_receipts (history_id, source_id, idempotency_key, request_hash) "
+                   "VALUES ('t_migration', 'prior-store', 'prior-receipt', ?)", ("a" * 64,))
+        # Every original table is populated so preservation assertions cannot pass vacuously.
+        db.execute("INSERT INTO exchanges VALUES ('ex_v1', 't_migration', 1)")
+        db.execute("INSERT INTO chunks VALUES ('ch_v1', 't_migration', '5-20', ?, 1)",
+                   ("b" * 64,))
+        db.execute("INSERT INTO nodes VALUES ('n_v1', 't_migration', NULL, 0, '5-20', "
+                   "'Prior launch', 'Original Oslo summary', 'published', 2)")
+        db.execute("INSERT INTO node_chunks VALUES ('n_v1', 'ch_v1', 0)")
+        db.execute("INSERT INTO summary_fts(rowid, node_id, history_id, text) "
+                   "VALUES (11, 'n_v1', 't_migration', 'Original Oslo summary')")
+        db.execute("INSERT INTO pending_cache_purges VALUES ('retired-v1-scope', 1234)")
+        db.execute("UPDATE store_meta SET index_committed_seq=20, index_pending_seq=20 WHERE id=1")
+
+
+def history_snapshot(path, columns=None):
+    """Compare logical v1 data, including FTS rowids, while permitting the new derived schema."""
+    tables = ("store_meta", "messages", "ingest_receipts", "exchanges", "chunks", "nodes",
+              "node_chunks", "message_fts", "summary_fts", "pending_cache_purges")
+    with closing(sqlite3.connect(path)) as db:
+        if columns is None:
+            columns = {table: (["rowid"] if table.endswith("_fts") else [])
+                       + [row[1] for row in db.execute(f"PRAGMA table_info({table})")] for table in tables}
+        rows = {table: sorted(db.execute(f"SELECT {','.join(names)} FROM {table}").fetchall(),
+                              key=lambda row: json.dumps(row, ensure_ascii=False))
+                for table, names in columns.items()}
+    return columns, rows
+
+
 def verify(work, artifacts_out):
     assert not work.resolve().is_relative_to(ROOT)
     artifacts = work / "artifacts"
     artifacts.mkdir()
-    run([sys.executable, "-m", "build", "--sdist", "--wheel", "--outdir", artifacts], ROOT / "packages/python")
+    run([sys.executable, "-m", "build", "--sdist", "--wheel", "--outdir", artifacts],
+        ROOT / "packages/python")
     run(["npm", "run", "build"], ROOT / "packages/typescript")
     packed = json.loads(run(["npm", "pack", "--json", "--pack-destination", artifacts],
                             ROOT / "packages/typescript"))
@@ -103,7 +160,8 @@ def verify(work, artifacts_out):
         python_dir.mkdir()
         run([sys.executable, "-m", "venv", python_dir / "venv"], work)
         python = python_dir / "venv/bin/python"
-        run([python, "-m", "pip", "install", "--disable-pip-version-check", artifact], python_dir, consumer=True)
+        run([python, "-m", "pip", "install", "--disable-pip-version-check", artifact],
+            python_dir, consumer=True)
         shutil.copyfile(HERE / "memory_consumer.py", python_dir / "memory_consumer.py")
         shutil.copyfile(ROOT / "spec/fixtures/tree-memory.json", python_dir / "tree-memory.json")
         commands[label] = ([python, "-I", "memory_consumer.py"], python_dir)
@@ -141,6 +199,25 @@ def verify(work, artifacts_out):
         for key in ("text", "sequences", "chunks"):
             assert all(read[key] == reads[0][key] for read in reads[1:]), f"cross-runtime mismatch: {key}"
 
+    migration_checks = []
+    for migrator, (command, cwd) in commands.items():
+        db = work / f"{migrator}-v1.db"
+        create_v1_history(db)
+        columns, before = history_snapshot(db)
+        run([*command, "migrate", db], cwd, consumer=True)
+        _, after = history_snapshot(db, columns)
+        # Only schema_version may change among the original store_meta columns.
+        expected_meta = list(before["store_meta"][0])
+        expected_meta[columns["store_meta"].index("schema_version")] = 2
+        assert after == before | {"store_meta": [tuple(expected_meta)]}, "migration altered original history"
+        assert history_snapshot(Path(str(db) + ".v1.bak"), columns)[1] == before, "backup differs from v1"
+        seed = json.loads(run([*command, "migration-append", db], cwd, consumer=True))
+        for reader, (read_command, read_cwd) in commands.items():
+            result = json.loads(run([*read_command, "migration-read", db], read_cwd, consumer=True))
+            assert result == seed, "migrated history differs between installed runtimes"
+            migration_checks.append({"migrator": migrator, "reader": reader, "status": "PASS",
+                                     "source_sequences": result["sequences"]})
+
     if artifacts_out:
         artifacts_out.mkdir(parents=True, exist_ok=True)
         for artifact in (wheel, tarball, sdist, rebuilt_wheel):
@@ -170,6 +247,8 @@ def verify(work, artifacts_out):
                        "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
                       for p in (wheel, tarball, sdist, rebuilt_wheel)],
         "checks": checks,
+        "schema_v1_migration": "PASS",
+        "migration_checks": migration_checks,
         "not_measured": ["real-model retrieval quality", "answer correctness", "model tokens or cost"],
     }
 

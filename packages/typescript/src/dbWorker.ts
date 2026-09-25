@@ -18,7 +18,8 @@ interface Request {
 
 if (!parentPort) throw new Error("dbWorker must be run as a worker_thread");
 
-const db = new Database(workerData.path as string);
+const db = new Database(workerData.path as string, workerData.options ?? {});
+parentPort.postMessage({ ready: true });
 
 parentPort.on("message", (req: Request) => {
   try {

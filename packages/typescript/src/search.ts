@@ -8,6 +8,7 @@ import { createHash } from "node:crypto";
 import { codePointLength } from "./models.js";
 import { bestAnchor, excerptForQuery, ftsTermExpression, queryTerms, relevance, textKeys } from "./relevance.js";
 import { HistoryStore } from "./store.js";
+import { requireSearchMetadata } from "./searchMetadata.js";
 
 const DEFAULT_LIMIT = 20;
 const MAX_LINKED = 2;
@@ -59,20 +60,38 @@ function candidateFromRow(row: CandidateRow, terms: string[], excerptTerms?: str
 }
 
 export async function search(store: HistoryStore, query: string, limit = DEFAULT_LIMIT): Promise<SearchResult> {
+  return store.withLock(async () => {
+    const io = store.connection;
+    await io.exec("BEGIN");
+    try {
+      const result = await searchInSnapshot(store, query, limit);
+      await io.exec("COMMIT");
+      return result;
+    } catch (err) {
+      await io.exec("ROLLBACK").catch(() => undefined);
+      throw err;
+    }
+  });
+}
+
+/** Internal helper: caller owns the store lock and an active SQLite read transaction. */
+export async function searchInSnapshot(store: HistoryStore, query: string, limit = DEFAULT_LIMIT): Promise<SearchResult> {
   if (!Number.isInteger(limit) || limit < 1 || limit > 5000) throw new RangeError("require 1 <= search limit <= 5000");
+  await requireSearchMetadata(store.connection);
   const terms = queryTerms(query);
   if (!terms.length) {
     return { candidates: [], diagnostics: [{ code: "empty_or_nonsearchable_query", stage: "search", retryable: false }] };
   }
 
-  const matches = terms.map(() => "SELECT message_id FROM message_fts WHERE history_id = ? AND message_fts MATCH ?").join(" UNION ALL ");
-  const parameters: (string | number)[] = terms.flatMap(term => [store.historyId, ftsTermExpression(term)]);
-  parameters.push(limit);
+  const matches = terms.map(() => "SELECT rowid AS fts_rowid FROM message_fts WHERE message_fts MATCH ?").join(" UNION ALL ");
+  const parameters: (string | number)[] = terms.map(ftsTermExpression);
+  parameters.push(store.historyId, limit);
   const rows = await store.connection.all<CandidateRow>(
-    "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM messages m " +
-      "JOIN (SELECT message_id, count(*) AS matches FROM (" + matches + ") " +
-      "GROUP BY message_id) ranked ON ranked.message_id = m.message_id " +
-      "ORDER BY ranked.matches DESC, m.seq DESC LIMIT ?", parameters,
+    "WITH top AS MATERIALIZED (SELECT x.message_id, x.seq, count(*) AS matches FROM (" + matches + ") hits " +
+      "JOIN lexical_message_meta x ON x.fts_rowid = hits.fts_rowid WHERE x.history_id = ? " +
+      "GROUP BY x.message_id, x.seq ORDER BY matches DESC, x.seq DESC LIMIT ?) " +
+      "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM top " +
+      "JOIN messages m ON m.message_id = top.message_id ORDER BY top.matches DESC, top.seq DESC", parameters,
   );
 
   const candidates: LexicalCandidate[] = rows.flatMap(row => candidateFromRow(row, terms) ?? []);
@@ -108,8 +127,8 @@ export async function linkedCorrections(
   }
   if (!anchors.length) return { pairs: [], limited: false };
   const rowLimit = Math.min(128, Math.max(32, limit * 8));
-  // ponytail: FTS5 walks rowid (insertion order == seq order per history) newest-first and stops at
-  // the limit instead of joining and sorting every match; mirrors search.py.
+  // FTS5 bounds candidates by newest rowid first, then orders that set by seq; mirrors search.py.
+  // Imported or migrated stores can have rowids in a different order from seq.
   const rows = await store.connection.all<CandidateRow>(
     "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM (" +
       "SELECT message_id FROM message_fts WHERE message_fts MATCH ? AND history_id = ? " +

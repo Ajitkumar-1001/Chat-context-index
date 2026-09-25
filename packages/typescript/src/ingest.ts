@@ -22,6 +22,7 @@ import {
 } from "./models.js";
 import { HistoryStore } from "./store.js";
 import { mapStorageError } from "./ioWorker.js";
+import { insertSearchMetadata, requireSearchMetadata } from "./searchMetadata.js";
 
 const ADAPTER_VERSION = "native-1";
 
@@ -84,65 +85,66 @@ async function ingestLocked(
   requestHash: string,
 ): Promise<IngestReceipt> {
   const io = store.connection;
+  await io.exec("BEGIN IMMEDIATE");
+  try {
+    await requireSearchMetadata(io);
 
-  const existing = await io.get<{
-    request_hash: string;
-    inserted_seq_start: number | null;
-    inserted_seq_end: number | null;
-    skipped_count: number;
-    unsupported_block_count: number;
-    indexing_status: string;
-  }>(
-    "SELECT request_hash, inserted_seq_start, inserted_seq_end, skipped_count, " +
-      "unsupported_block_count, indexing_status FROM ingest_receipts " +
-      "WHERE history_id = ? AND source_id = ? AND idempotency_key = ?",
-    [historyId, sourceId, idempotencyKey],
-  );
-  if (existing) {
-    if (existing.request_hash === requestHash) {
-      return {
-        historyId,
-        sourceId,
-        idempotencyKey,
-        requestHash: existing.request_hash,
-        insertedSeqStart: existing.inserted_seq_start,
-        insertedSeqEnd: existing.inserted_seq_end,
-        skippedCount: existing.skipped_count,
-        unsupportedBlockCount: existing.unsupported_block_count,
-        indexingStatus: existing.indexing_status,
-        replayed: true,
-      };
+    const existing = await io.get<{
+      request_hash: string;
+      inserted_seq_start: number | null;
+      inserted_seq_end: number | null;
+      skipped_count: number;
+      unsupported_block_count: number;
+      indexing_status: string;
+    }>(
+      "SELECT request_hash, inserted_seq_start, inserted_seq_end, skipped_count, " +
+        "unsupported_block_count, indexing_status FROM ingest_receipts " +
+        "WHERE history_id = ? AND source_id = ? AND idempotency_key = ?",
+      [historyId, sourceId, idempotencyKey],
+    );
+    if (existing) {
+      if (existing.request_hash === requestHash) {
+        await io.exec("COMMIT");
+        return {
+          historyId,
+          sourceId,
+          idempotencyKey,
+          requestHash: existing.request_hash,
+          insertedSeqStart: existing.inserted_seq_start,
+          insertedSeqEnd: existing.inserted_seq_end,
+          skippedCount: existing.skipped_count,
+          unsupportedBlockCount: existing.unsupported_block_count,
+          indexingStatus: existing.indexing_status,
+          replayed: true,
+        };
+      }
+      throw new IdempotencyConflict(
+        `idempotency_key ${idempotencyKey} was already used for a different request ` +
+          `(history_id=${historyId}, source_id=${sourceId})`,
+      );
     }
-    throw new IdempotencyConflict(
-      `idempotency_key ${idempotencyKey} was already used for a different request ` +
-        `(history_id=${historyId}, source_id=${sourceId})`,
-    );
-  }
 
-  for (const m of messages) {
-    if (m.externalId == null) continue;
-    const row = await io.get<{ original_payload: string }>(
-      "SELECT original_payload FROM messages WHERE history_id = ? AND source_id = ? AND external_id = ?",
-      [historyId, sourceId, m.externalId],
-    );
-    if (row) {
-      const newPayloadStr = canonicalPayloadJson(messagePayload(m));
-      if (row.original_payload !== newPayloadStr) {
-        throw new MessageConflict(
-          `external_id ${m.externalId} already exists with different content ` +
-            `(history_id=${historyId}, source_id=${sourceId})`,
-        );
+    for (const m of messages) {
+      if (m.externalId == null) continue;
+      const row = await io.get<{ original_payload: string }>(
+        "SELECT original_payload FROM messages WHERE history_id = ? AND source_id = ? AND external_id = ?",
+        [historyId, sourceId, m.externalId],
+      );
+      if (row) {
+        const newPayloadStr = canonicalPayloadJson(messagePayload(m));
+        if (row.original_payload !== newPayloadStr) {
+          throw new MessageConflict(
+            `external_id ${m.externalId} already exists with different content ` +
+              `(history_id=${historyId}, source_id=${sourceId})`,
+          );
+        }
       }
     }
-  }
 
-  let seqStart = 0;
-  let seqEnd: number | null = null;
-  let inserted = 0;
-  let skipped = 0;
-
-  try {
-    await io.exec("BEGIN IMMEDIATE");
+    let seqStart = 0;
+    let seqEnd: number | null = null;
+    let inserted = 0;
+    let skipped = 0;
 
     const highWaterRow = await io.get<{ seq_high_water_mark: number }>(
       "SELECT seq_high_water_mark FROM store_meta WHERE id = 1",
@@ -191,11 +193,12 @@ async function ingestLocked(
         ],
       );
       if (textProjection != null) {
-        await io.run("INSERT INTO message_fts (message_id, history_id, text) VALUES (?, ?, ?)", [
+        const fts = await io.run("INSERT INTO message_fts (message_id, history_id, text) VALUES (?, ?, ?)", [
           messageId,
           historyId,
           textProjection,
         ]);
+        await insertSearchMetadata(io, fts.lastInsertRowid, messageId, historyId, nextSeq);
       }
       nextSeq++;
       inserted++;
@@ -219,26 +222,26 @@ async function ingestLocked(
         "pending",
       ],
     );
-    await io.run("UPDATE store_meta SET history_revision = history_revision + 1, seq_high_water_mark = ? WHERE id = 1", [
+    await io.run("UPDATE store_meta SET history_revision = history_revision + 1, search_metadata_revision = search_metadata_revision + 1, seq_high_water_mark = ? WHERE id = 1", [
       nextSeq - 1,
     ]);
 
     await io.exec("COMMIT");
+
+    return {
+      historyId,
+      sourceId,
+      idempotencyKey,
+      requestHash,
+      insertedSeqStart: inserted > 0 ? seqStart : null,
+      insertedSeqEnd: seqEnd,
+      skippedCount: skipped,
+      unsupportedBlockCount: 0,
+      indexingStatus: "pending",
+      replayed: false,
+    };
   } catch (err) {
     await io.exec("ROLLBACK").catch(() => undefined);
     throw mapStorageError(err as { message: string; code?: string });
   }
-
-  return {
-    historyId,
-    sourceId,
-    idempotencyKey,
-    requestHash,
-    insertedSeqStart: inserted > 0 ? seqStart : null,
-    insertedSeqEnd: seqEnd,
-    skippedCount: skipped,
-    unsupportedBlockCount: 0,
-    indexingStatus: "pending",
-    replayed: false,
-  };
 }

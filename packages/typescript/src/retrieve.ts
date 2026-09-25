@@ -4,7 +4,7 @@
  */
 
 import { VersionConflict } from "./errors.js";
-import { Diagnostic, LexicalCandidate, linkedCorrections, search } from "./search.js";
+import { Diagnostic, LexicalCandidate, linkedCorrections, searchInSnapshot } from "./search.js";
 import { HistoryStore } from "./store.js";
 import { BoundedProvider, CallBudget } from "./provider.js";
 import { renderEvidenceContext } from "./contextAssembly.js";
@@ -160,11 +160,19 @@ export async function retrieveWithLinks(
   const budget = options.budget ?? new CallBudget(store.config.providerAttemptLimitRetrieve);
 
   const [snapshot, searchResult, linking, treeExists] = await store.withLock(async () => {
-    const snap = await captureSnapshot(store);
-    const sr = await search(store, query, limit);
-    const linked = await linkedCorrections(store, sr.candidates, query, snap.snapshotMaxSeq, limit);
-    const tree = await hasTree(store);
-    return [snap, sr, linked, tree] as const;
+    const io = store.connection;
+    await io.exec("BEGIN");
+    try {
+      const snap = await captureSnapshot(store);
+      const sr = await searchInSnapshot(store, query, limit);
+      const linked = await linkedCorrections(store, sr.candidates, query, snap.snapshotMaxSeq, limit);
+      const tree = await hasTree(store);
+      await io.exec("COMMIT");
+      return [snap, sr, linked, tree] as const;
+    } catch (err) {
+      await io.exec("ROLLBACK").catch(() => undefined);
+      throw err;
+    }
   });
 
   let indexDegraded = !treeExists;

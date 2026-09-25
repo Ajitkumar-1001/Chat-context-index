@@ -10,13 +10,15 @@
  * resumed (existing path) transactionally.
  */
 
-import { existsSync, statSync } from "node:fs";
+import { closeSync, existsSync, openSync, realpathSync, statSync } from "node:fs";
+import { isAbsolute } from "node:path";
 import Database from "better-sqlite3";
 import { Config, resolveConfig, validateConfig } from "./config.js";
-import { RuntimeCompatibilityError, SchemaVersionError } from "./errors.js";
+import { InputValidationError, RuntimeCompatibilityError, SchemaVersionError, StoreCorrupt } from "./errors.js";
 import { IOWorker, mapStorageError } from "./ioWorker.js";
 import { Message } from "./models.js";
 import { prefixedId } from "./ids.js";
+import { LEXICAL_METADATA_DDL, backfillSearchMetadata, preserveRebuildRowids, requireSearchMetadata, validateMessageFts, validateSearchMetadata } from "./searchMetadata.js";
 
 // get_messages() pagination (contracts/operations.md `search()`/`get_messages()`/`view_node()`
 // Pagination/size limits) — same defaults as store.py.
@@ -27,8 +29,7 @@ export const MAX_GET_MESSAGES_LIMIT = 5_000;
 // 3.7.0 through 3.51.2) — same floor as store.py, checked against the LOADED runtime.
 const MIN_SQLITE_VERSION: [number, number, number] = [3, 51, 3];
 
-// First schema version for the first release — no prior version to migrate from.
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 // Lifted verbatim from store.py's `_SCHEMA_DDL` (spec/storage-format.md) — same tables, same
 // columns, same constraints, so a store created by either language is structurally identical.
@@ -39,6 +40,7 @@ CREATE TABLE IF NOT EXISTS store_meta (
     store_instance_id TEXT NOT NULL UNIQUE,
     schema_version INTEGER NOT NULL,
     history_revision INTEGER NOT NULL DEFAULT 0,
+    search_metadata_revision INTEGER NOT NULL DEFAULT 0,
     index_revision INTEGER NOT NULL DEFAULT 0,
     cache_generation INTEGER NOT NULL DEFAULT 0,
     index_committed_seq INTEGER NOT NULL DEFAULT 0,
@@ -122,6 +124,8 @@ CREATE VIRTUAL TABLE IF NOT EXISTS summary_fts USING fts5(
     node_id UNINDEXED, history_id UNINDEXED, text
 );
 
+${LEXICAL_METADATA_DDL}
+
 CREATE TABLE IF NOT EXISTS pending_cache_purges (
     scope_id TEXT PRIMARY KEY,
     requested_at REAL NOT NULL
@@ -137,6 +141,11 @@ export interface NodeView {
   summary: string | null;
   state: string;
   indexRevision: number;
+}
+
+export interface SearchMaintenanceOptions {
+  backupPath: string;
+  config?: Partial<Config>;
 }
 
 function checkRuntime(): void {
@@ -278,6 +287,16 @@ export class HistoryStore {
     }
   }
 
+  /** Explicit, offline v1→v2 migration; every actual change first creates a new SQLite backup. */
+  static async migrate(dbPath: string, options: SearchMaintenanceOptions): Promise<void> {
+    await maintainSearchIndex(dbPath, options, false);
+  }
+
+  /** Explicit, offline recovery from authoritative messages; never changes originals or revisions. */
+  static async rebuildSearchIndex(dbPath: string, options: SearchMaintenanceOptions): Promise<void> {
+    await maintainSearchIndex(dbPath, options, true);
+  }
+
   async getMessages(startSeq: number, endSeq: number, limit = DEFAULT_GET_MESSAGES_LIMIT): Promise<Message[]> {
     const bounded = Math.min(limit, MAX_GET_MESSAGES_LIMIT);
     const rows = await this.io.all<Record<string, unknown>>(
@@ -368,8 +387,75 @@ async function resumeExisting(io: IOWorker): Promise<[string, string]> {
   if (row.schema_version < SCHEMA_VERSION) {
     throw new SchemaVersionError(
       `store schema_version ${row.schema_version} is older than this build (${SCHEMA_VERSION}) ` +
-        "and no migration path exists yet",
+        "— explicitly migrate() with a new backupPath before opening",
     );
   }
+  await requireSearchMetadata(io);
   return [row.history_id, row.store_instance_id];
+}
+
+async function createMaintenanceBackup(ioPath: string, backupPath: string): Promise<void> {
+  if (typeof backupPath !== "string" || !isAbsolute(backupPath)) {
+    throw new InputValidationError("backupPath must be a new absolute path");
+  }
+  // Exclusive creation also rejects symlinks and an existing zero-length file.
+  const fd = openSync(backupPath, "wx", 0o600);
+  closeSync(fd);
+  const reader = await IOWorker.open(ioPath, { readonly: true, fileMustExist: true });
+  try {
+    await reader.exec("PRAGMA synchronous=FULL");
+    // The main connection already holds BEGIN IMMEDIATE, so no writer can race this snapshot.
+    await reader.run("VACUUM main INTO ?", [backupPath]);
+  } finally { await reader.close(); }
+}
+
+async function maintainSearchIndex(dbPath: string, options: SearchMaintenanceOptions, rebuild: boolean): Promise<void> {
+  const config = resolveConfig(options?.config);
+  checkRuntime();
+  // Resolve once: later cwd changes or a retargeted source symlink must not redirect the backup.
+  try { dbPath = realpathSync(dbPath); }
+  catch (error) { throw mapStorageError(error as { message: string; code?: string }); }
+  // Maintenance never creates a missing history or silently initializes an unrelated database.
+  const io = await IOWorker.open(dbPath, { fileMustExist: true });
+  try {
+    await io.exec("PRAGMA synchronous=FULL");
+    await io.exec(`PRAGMA busy_timeout=${config.sqliteBusyTimeoutMs}`);
+    await io.exec("BEGIN IMMEDIATE");
+    try {
+      const meta = await io.get<{ schema_version: number }>("SELECT schema_version FROM store_meta WHERE id = 1");
+      if (!meta) throw new StoreCorrupt("missing store_meta row");
+      if (rebuild ? meta.schema_version !== SCHEMA_VERSION : ![1, SCHEMA_VERSION].includes(meta.schema_version)) {
+        throw new SchemaVersionError(`unsupported schema_version ${meta.schema_version} for ${rebuild ? 'rebuildSearchIndex' : 'migrate'}`);
+      }
+      if (!rebuild && meta.schema_version === SCHEMA_VERSION) {
+        await requireSearchMetadata(io);
+        await validateSearchMetadata(io);
+      } else {
+        await createMaintenanceBackup(dbPath, options?.backupPath);
+        if (rebuild) {
+          await preserveRebuildRowids(io);
+          await io.exec("DROP TABLE IF EXISTS message_fts; DROP TABLE IF EXISTS lexical_message_meta");
+          await io.exec("CREATE VIRTUAL TABLE message_fts USING fts5(message_id UNINDEXED, history_id UNINDEXED, text)");
+          await io.exec(LEXICAL_METADATA_DDL);
+          await io.exec("INSERT INTO message_fts (rowid, message_id, history_id, text) " +
+            "SELECT saved.fts_rowid, m.message_id, m.history_id, m.text_projection " +
+            "FROM cci_rebuild_rowids saved JOIN messages m ON m.message_id = saved.message_id ORDER BY saved.fts_rowid");
+          await io.exec("DROP TABLE cci_rebuild_rowids");
+        } else {
+          await io.exec("ALTER TABLE store_meta ADD COLUMN search_metadata_revision INTEGER NOT NULL DEFAULT 0");
+          await io.exec(LEXICAL_METADATA_DDL);
+        }
+        await validateMessageFts(io);
+        await backfillSearchMetadata(io);
+        await validateSearchMetadata(io);
+        await io.exec("UPDATE store_meta SET search_metadata_revision = history_revision WHERE id = 1");
+        if (!rebuild) await io.exec(`UPDATE store_meta SET schema_version = ${SCHEMA_VERSION} WHERE id = 1`);
+      }
+      await requireSearchMetadata(io);
+      await io.exec("COMMIT");
+    } catch (err) {
+      await io.exec("ROLLBACK").catch(() => undefined);
+      throw mapStorageError(err as { message: string; code?: string });
+    }
+  } finally { await io.close(); }
 }

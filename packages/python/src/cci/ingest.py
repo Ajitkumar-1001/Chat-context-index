@@ -42,6 +42,7 @@ from .models import (
 from .models import (
     payload_hash as compute_payload_hash,
 )
+from .search_metadata import assert_search_metadata, immediate_transaction, insert_search_metadata
 from .store import HistoryStore, map_storage_error
 
 ADAPTER_VERSION = "native-1"
@@ -117,10 +118,18 @@ async def ingest(
     await store.begin_write()
     try:
         async with store.write_lock:
-            return await _ingest_locked(
-                store, history_id, messages, source_id, idempotency_key, session_metadata,
-                request_hash,
-            )
+            try:
+                async with immediate_transaction(store.connection):
+                    await assert_search_metadata(store.connection)
+                    receipt = await _ingest_locked(
+                        store, history_id, messages, source_id, idempotency_key, session_metadata,
+                        request_hash,
+                    )
+            except apsw.Error as exc:
+                raise map_storage_error(exc) from exc
+            if not receipt.replayed:
+                _after_commit_barrier()
+            return receipt
     finally:
         await store.end_write()
 
@@ -187,95 +196,94 @@ async def _ingest_locked(
 
     try:
         # Atomic commit: messages + message_fts + receipt + history_revision bump.
-        async with connection:
-            cursor = await connection.execute(
-                "SELECT seq_high_water_mark FROM store_meta WHERE id = 1"
-            )
-            row = await fetchone(cursor)
-            next_seq = (row[0] if row else 0) + 1
+        cursor = await connection.execute(
+            "SELECT seq_high_water_mark FROM store_meta WHERE id = 1"
+        )
+        row = await fetchone(cursor)
+        next_seq = (row[0] if row else 0) + 1
 
-            seq_start = next_seq
-            inserted = 0
-            skipped = 0
-            for idx, m in enumerate(messages):
-                existing_identity = None
-                if m.external_id is not None:
-                    cursor = await connection.execute(
-                        "SELECT message_id FROM messages "
-                        "WHERE history_id = ? AND source_id = ? AND external_id = ?",
-                        (history_id, source_id, m.external_id),
-                    )
-                    existing_identity = await fetchone(cursor)
-                if existing_identity is not None:
-                    # Identical existing message (content already verified equal above) is
-                    # skipped, not re-inserted (FR-002).
-                    skipped += 1
-                    continue
-
-                payload = message_payload(m)
-                payload_str = canonical_payload_json(payload)
-                phash = compute_payload_hash(payload)
-                message_id = prefixed_id("m")
-                text_projection = render_text_projection(m.content)
-                await connection.execute(
-                    "INSERT INTO messages (message_id, seq, history_id, source_id, external_id, "
-                    "idempotency_key, position_in_batch, role, original_payload, "
-                    "text_projection, payload_hash, session_metadata, created_at) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (
-                        message_id,
-                        next_seq,
-                        history_id,
-                        source_id,
-                        m.external_id,
-                        idempotency_key if m.external_id is None else None,
-                        idx if m.external_id is None else None,
-                        m.role,
-                        payload_str,
-                        text_projection,
-                        phash,
-                        _json_or_none(session_metadata),
-                        time.time(),
-                    ),
+        seq_start = next_seq
+        inserted = 0
+        skipped = 0
+        for idx, m in enumerate(messages):
+            existing_identity = None
+            if m.external_id is not None:
+                cursor = await connection.execute(
+                    "SELECT message_id FROM messages "
+                    "WHERE history_id = ? AND source_id = ? AND external_id = ?",
+                    (history_id, source_id, m.external_id),
                 )
-                if text_projection is not None:
-                    await connection.execute(
-                        "INSERT INTO message_fts (message_id, history_id, text) VALUES (?, ?, ?)",
-                        (message_id, history_id, text_projection),
-                    )
-                next_seq += 1
-                inserted += 1
+                existing_identity = await fetchone(cursor)
+            if existing_identity is not None:
+                # Identical existing message (content already verified equal above) is
+                # skipped, not re-inserted (FR-002).
+                skipped += 1
+                continue
 
-            seq_end = next_seq - 1 if inserted else None
-
+            payload = message_payload(m)
+            payload_str = canonical_payload_json(payload)
+            phash = compute_payload_hash(payload)
+            message_id = prefixed_id("m")
+            text_projection = render_text_projection(m.content)
             await connection.execute(
-                "INSERT INTO ingest_receipts (history_id, source_id, idempotency_key, "
-                "request_hash, inserted_seq_start, inserted_seq_end, skipped_count, "
-                "unsupported_block_count, indexing_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO messages (message_id, seq, history_id, source_id, external_id, "
+                "idempotency_key, position_in_batch, role, original_payload, "
+                "text_projection, payload_hash, session_metadata, created_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
+                    message_id,
+                    next_seq,
                     history_id,
                     source_id,
-                    idempotency_key,
-                    request_hash,
-                    seq_start if inserted else None,
-                    seq_end,
-                    skipped,
-                    0,
-                    "pending",
+                    m.external_id,
+                    idempotency_key if m.external_id is None else None,
+                    idx if m.external_id is None else None,
+                    m.role,
+                    payload_str,
+                    text_projection,
+                    phash,
+                    _json_or_none(session_metadata),
+                    time.time(),
                 ),
             )
-            await connection.execute(
-                "UPDATE store_meta SET history_revision = history_revision + 1, "
-                "seq_high_water_mark = ? WHERE id = 1",
-                (next_seq - 1,),
-            )
+            if text_projection is not None:
+                await connection.execute(
+                    "INSERT INTO message_fts (message_id, history_id, text) VALUES (?, ?, ?)",
+                    (message_id, history_id, text_projection),
+                )
+                await insert_search_metadata(connection, message_id, history_id, next_seq)
+            next_seq += 1
+            inserted += 1
 
-            _before_commit_barrier()
-            await _pause_before_commit_barrier()
+        seq_end = next_seq - 1 if inserted else None
+
+        await connection.execute(
+            "INSERT INTO ingest_receipts (history_id, source_id, idempotency_key, "
+            "request_hash, inserted_seq_start, inserted_seq_end, skipped_count, "
+            "unsupported_block_count, indexing_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                history_id,
+                source_id,
+                idempotency_key,
+                request_hash,
+                seq_start if inserted else None,
+                seq_end,
+                skipped,
+                0,
+                "pending",
+            ),
+        )
+        await connection.execute(
+            "UPDATE store_meta SET history_revision = history_revision + 1, "
+            "search_metadata_revision = search_metadata_revision + 1, "
+            "seq_high_water_mark = ? WHERE id = 1",
+            (next_seq - 1,),
+        )
+
+        _before_commit_barrier()
+        await _pause_before_commit_barrier()
     except apsw.Error as exc:
         raise map_storage_error(exc) from exc
-
-    _after_commit_barrier()
 
     return IngestReceipt(
         history_id=history_id,

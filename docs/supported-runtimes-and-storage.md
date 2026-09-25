@@ -32,6 +32,9 @@ store file is **sequential, not concurrent**: close in one runtime before openin
 
 ## Schema versioning
 
-`schema_version` is checked on every `open()`. This is schema version 1 — the first release —
-so there is no prior version to migrate from; opening a store with a newer `schema_version` than
-this build supports raises `SchemaVersionError` without modifying the file.
+`schema_version` is checked on every `open()`. New stores use **schema version 2**, including
+a compact lexical-search mapping protected by a history-revision check. Existing version-1
+stores require an explicit migration with a new backup file and all old processes stopped;
+see [migration and recovery](backup-and-migration.md). Both SDKs support the same version-2
+layout. Unsupported versions raise `SchemaVersionError`; a stale search mapping raises
+`StoreCorrupt` and requires explicit recovery. The portable JSONL export format stays at version 1.

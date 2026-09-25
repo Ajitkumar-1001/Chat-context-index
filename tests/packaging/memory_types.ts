@@ -4,6 +4,11 @@ import {
   type Provider, type ProviderRequest, type ProviderResponse,
 } from "chat-context-index";
 
+export async function migrateAndRecover(path: string): Promise<void> {
+  await HistoryStore.migrate(path, { backupPath: `${path}.v1.bak`, config: { cacheBackend: "none" } });
+  await HistoryStore.rebuildSearchIndex(path, { backupPath: `${path}.before-rebuild.bak` });
+}
+
 export async function consumer(store: HistoryStore): Promise<Context> {
   const inner: Provider = {
     async complete(request: ProviderRequest): Promise<ProviderResponse> {

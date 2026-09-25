@@ -14,7 +14,7 @@
 import { Worker } from "node:worker_threads";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { StoreBusy, StoreCorrupt, StoreError } from "./errors.js";
+import { CciError, StoreBusy, StoreCorrupt, StoreError } from "./errors.js";
 
 const WORKER_PATH = path.join(path.dirname(fileURLToPath(import.meta.url)), "dbWorker.js");
 
@@ -26,10 +26,12 @@ interface PendingRequest {
 /** Maps a raw better-sqlite3 error to the fixed 15-code taxonomy — mirrors store.py's
  * `map_storage_error`. Used so a caller never sees a raw sqlite error code as-is. */
 export function mapStorageError(err: { message: string; code?: string }): Error {
+  if (err instanceof CciError) return err;
   const msg = err.message ?? String(err);
   const code = err.code ?? "";
   if (code === "SQLITE_BUSY" || /database is locked/i.test(msg)) return new StoreBusy(msg);
-  if (code === "SQLITE_CORRUPT" || code === "SQLITE_NOTADB" || /malformed|not a database/i.test(msg)) {
+  // Extended codes (e.g. SQLITE_CORRUPT_VTAB from FTS5) are corruption too, as apsw.CorruptError treats them.
+  if (code.startsWith("SQLITE_CORRUPT") || code === "SQLITE_NOTADB" || /malformed|not a database/i.test(msg)) {
     return new StoreCorrupt(msg);
   }
   return new StoreError(msg);
@@ -52,12 +54,18 @@ export class IOWorker {
     });
   }
 
-  static async open(dbPath: string): Promise<IOWorker> {
-    const worker = new Worker(WORKER_PATH, { workerData: { path: dbPath } });
-    await new Promise<void>((resolve, reject) => {
-      worker.once("online", () => resolve());
-      worker.once("error", reject);
-    });
+  static async open(dbPath: string, options: { readonly?: boolean; fileMustExist?: boolean } = {}): Promise<IOWorker> {
+    const worker = new Worker(WORKER_PATH, { workerData: { path: dbPath, options } });
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const fail = (error: Error) => reject(mapStorageError(error));
+        worker.once("error", fail);
+        worker.once("message", () => { worker.off("error", fail); resolve(); });
+      });
+    } catch (error) {
+      await worker.terminate();
+      throw error;
+    }
     return new IOWorker(worker);
   }
 

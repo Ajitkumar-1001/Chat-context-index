@@ -14,9 +14,12 @@ import json
 from collections import Counter
 from dataclasses import dataclass, field
 
+import apsw
+
 from .io_worker import fetchall
 from .relevance import best_anchor, excerpt_for_query, fts_term_expression, query_terms, relevance, text_keys
-from .store import HistoryStore
+from .search_metadata import assert_search_metadata
+from .store import HistoryStore, map_storage_error
 
 DEFAULT_LIMIT = 20
 MAX_LINKED = 2
@@ -73,8 +76,19 @@ def _candidate_from_row(
 
 
 async def search(store: HistoryStore, query: str, limit: int = DEFAULT_LIMIT) -> SearchResult:
+    async with store.write_lock:
+        try:
+            async with store.connection:
+                return await _search_in_snapshot(store, query, limit)
+        except apsw.Error as exc:
+            raise map_storage_error(exc) from exc
+
+
+async def _search_in_snapshot(store: HistoryStore, query: str, limit: int = DEFAULT_LIMIT) -> SearchResult:
+    """The caller owns the connection lock and read snapshot (also used by retrieve)."""
     if not isinstance(limit, int) or not 1 <= limit <= 5000:
         raise ValueError("require 1 <= search limit <= 5000")
+    await assert_search_metadata(store.connection)
     terms = query_terms(query)
     if not terms:
         return SearchResult(
@@ -84,18 +98,17 @@ async def search(store: HistoryStore, query: str, limit: int = DEFAULT_LIMIT) ->
 
     # Count distinct inflection-key matches before LIMIT; frequency within one message does not score.
     matches = " UNION ALL ".join(
-        "SELECT message_id FROM message_fts WHERE history_id = ? AND message_fts MATCH ?"
+        "SELECT rowid AS fts_rowid FROM message_fts WHERE message_fts MATCH ?"
         for _ in terms
     )
-    parameters: list[str | int] = []
-    for term in terms:
-        parameters.extend((store.history_id, fts_term_expression(term)))
-    parameters.append(limit)
+    parameters: list[str | int] = [fts_term_expression(term) for term in terms]
+    parameters.extend((store.history_id, limit))
     cursor = await store.connection.execute(
-        "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM messages m "
-        "JOIN (SELECT message_id, count(*) AS matches FROM (" + matches + ") "
-        "GROUP BY message_id) ranked ON ranked.message_id = m.message_id "
-        "ORDER BY ranked.matches DESC, m.seq DESC LIMIT ?", parameters,
+        "WITH top AS MATERIALIZED (SELECT x.message_id,x.seq,count(*) AS matches FROM (" + matches + ") "
+        "hits JOIN lexical_message_meta x ON x.fts_rowid=hits.fts_rowid WHERE x.history_id=? "
+        "GROUP BY x.message_id,x.seq ORDER BY matches DESC,x.seq DESC LIMIT ?) "
+        "SELECT m.message_id,m.seq,m.original_payload,m.text_projection FROM top "
+        "JOIN messages m ON m.message_id=top.message_id ORDER BY top.matches DESC,top.seq DESC", parameters,
     )
     rows = await fetchall(cursor)
 
@@ -135,9 +148,9 @@ async def linked_corrections(
     if not anchors:
         return [], False
     row_limit = min(128, max(32, limit * 8))
-    # ponytail: FTS5 walks rowid (insertion order == seq order per history) newest-first and stops at
-    # the limit instead of joining and sorting every match; rows are re-sorted by seq below, so a
-    # rowid/seq divergence would only change which recent rows are seen. Index seq in FTS if it ever does.
+    # FTS5 walks descending rowids and stops at the limit before payload hydration.
+    # Rowids can differ from seq in migrated stores, so recovery preserves usable rowids:
+    # the bounded subset is selected by rowid, then the selected rows are sorted by seq.
     cursor = await store.connection.execute(
         "SELECT m.message_id, m.seq, m.original_payload, m.text_projection FROM ("
         "SELECT message_id FROM message_fts WHERE message_fts MATCH ? AND history_id = ? "

@@ -24,7 +24,7 @@ from .context_assembly import EvidenceBlock, render_evidence_context
 from .errors import VersionConflict
 from .io_worker import fetchone
 from .provider import CallBudget, MemoizedProvider
-from .search import Diagnostic, LexicalCandidate, linked_corrections, search
+from .search import Diagnostic, LexicalCandidate, _search_in_snapshot, linked_corrections
 from .store import HistoryStore
 
 CONTRACT_VERSION = 1
@@ -195,7 +195,7 @@ async def retrieve_with_links(
     async with store.write_lock:
         async with store.connection:
             snapshot = await _capture_snapshot(store)
-            search_result = await search(store, query, limit=limit)
+            search_result = await _search_in_snapshot(store, query, limit=limit)
             pairs, link_limited = await linked_corrections(
                 store, search_result.candidates, query, snapshot.snapshot_max_seq, limit,
             )

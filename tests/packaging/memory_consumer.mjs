@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { HistoryStore, ingest, index, retrieve, prepareContext, packContext, BoundedProvider } from "chat-context-index";
+import { HistoryStore, ingest, index, retrieve, search, prepareContext, packContext, BoundedProvider } from "chat-context-index";
 
 const packagePath = fs.realpathSync(fileURLToPath(import.meta.resolve("chat-context-index")));
 assert(packagePath.startsWith(path.resolve("node_modules", "chat-context-index") + path.sep));
@@ -20,6 +20,33 @@ class Router {
 }
 
 const [phase, dbPath] = process.argv.slice(2);
+if (phase === "migrate") {
+  await assert.rejects(() => HistoryStore.open(dbPath, { cacheBackend: "none" }), { name: "SchemaVersionError" });
+  const options = { backupPath: dbPath + ".v1.bak", config: { cacheBackend: "none" } };
+  await HistoryStore.migrate(dbPath, options);
+  const backup = fs.readFileSync(options.backupPath);
+  await HistoryStore.migrate(dbPath, options);
+  assert.deepEqual(fs.readFileSync(options.backupPath), backup);
+  process.exit(0);
+}
+if (phase === "migration-append" || phase === "migration-read") {
+  const migrated = await HistoryStore.open(dbPath, { cacheBackend: "none" });
+  try {
+    if (phase === "migration-append") {
+      await ingest(migrated, migrated.historyId, [{ role: "user", content: "Continue in Oslo." }],
+        "after-migration", "continue");
+    }
+    const messages = await migrated.getMessages(1, 100);
+    assert.deepEqual(messages.map(m => m.seq), [5, 9, 20, 41]);
+    assert.deepEqual(messages.slice(0, 3).map(m => m.messageId), ["m_v1_first", "m_v1_tool", "m_v1_later"]);
+    const result = await search(migrated, "Oslo", 8);
+    assert.deepEqual(result.candidates.map(c => c.seq), [41, 20, 5]);
+    console.log(JSON.stringify({ history_id: migrated.historyId, store_instance_id: migrated.storeInstanceId,
+      message_ids: messages.map(m => m.messageId), sequences: result.candidates.map(c => c.seq),
+      excerpts: result.candidates.map(c => c.excerpt) }));
+  } finally { await migrated.close(); }
+  process.exit(0);
+}
 if (phase === "default") {
   const require = createRequire(import.meta.url);
   assert.throws(() => require.resolve("redis"), { code: "MODULE_NOT_FOUND" });
