@@ -1,0 +1,219 @@
+{
+  "status": "PASS",
+  "scope": "Installed Python package; one visible development conversation and paraphrased query. This is not held-out quality, answer generation, native TypeScript live validation, sustained capacity, or a cost-savings comparison.",
+  "source_sha": "e762f7bd0033e3ae8326f647f14c901438c74220",
+  "ci_run_id": 36082860041,
+  "started_at_utc": "2026-09-25T01:48:13.161766+00:00",
+  "completed_at_utc": "2026-09-25T01:48:48.778133+00:00",
+  "allocation_id": "smoke-candidate-004",
+  "allocation_reusable": false,
+  "provider": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "wheel_sha256": "219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79",
+  "fixture_sha256": "19674ad028c831bcee035071a21abbd1d2846d6274f66712398382e47db596b5",
+  "evaluator_source_sha256": {
+    "evaluations/held_out/comparison.py": "8f2f52f4bd982afd1b502da1ae7a92383bcaa3b5bc031d5c7a506e393c69b8db",
+    "evaluations/held_out/run_evaluation.py": "7853fbc317934d94f268707c1bb60ffb78fd0a4d49563c164fd6f9ead15477aa",
+    "evaluations/live_smoke.py": "2c742527621e5adf1c4b9b8201779791b742f8298b1fe96341db003b90eb2f8c",
+    "evaluations/held_out/release_validation.py": "8eb8feb33e091eb6407cc3f2aacfae8fdde34ed4ec3667615e3e7e612a93c836"
+  },
+  "guard_source_sha256": {
+    "evaluations/run_allocated_comparison.py": "5b55c07723eb5b777302332de0267cfd7186ccfd7d45bb7487686d0f7bfd625d",
+    "evaluations/run_allocated_release.py": "c4c44b3319d022adf282fe6f29f319b00576c71c30519b78d54a3bce0e98ef99"
+  },
+  "outer_plan_sha256": "0a741d80a368509bf659d34873d01d0205bebe91d928f0a2847a7f01bba67961",
+  "package": {
+    "version": "0.1.0",
+    "python": "3.12.11",
+    "isolated_python": true,
+    "wheel_sha256": "219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79",
+    "installed_sources_match_wheel": true,
+    "openai_version": "2.45.0"
+  },
+  "limits": {
+    "max_calls": 10,
+    "max_reserved_tokens": 100000,
+    "max_estimated_usd": 0.04,
+    "max_output_tokens_per_call": 256,
+    "max_input_bytes_per_call": 8000,
+    "call_timeout_s": 60.0,
+    "run_timeout_s": 240.0,
+    "concurrency": 1,
+    "minimum_request_interval_s": 5.0
+  },
+  "expected_original_evidence_retrieved": true,
+  "checks": {
+    "lexical_evidence_count": 0,
+    "index": {
+      "committed_coverage": {
+        "start_seq": 1,
+        "end_seq": 4
+      },
+      "pending_coverage": {
+        "start_seq": null,
+        "end_seq": null
+      },
+      "provider_usage": {
+        "current_provider_calls": 6,
+        "retries": 0,
+        "usage_unknown": false,
+        "memo_hits": 0,
+        "memo_misses": 0,
+        "memo_errors": 0,
+        "stage_ms": {},
+        "input_tokens": 657,
+        "output_tokens": 241
+      },
+      "status": "complete"
+    },
+    "unchanged_index_calls": 0,
+    "reopen_preserved_originals": true,
+    "routing": {
+      "requested_mode": "tree",
+      "actual_mode": "tree",
+      "candidate_count": 1,
+      "selected_chunk_ids": [
+        "c_01M3B3ZBZNVRGAA64TVR75KC3E"
+      ]
+    },
+    "retrieval_usage": {
+      "current_provider_calls": 2,
+      "retries": 0,
+      "usage_unknown": false,
+      "memo_hits": 0,
+      "memo_misses": 0,
+      "memo_errors": 0,
+      "stage_ms": {},
+      "input_tokens": 409,
+      "output_tokens": 67
+    },
+    "evidence": [
+      {
+        "message_id": "m_01M3B3ZBZJ7VW947KBHJ96E7R3",
+        "seq": 1,
+        "source_pointer": "/content",
+        "excerpt": "The deployment target is Oslo."
+      }
+    ],
+    "context": "<<<CCI_EVIDENCE id=m_01M3B3ZBZJ7VW947KBHJ96E7R3 source=/content\nThe deployment target is Oslo.\nCCI_EVIDENCE_END>>>",
+    "expected_original_evidence_retrieved": true
+  },
+  "attempts": 8,
+  "actual_input_tokens_observed": 1066,
+  "actual_output_tokens_observed": 308,
+  "total_actual_tokens_observed": 1374,
+  "usage_unknown": false,
+  "errors": 0,
+  "sdk_retries": 0,
+  "estimated_usd_from_actual_tokens": 0.0010898,
+  "cost_basis": "Observed provider token usage at frozen Standard pricing; an estimate, not an invoice or savings claim. Previous unknown-usage reservations remain intact.",
+  "pricing_usd_per_million": {
+    "input_usd_per_million": 0.3,
+    "output_usd_per_million": 2.5
+  },
+  "calls": [
+    {
+      "call_id": 1,
+      "operation": "indexing",
+      "status": "ok",
+      "elapsed_s": 1.722,
+      "input_tokens": 76,
+      "output_tokens": 32,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null
+    },
+    {
+      "call_id": 2,
+      "operation": "indexing",
+      "status": "ok",
+      "elapsed_s": 0.56,
+      "input_tokens": 75,
+      "output_tokens": 26,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null
+    },
+    {
+      "call_id": 3,
+      "operation": "indexing",
+      "status": "ok",
+      "elapsed_s": 0.587,
+      "input_tokens": 77,
+      "output_tokens": 41,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null
+    },
+    {
+      "call_id": 4,
+      "operation": "indexing",
+      "status": "ok",
+      "elapsed_s": 0.654,
+      "input_tokens": 83,
+      "output_tokens": 40,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null
+    },
+    {
+      "call_id": 5,
+      "operation": "indexing",
+      "status": "ok",
+      "elapsed_s": 0.695,
+      "input_tokens": 164,
+      "output_tokens": 42,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null
+    },
+    {
+      "call_id": 6,
+      "operation": "indexing",
+      "status": "ok",
+      "elapsed_s": 0.792,
+      "input_tokens": 182,
+      "output_tokens": 60,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null
+    },
+    {
+      "call_id": 7,
+      "operation": "tree_navigation",
+      "status": "ok",
+      "elapsed_s": 0.98,
+      "input_tokens": 225,
+      "output_tokens": 29,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null
+    },
+    {
+      "call_id": 8,
+      "operation": "tree_navigation",
+      "status": "ok",
+      "elapsed_s": 0.587,
+      "input_tokens": 184,
+      "output_tokens": 38,
+      "resolved_model": "gemini-3.5-flash-lite",
+      "finish_reason": "stop",
+      "error_type": null,
+      "http_status": null
+    }
+  ],
+  "private_report_sha256": "447ad62871756b274108b532de0cea457917d297429fb452a677eb90bebc0550",
+  "private_journal_sha256": "f8b974348d280042529096f63c19ea603ba9ddb4c733a5cc348123a0c3218cad",
+  "private_allocation_accounting_sha256": "9e6bb3bfca83c15c38682ac274215b8b7bde6dbd771d7c13e7160b155dfd20c6",
+  "prior_failed_reservations_preserved": true,
+  "sustained_account_capacity_established": false,
+  "held_out_trials_started": false,
+  "lower_cost_claim": false
+}

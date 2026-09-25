@@ -1,0 +1,776 @@
+{
+  "schema_version": 1,
+  "status": "COMPLETE_WITH_HOSTED_TARGET_FAILURES",
+  "claim_scope": "Observed GitHub-hosted Linux hardware only; these results do not qualify the fixed reference host or approve a release.",
+  "fixed_reference_gate": "NOT_QUALIFIED",
+  "fixed_reference_hardware_criteria_changed": false,
+  "source_sha": "e762f7bd0033e3ae8326f647f14c901438c74220",
+  "tooling_commit": "e762f7bd0033e3ae8326f647f14c901438c74220",
+  "ci_run_id": "36082860041",
+  "ci_run_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36082860041",
+  "ci_conclusion": "success",
+  "performance_run_id": "36083318975",
+  "performance_run_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36083318975",
+  "performance_run_status": "completed",
+  "performance_run_conclusion": "failure",
+  "performance_run_finished_at": "2026-09-25T02:21:53Z",
+  "canonical_package_report_sha256": "5d2a89a54326a83cff054daa2f1f8c50c17d38dfdf1d22b98bb1321e4aa07a7c",
+  "artifacts": [
+    {
+      "filename": "chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79"
+    },
+    {
+      "filename": "chat-context-index-0.1.0.tgz",
+      "sha256": "dd0818da05dc59d9465b6fb71caeaf58fb90fc67b5e9392f4faf59784b64d13b"
+    },
+    {
+      "filename": "chat_context_index-0.1.0.tar.gz",
+      "sha256": "89d22c831d69920c0a661fd88dc882c92589d000637bd3f39bf9f8afdc97086a"
+    },
+    {
+      "filename": "wheel-from-sdist/chat_context_index-0.1.0-py3-none-any.whl",
+      "sha256": "219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79"
+    }
+  ],
+  "source_sha256": {
+    "benchmarks/generate_reference_fixture.py": "d4b764315ed52c191043e0a5401b33107d899895a29a4236a17387780d6ea4a0",
+    "benchmarks/reference_fixture_benchmark.mjs": "af7b8090338bd455c441add89afbcd01eb51e4bbc421fd18fbb035a61ccedc75",
+    "benchmarks/reference_fixture_benchmark.py": "7057a958d986868afa43e38bcd411c37c69db27c46789b36640c485a2f3c665f",
+    "benchmarks/run_hosted_benchmark.py": "2d88f3ffcf34393c9f0f2edd3f5c3234db742e5a08c74fc680d2c8d4eb09426a",
+    "benchmarks/run_reference_gate.py": "997298e25c85ea1255c432e1832edf85d8e29698609629b6930dfe20f7dcf3d1",
+    "scripts/release_controls.py": "c523c420ee57ca65347f0eebc78177fe2cbf5526dd69b46a631733101df3a2b5"
+  },
+  "verification": {
+    "all_four_manifests_and_reports_verified": true,
+    "candidate_source_ci_run_archive_binding_verified": true,
+    "source_and_tooling_input_hashes_verified": true,
+    "report_hashes_verified": true,
+    "installed_imports_outside_checkout_verified": true,
+    "cold_raw_trials_and_p95_verified": true,
+    "hosted_assessment_recomputed": true
+  },
+  "measurement_scope": {
+    "model_calls": 0,
+    "cold_trials_per_mode_per_job": 20,
+    "search_trials_per_concurrency_per_job": 1000,
+    "search_concurrency": [
+      1,
+      4,
+      16
+    ],
+    "ingest_batch_trials_per_concurrency_per_job": 32,
+    "ingest_concurrency": [
+      4,
+      16
+    ],
+    "filesystem_cold_method": "sync and drop_caches=3 before each isolated child on its fresh hosted VM",
+    "concurrency_errors_all_jobs": 0
+  },
+  "jobs": [
+    {
+      "language": "python",
+      "messages": 10000,
+      "status": "FAIL_HOSTED_TARGETS",
+      "failures": [
+        "reference threshold failed: filesystem_cold",
+        "hosted target exceeded: filesystem_cold first_search_top8_ms"
+      ],
+      "job_id": 107909733492,
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36083318975/job/107909733492",
+      "job_conclusion": "failure",
+      "artifact_name": "hosted-performance-python-10000-36083318975",
+      "started_at": "2026-09-25T01:44:42.022473+00:00",
+      "finished_at": "2026-09-25T01:48:35.628714+00:00",
+      "benchmark_exit_code": 0,
+      "benchmark_exit_explanation": "The original CLI warm targets pass; hosted filesystem-cold first search exceeds 100 ms.",
+      "installed_archive": "chat_context_index-0.1.0-py3-none-any.whl",
+      "installed_archive_sha256": "219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79",
+      "installed_archive_contents_verified": true,
+      "installed_import_outside_checkout_verified": true,
+      "fixture_sha256": "8a88a11bce715e54fbf78333089ffb7889e84adad7d213040782a79576c65f61",
+      "fixture_seed": 7,
+      "batch_size": 100,
+      "hardware": {
+        "runner_environment": "github-hosted",
+        "runner_image": "ubuntu24",
+        "runner_image_version": "20260920.314.1",
+        "system": "Linux",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "architecture": "x86_64",
+        "cpu_count": 4,
+        "affinity_cpu_count": 4,
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hypervisor_vendor": "Microsoft",
+        "memory_bytes": 16766414848,
+        "filesystem_types": [
+          "ext4"
+        ],
+        "disks": [
+          {
+            "type": "disk",
+            "rotational_flag": true,
+            "reported_size": "150G",
+            "model": "Virtual Disk"
+          }
+        ],
+        "container_detection": {
+          "result": "none",
+          "exit_code": 1
+        },
+        "probe_exit_codes": {
+          "cpu_details": 0,
+          "mount": 0,
+          "block_devices": 0,
+          "container_detection": 1
+        }
+      },
+      "runtime": {
+        "python_version": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+        "apsw_version": "3.53.4.0",
+        "sqlite_library_version": "3.53.4",
+        "cache_backend": "sqlite"
+      },
+      "warm": {
+        "batch_ingest_100_ms": {
+          "p50": 21.437613999999883,
+          "p95": 29.315068000002498,
+          "pass": true,
+          "threshold_p95_ms": 500,
+          "trials": 100
+        },
+        "lexical_search_top8_ms": {
+          "p50": 63.733592999994926,
+          "p95": 65.32127799999898,
+          "pass": true,
+          "threshold_p95_ms": 100,
+          "trials": 1000
+        },
+        "store_open_ms": {
+          "p50": 1.2070710000102736,
+          "p95": 1.3921359999926608,
+          "pass": true,
+          "threshold_p95_ms": 2000,
+          "trials": 20
+        }
+      },
+      "cold": {
+        "process_cold": {
+          "import_ms": {
+            "p50": 33.51600699997448,
+            "p95": 33.9790210000217,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 1.7131989999938924,
+            "p95": 1.800852000002351,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 69.58585199998879,
+            "p95": 70.13567999999282,
+            "trials": 20
+          },
+          "observed_messages_each_trial": 10000
+        },
+        "filesystem_cold": {
+          "import_ms": {
+            "p50": 49.20411199998398,
+            "p95": 53.76960000000963,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 2.290565000009792,
+            "p95": 3.0693200000087018,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 606.9947449999802,
+            "p95": 638.0763419999766,
+            "trials": 20
+          },
+          "observed_messages_each_trial": 10000
+        }
+      },
+      "warm_search_p95_ms": 65.32127799999898,
+      "process_cold_search_p95_ms": 70.13567999999282,
+      "filesystem_cold_search_p95_ms": 638.0763419999766,
+      "concurrency": {
+        "ingest_100_ms": {
+          "16": {
+            "errors": 0,
+            "p50": 206.2324800000397,
+            "p95": 355.1103689999877,
+            "throughput_messages_per_s": 4125.986492103032,
+            "trials": 32
+          },
+          "4": {
+            "errors": 0,
+            "p50": 65.47858900000847,
+            "p95": 96.16516300002331,
+            "throughput_messages_per_s": 4037.428348658127,
+            "trials": 32
+          }
+        },
+        "search_top8_ms": {
+          "1": {
+            "errors": 0,
+            "p50": 63.733592999994926,
+            "p95": 65.32127799999898,
+            "throughput_per_s": 15.823543569320906,
+            "trials": 1000
+          },
+          "16": {
+            "errors": 0,
+            "p50": 1076.9887780000147,
+            "p95": 1121.4418240000157,
+            "throughput_per_s": 14.407089462619847,
+            "trials": 1000
+          },
+          "4": {
+            "errors": 0,
+            "p50": 257.455407000009,
+            "p95": 268.41504799998006,
+            "throughput_per_s": 15.205418279140684,
+            "trials": 1000
+          }
+        }
+      },
+      "resources": {
+        "peak_rss_bytes": 60059648,
+        "store_bytes": 45603104
+      },
+      "evidence_sha256": {
+        "manifest.json": "5b08815614478edd63fc36fd1272f90b20d971947e2b4809ae0b126fc152d8fa",
+        "benchmark.json": "27e0b848a05306bee10853f7c18d938f139b4904c3ed33291d779845810ebd8f",
+        "candidate-run.json": "90666b7abb24276fbae42f1fb2898f012ad71a45fdcfe8c8faa8bed29cd6ac45"
+      }
+    },
+    {
+      "language": "typescript",
+      "messages": 10000,
+      "status": "FAIL_HOSTED_TARGETS",
+      "failures": [
+        "reference threshold failed: filesystem_cold",
+        "hosted target exceeded: filesystem_cold first_search_top8_ms"
+      ],
+      "job_id": 107909733511,
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36083318975/job/107909733511",
+      "job_conclusion": "failure",
+      "artifact_name": "hosted-performance-typescript-10000-36083318975",
+      "started_at": "2026-09-25T01:44:35.658107+00:00",
+      "finished_at": "2026-09-25T01:48:12.224580+00:00",
+      "benchmark_exit_code": 0,
+      "benchmark_exit_explanation": "The original CLI warm targets pass; hosted filesystem-cold first search exceeds 100 ms.",
+      "installed_archive": "chat-context-index-0.1.0.tgz",
+      "installed_archive_sha256": "dd0818da05dc59d9465b6fb71caeaf58fb90fc67b5e9392f4faf59784b64d13b",
+      "installed_archive_contents_verified": true,
+      "installed_import_outside_checkout_verified": true,
+      "fixture_sha256": "8a88a11bce715e54fbf78333089ffb7889e84adad7d213040782a79576c65f61",
+      "fixture_seed": 7,
+      "batch_size": 100,
+      "hardware": {
+        "runner_environment": "github-hosted",
+        "runner_image": "ubuntu24",
+        "runner_image_version": "20260920.314.1",
+        "system": "Linux",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "architecture": "x86_64",
+        "cpu_count": 4,
+        "affinity_cpu_count": 4,
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hypervisor_vendor": "Microsoft",
+        "memory_bytes": 16766410752,
+        "filesystem_types": [
+          "ext4"
+        ],
+        "disks": [
+          {
+            "type": "disk",
+            "rotational_flag": true,
+            "reported_size": "150G",
+            "model": "Virtual Disk"
+          }
+        ],
+        "container_detection": {
+          "result": "none",
+          "exit_code": 1
+        },
+        "probe_exit_codes": {
+          "cpu_details": 0,
+          "mount": 0,
+          "block_devices": 0,
+          "container_detection": 1
+        }
+      },
+      "runtime": {
+        "node": "v22.23.2"
+      },
+      "warm": {
+        "store_open_ms": {
+          "p50": 45.76523299998371,
+          "p95": 46.93387499998789,
+          "trials": 20,
+          "threshold_p95_ms": 2000,
+          "pass": true
+        },
+        "batch_ingest_100_ms": {
+          "p50": 30.399957000000086,
+          "p95": 37.798063000000184,
+          "trials": 100,
+          "threshold_p95_ms": 500,
+          "pass": true
+        },
+        "lexical_search_top8_ms": {
+          "p50": 62.024970999998914,
+          "p95": 64.82230299999355,
+          "trials": 1000,
+          "errors": 0,
+          "throughput_per_s": 16.1681719010454,
+          "threshold_p95_ms": 100,
+          "pass": true
+        }
+      },
+      "cold": {
+        "process_cold": {
+          "import_ms": {
+            "p50": 23.42774,
+            "p95": 24.82455,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 54.57184,
+            "p95": 55.27600600000001,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 79.73160600000001,
+            "p95": 81.434057,
+            "trials": 20
+          },
+          "observed_messages_each_trial": 10000
+        },
+        "filesystem_cold": {
+          "import_ms": {
+            "p50": 33.690124000000004,
+            "p95": 35.137056,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 58.89098800000001,
+            "p95": 60.958254999999994,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 678.6105319999999,
+            "p95": 703.664987,
+            "trials": 20
+          },
+          "observed_messages_each_trial": 10000
+        }
+      },
+      "warm_search_p95_ms": 64.82230299999355,
+      "process_cold_search_p95_ms": 81.434057,
+      "filesystem_cold_search_p95_ms": 703.664987,
+      "concurrency": {
+        "search_top8_ms": {
+          "1": {
+            "p50": 62.024970999998914,
+            "p95": 64.82230299999355,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 16.1681719010454
+          },
+          "4": {
+            "p50": 163.38213800000085,
+            "p95": 245.57943900000828,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 16.547389286512068
+          },
+          "16": {
+            "p50": 483.15696399999433,
+            "p95": 906.2262050000136,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 17.253973644929044
+          }
+        },
+        "ingest_100_ms": {
+          "4": {
+            "p50": 82.3060289999994,
+            "p95": 123.89648500000476,
+            "trials": 32,
+            "errors": 0,
+            "throughput_messages_per_s": 3199.55205951214
+          },
+          "16": {
+            "p50": 247.94359799998347,
+            "p95": 419.83223,
+            "trials": 32,
+            "errors": 0,
+            "throughput_messages_per_s": 3616.2186602303414
+          }
+        }
+      },
+      "resources": {
+        "peak_rss_bytes": 194121728,
+        "store_bytes": 45599008
+      },
+      "evidence_sha256": {
+        "manifest.json": "1df2dd23e8e2490386fbebcc17f16b656fb1251b1abcfd26e993c261b7d6ed2f",
+        "benchmark.json": "988739a6dbeb95e93d7032f8f67a04ba9574b2357ec5df91ce5186d5ee542b62",
+        "candidate-run.json": "90666b7abb24276fbae42f1fb2898f012ad71a45fdcfe8c8faa8bed29cd6ac45"
+      }
+    },
+    {
+      "language": "python",
+      "messages": 100000,
+      "status": "PASS_HOSTED_OBSERVATION",
+      "failures": [],
+      "job_id": 107909733405,
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36083318975/job/107909733405",
+      "job_conclusion": "success",
+      "artifact_name": "hosted-performance-python-100000-36083318975",
+      "started_at": "2026-09-25T01:44:37.847201+00:00",
+      "finished_at": "2026-09-25T02:21:48.859390+00:00",
+      "benchmark_exit_code": 1,
+      "benchmark_exit_explanation": "Warm lexical-search p95 exceeds the 100 ms CLI threshold; 100k is retained as a scale observation.",
+      "installed_archive": "chat_context_index-0.1.0-py3-none-any.whl",
+      "installed_archive_sha256": "219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79",
+      "installed_archive_contents_verified": true,
+      "installed_import_outside_checkout_verified": true,
+      "fixture_sha256": "39b27e35194fdf34990710b6b0359f1c0e58b2d5cd5c5c2a842ee172975a44cf",
+      "fixture_seed": 7,
+      "batch_size": 100,
+      "hardware": {
+        "runner_environment": "github-hosted",
+        "runner_image": "ubuntu24",
+        "runner_image_version": "20260920.314.1",
+        "system": "Linux",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "architecture": "x86_64",
+        "cpu_count": 4,
+        "affinity_cpu_count": 4,
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "hypervisor_vendor": "Microsoft",
+        "memory_bytes": 16766414848,
+        "filesystem_types": [
+          "ext4"
+        ],
+        "disks": [
+          {
+            "type": "disk",
+            "rotational_flag": true,
+            "reported_size": "150G",
+            "model": "Virtual Disk"
+          }
+        ],
+        "container_detection": {
+          "result": "none",
+          "exit_code": 1
+        },
+        "probe_exit_codes": {
+          "cpu_details": 0,
+          "mount": 0,
+          "block_devices": 0,
+          "container_detection": 1
+        }
+      },
+      "runtime": {
+        "python_version": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+        "apsw_version": "3.53.4.0",
+        "sqlite_library_version": "3.53.4",
+        "cache_backend": "sqlite"
+      },
+      "warm": {
+        "batch_ingest_100_ms": {
+          "p50": 18.009242999994513,
+          "p95": 27.824367999997435,
+          "pass": true,
+          "threshold_p95_ms": 500,
+          "trials": 1000
+        },
+        "lexical_search_top8_ms": {
+          "p50": 663.4501319999799,
+          "p95": 675.461447999993,
+          "pass": false,
+          "threshold_p95_ms": 100,
+          "trials": 1000
+        },
+        "store_open_ms": {
+          "p50": 1.016323000385455,
+          "p95": 1.330666999820096,
+          "pass": true,
+          "threshold_p95_ms": 2000,
+          "trials": 20
+        }
+      },
+      "cold": {
+        "process_cold": {
+          "import_ms": {
+            "p50": 34.20277800023541,
+            "p95": 35.125248999975156,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 1.7096179999498418,
+            "p95": 1.7637200003264297,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 702.7245770000263,
+            "p95": 706.0317450000184,
+            "trials": 20
+          },
+          "observed_messages_each_trial": 100000
+        },
+        "filesystem_cold": {
+          "import_ms": {
+            "p50": 44.58325799987506,
+            "p95": 45.755922999887844,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 2.262882000195532,
+            "p95": 2.6976069998454477,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 5030.819367999811,
+            "p95": 5101.496820000193,
+            "trials": 20
+          },
+          "observed_messages_each_trial": 100000
+        }
+      },
+      "warm_search_p95_ms": 675.461447999993,
+      "process_cold_search_p95_ms": 706.0317450000184,
+      "filesystem_cold_search_p95_ms": 5101.496820000193,
+      "concurrency": {
+        "ingest_100_ms": {
+          "16": {
+            "errors": 0,
+            "p50": 156.11641700024848,
+            "p95": 263.0557470001804,
+            "throughput_messages_per_s": 5383.896638294114,
+            "trials": 32
+          },
+          "4": {
+            "errors": 0,
+            "p50": 44.677243000023736,
+            "p95": 67.77231500018388,
+            "throughput_messages_per_s": 5712.765210819584,
+            "trials": 32
+          }
+        },
+        "search_top8_ms": {
+          "1": {
+            "errors": 0,
+            "p50": 663.4501319999799,
+            "p95": 675.461447999993,
+            "throughput_per_s": 1.5217001851173437,
+            "trials": 1000
+          },
+          "16": {
+            "errors": 0,
+            "p50": 11715.772282999978,
+            "p95": 11918.092892999994,
+            "throughput_per_s": 1.3697628869399954,
+            "trials": 1000
+          },
+          "4": {
+            "errors": 0,
+            "p50": 2751.2261730000773,
+            "p95": 2803.7999809998837,
+            "throughput_per_s": 1.4650372028475842,
+            "trials": 1000
+          }
+        }
+      },
+      "resources": {
+        "peak_rss_bytes": 122667008,
+        "store_bytes": 436487248
+      },
+      "evidence_sha256": {
+        "manifest.json": "431a952589fbd8805af8d3d251d2a6b109fababce9a12f524dd59ece8ed9b377",
+        "benchmark.json": "f4b1b9a89ce44ceb2eff4699f7dc506a660fedd961a87ac30374a90554ccaabe",
+        "candidate-run.json": "90666b7abb24276fbae42f1fb2898f012ad71a45fdcfe8c8faa8bed29cd6ac45"
+      }
+    },
+    {
+      "language": "typescript",
+      "messages": 100000,
+      "status": "PASS_HOSTED_OBSERVATION",
+      "failures": [],
+      "job_id": 107909733474,
+      "job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36083318975/job/107909733474",
+      "job_conclusion": "success",
+      "artifact_name": "hosted-performance-typescript-100000-36083318975",
+      "started_at": "2026-09-25T01:44:37.778795+00:00",
+      "finished_at": "2026-09-25T02:19:14.608829+00:00",
+      "benchmark_exit_code": 1,
+      "benchmark_exit_explanation": "Warm lexical-search p95 exceeds the 100 ms CLI threshold; 100k is retained as a scale observation.",
+      "installed_archive": "chat-context-index-0.1.0.tgz",
+      "installed_archive_sha256": "dd0818da05dc59d9465b6fb71caeaf58fb90fc67b5e9392f4faf59784b64d13b",
+      "installed_archive_contents_verified": true,
+      "installed_import_outside_checkout_verified": true,
+      "fixture_sha256": "39b27e35194fdf34990710b6b0359f1c0e58b2d5cd5c5c2a842ee172975a44cf",
+      "fixture_seed": 7,
+      "batch_size": 100,
+      "hardware": {
+        "runner_environment": "github-hosted",
+        "runner_image": "ubuntu24",
+        "runner_image_version": "20260920.314.1",
+        "system": "Linux",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "architecture": "x86_64",
+        "cpu_count": 4,
+        "affinity_cpu_count": 4,
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hypervisor_vendor": "Microsoft",
+        "memory_bytes": 16766414848,
+        "filesystem_types": [
+          "ext4"
+        ],
+        "disks": [
+          {
+            "type": "disk",
+            "rotational_flag": true,
+            "reported_size": "150G",
+            "model": "Virtual Disk"
+          }
+        ],
+        "container_detection": {
+          "result": "none",
+          "exit_code": 1
+        },
+        "probe_exit_codes": {
+          "cpu_details": 0,
+          "mount": 0,
+          "block_devices": 0,
+          "container_detection": 1
+        }
+      },
+      "runtime": {
+        "node": "v22.23.2"
+      },
+      "warm": {
+        "store_open_ms": {
+          "p50": 46.974353000056,
+          "p95": 48.27247800002806,
+          "trials": 20,
+          "threshold_p95_ms": 2000,
+          "pass": true
+        },
+        "batch_ingest_100_ms": {
+          "p50": 28.970836999999847,
+          "p95": 39.54874999999993,
+          "trials": 1000,
+          "threshold_p95_ms": 500,
+          "pass": true
+        },
+        "lexical_search_top8_ms": {
+          "p50": 642.5611260000151,
+          "p95": 669.3430260000023,
+          "trials": 1000,
+          "errors": 0,
+          "throughput_per_s": 1.5672120086308154,
+          "threshold_p95_ms": 100,
+          "pass": false
+        }
+      },
+      "cold": {
+        "process_cold": {
+          "import_ms": {
+            "p50": 24.605925,
+            "p95": 25.389825999999996,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 55.398499,
+            "p95": 57.247527999999996,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 644.506616,
+            "p95": 651.379059,
+            "trials": 20
+          },
+          "observed_messages_each_trial": 100000
+        },
+        "filesystem_cold": {
+          "import_ms": {
+            "p50": 32.800072,
+            "p95": 36.279212,
+            "trials": 20
+          },
+          "store_open_ms": {
+            "p50": 58.771774,
+            "p95": 60.58267599999999,
+            "trials": 20
+          },
+          "first_search_top8_ms": {
+            "p50": 6321.099415,
+            "p95": 6535.564249,
+            "trials": 20
+          },
+          "observed_messages_each_trial": 100000
+        }
+      },
+      "warm_search_p95_ms": 669.3430260000023,
+      "process_cold_search_p95_ms": 651.379059,
+      "filesystem_cold_search_p95_ms": 6535.564249,
+      "concurrency": {
+        "search_top8_ms": {
+          "1": {
+            "p50": 642.5611260000151,
+            "p95": 669.3430260000023,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 1.5672120086308154
+          },
+          "4": {
+            "p50": 1649.9897890000138,
+            "p95": 2535.962654000148,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 1.6041426852536989
+          },
+          "16": {
+            "p50": 5099.303329000017,
+            "p95": 9826.439391999971,
+            "trials": 1000,
+            "errors": 0,
+            "throughput_per_s": 1.6067610028872343
+          }
+        },
+        "ingest_100_ms": {
+          "4": {
+            "p50": 77.72727100015618,
+            "p95": 122.76234999997541,
+            "trials": 32,
+            "errors": 0,
+            "throughput_messages_per_s": 3336.096176983896
+          },
+          "16": {
+            "p50": 258.17898000008427,
+            "p95": 445.22358899982646,
+            "trials": 32,
+            "errors": 0,
+            "throughput_messages_per_s": 3338.5844606794562
+          }
+        }
+      },
+      "resources": {
+        "peak_rss_bytes": 405573632,
+        "store_bytes": 436487248
+      },
+      "evidence_sha256": {
+        "manifest.json": "0169fe8e38513c7ac04f909e6645e5bd0e3be3535d8a4513253f2410e4abe1e2",
+        "benchmark.json": "1a0b20f02508b1e1d5659fd4f4560fd38bf85b7169b6e5c6f57e24fe8d0e1b9e",
+        "candidate-run.json": "90666b7abb24276fbae42f1fb2898f012ad71a45fdcfe8c8faa8bed29cd6ac45"
+      }
+    }
+  ]
+}

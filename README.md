@@ -21,7 +21,7 @@
 </div>
 
 > [!NOTE]
-> **Pre-release.** The latest retained CI evidence applies to source `6dd96d7d`: 430 Python tests, 88 Node tests, and all 16 package combinations passed. The newer Python wheel (`219fd1e7…`) has not completed a live-model smoke; the earlier successful smoke applies only to wheel `a3286616…`. Newer branch changes still need fresh CI evidence. [Retained CI verification](evaluations/results/production-readiness-20260924/execution/follow-up-hosted-verification.json) · [Release status](docs/release-status.md).
+> **Pre-release.** Measured candidate `e762f7bd` passed 511 Python tests, 88 Node tests, all 16 package combinations, and an installed Python live-model smoke with actual token usage. Its hosted Linux 10k-message run failed the filesystem-cold search target. The 100k scale measurements completed, with filesystem-cold search p95 above five seconds in both runtimes. Quality/cost trials, human validation, registry setup, and final approval remain open. [Retained CI verification](evaluations/results/production-readiness-20260924/execution/main-candidate-verification-20260925.json) · [Release status](docs/release-status.md).
 
 Release validation now includes bounded native answer review, source-distribution installation checks,
 and a configured runtime/platform matrix. [Implementation progress and remaining gates](docs/release-status.md).
@@ -107,9 +107,9 @@ CCI_API_KEY=your-provider-key
 Presets cover OpenAI, Gemini, Anthropic, Groq, OpenRouter, and local Ollama through their Chat Completions
 compatibility endpoints. Set `CCI_BASE_URL` for another compatible service. Other native APIs can implement
 the package's `Provider` contract. See [configuration and limits](evaluations/LIVE_SMOKE.md). All presets
-have offline routing tests; an earlier installed Python wheel (`a3286616…`) passed the
-[Gemini development smoke](evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json).
-The newer wheel (`219fd1e7…`) still needs its own smoke. Other providers have not passed a live run.
+have offline routing tests; the installed Python wheel (`219fd1e7…`) from measured candidate
+`e762f7bd` passed the [Gemini development smoke](evaluations/results/production-readiness-20260924/execution/live-smoke-candidate-004-summary.json).
+Other providers have not passed a live run.
 
 ### Cache eligible model work
 
@@ -138,22 +138,21 @@ memoization backend.
 
 ## Measured example
 
-The [installed-package live smoke on September 24, 2026](evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json)
-**passed** using historical wheel `a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0`
-and `gemini-3.5-flash-lite`. This result does not validate the newer wheel
-`219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79`. The historical run indexed four synthetic
+The [installed-package live smoke on September 25, 2026 UTC](evaluations/results/production-readiness-20260924/execution/live-smoke-candidate-004-summary.json)
+**passed** using wheel `219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79`
+from candidate `e762f7bd`, CI run `36082860041`, and `gemini-3.5-flash-lite`. The run indexed four synthetic
 messages, closed and reopened SQLite, then retrieved the original “The deployment target is Oslo.”
 for “Where should the service launch?” through tree navigation. The result preserved sequence 1,
 its message ID, and the `/content` source pointer. Lexical search found no evidence.
 
 | Operation | Successful calls | Actual input tokens | Actual output tokens |
 | :--- | ---: | ---: | ---: |
-| Indexing | 6 | 653 | 239 |
-| Tree navigation | 2 | 405 | 62 |
-| **Total** | **8** | **1,058** | **301** |
+| Indexing | 6 | 657 | 241 |
+| Tree navigation | 2 | 409 | 67 |
+| **Total** | **8** | **1,066** | **308** |
 
 The run had **zero errors, retries, or missing usage**. Indexing unchanged history made zero calls.
-Estimated cost from the recorded tokens and frozen model prices was **$0.0010699**, below the
+Estimated cost from **1,374 recorded tokens** and frozen model prices was **$0.0010898**, below the
 **$0.04** smoke cap. This verifies one Python development fixture; it does not establish general
 recall, answer quality, native TypeScript live behavior, sustained provider capacity, or cost savings.
 Earlier failed attempts and their unknown-usage reservations remain in the
@@ -231,7 +230,7 @@ The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatInd
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- The latest retained hosted run, source `6dd96d7d`, passed 430 Python tests, 88 Node tests, and all 16 package combinations (144 writer/reader checks). These results do not certify newer branch changes. Live smoke for its newer wheel, Linux performance, and held-out quality/cost validation remain open. [Release status](docs/release-status.md).
+- Measured candidate `e762f7bd` passed 511 Python tests, 88 Node tests, all 16 package combinations (144 writer/reader checks), and one Python live smoke. Hosted Linux 10k-message filesystem-cold search p95 was 638.076 ms in Python and 703.665 ms in TypeScript, above the 100 ms target. At 100k messages, filesystem-cold p95 was 5,101.497 / 6,535.564 ms, and concurrency-16 search p95 was 11,918.093 / 9,826.439 ms. Completing the scale observations with zero recorded errors does not close the latency or reference-hardware gates. Held-out quality/cost validation remains open. These results apply to that candidate's recorded artifacts. [Release status](docs/release-status.md).
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 
