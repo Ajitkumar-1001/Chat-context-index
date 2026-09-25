@@ -23,7 +23,7 @@
 </div>
 
 > [!NOTE]
-> **Python 0.1.0 is released** on [PyPI](https://pypi.org/project/chat-context-index/0.1.0/) ([GitHub release `v0.1.0`](https://github.com/Ajitkumar-1001/Chat-context-index/releases/tag/v0.1.0), commit `46ac4c2`). [Release run 36097901586](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36097901586) rebuilt, checked and published a wheel and source archive byte-identical to those [main CI run 36094205085](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085) built and tested; their SHA-256 digests match PyPI's (wheel `411e7b8e…`, source `1d191e28…`). [Release verification record](evaluations/results/production-readiness-20260924/execution/release-0.1.0-verification.json). The TypeScript package is **not on npm yet**: its publish job failed. No live-model smoke, held-out answer-quality or cost trial, or human validation has been run on this build. The PyPI 0.1.0 page still shows the description written before upload, which calls the package a pre-release candidate; install it as shown below.
+> **Python 0.1.0 is released** on [PyPI](https://pypi.org/project/chat-context-index/0.1.0/) ([GitHub release `v0.1.0`](https://github.com/Ajitkumar-1001/Chat-context-index/releases/tag/v0.1.0), commit `46ac4c2`). [Release run 36097901586](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36097901586) rebuilt, checked and published a wheel and source archive byte-identical to those [main CI run 36094205085](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085) built and tested; their SHA-256 digests match PyPI's (wheel `411e7b8e…`, source `1d191e28…`). [Release verification record](evaluations/results/production-readiness-20260924/execution/release-0.1.0-verification.json). **TypeScript 0.1.0 is on [GitHub Packages](https://github.com/Ajitkumar-1001/Chat-context-index/pkgs/npm/chat-context-index)** as `@ajitkumar-1001/chat-context-index`, not on npmjs: its npmjs publish job failed. [Publish run 36185209650](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36185209650) checked the CI-tested archive (`2c13e400…`) against the release approval, changed only its package name, published it, then installed it from the registry and recalled a stored message. No live-model smoke, held-out answer-quality or cost trial, or human validation has been run on this build. The PyPI 0.1.0 page still shows the description written before upload, which calls the package a pre-release candidate; install it as shown below.
 
 That CI run passed 556 Python and 106 Node tests, rebuilt the wheel from the source archive, and
 passed all 16 install jobs (Python 3.11–3.14, Node 22/24, Linux x64 and macOS arm64).
@@ -54,8 +54,23 @@ python -m pip install chat-context-index
 The package imports as `cci` and installs the `cci` command. Add `[redis]` for Redis memoization
 or `[openai]` for the CLI's `--provider openai`. Importing the package makes no model calls.
 
-The TypeScript package is not published yet. Build and pack it in `packages/typescript` with
-`npm ci && npm run build && npm pack`, then install the tarball as its [README](packages/typescript/README.md) shows.
+TypeScript (Node.js 22 or later, ESM) is on GitHub Packages as `@ajitkumar-1001/chat-context-index`.
+GitHub's npm registry requires a classic personal access token with `read:packages`, even for
+public packages. Set `GITHUB_PACKAGES_TOKEN` to that token and add to your project's `.npmrc`:
+
+```ini
+@ajitkumar-1001:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}
+```
+
+Then install it under its npmjs name, so imports stay `from "chat-context-index"`:
+
+```bash
+npm install chat-context-index@npm:@ajitkumar-1001/chat-context-index@0.1.0
+```
+
+To build from source instead, run `npm ci && npm run build && npm pack` in `packages/typescript`,
+then install the tarball as its [README](packages/typescript/README.md) shows.
 
 ## Quick start
 
@@ -250,7 +265,7 @@ The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatInd
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- The `0.1.0` archives CI built for commit `46ac4c2` (the Python wheel on PyPI and the unpublished TypeScript tarball) were measured on GitHub-hosted Linux (4 vCPUs, about 16 GB of memory) in [run 36094491463](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094491463). At 10k messages, filesystem-cold first-search p95 was 52.229 ms in Python and 54.025 ms in TypeScript, under the 100 ms target. At 100k messages it was 355.338 / 399.048 ms, and concurrency-16 search p95 was 858.685 / 1,254.134 ms. Before the compact search index, candidate `e762f7bd` measured 638.076 / 703.665 ms at 10k. Hosted machines do not close the dedicated reference-hardware gate. Held-out quality/cost validation remains open.
+- The `0.1.0` archives CI built for commit `46ac4c2` (the Python wheel on PyPI and the TypeScript tarball, published to GitHub Packages with only its package name changed) were measured on GitHub-hosted Linux (4 vCPUs, about 16 GB of memory) in [run 36094491463](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094491463). At 10k messages, filesystem-cold first-search p95 was 52.229 ms in Python and 54.025 ms in TypeScript, under the 100 ms target. At 100k messages it was 355.338 / 399.048 ms, and concurrency-16 search p95 was 858.685 / 1,254.134 ms. Before the compact search index, candidate `e762f7bd` measured 638.076 / 703.665 ms at 10k. Hosted machines do not close the dedicated reference-hardware gate. Held-out quality/cost validation remains open.
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 

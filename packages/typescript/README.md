@@ -3,8 +3,11 @@
 Persistent conversation memory for RAG chats and agents. Save original messages in SQLite,
 then prepare recent context plus relevant older evidence for your application's model.
 
-Pre-release candidate. Node.js 22 or later is required; this package uses ESM.
-Install a locally built archive with `npm install /path/to/chat-context-index-0.1.0.tgz`.
+Node.js 22 or later is required; this package uses ESM.
+Version 0.1.0 is on GitHub Packages as `@ajitkumar-1001/chat-context-index`; the
+[repository README](https://github.com/Ajitkumar-1001/Chat-context-index#install) shows the token
+setup and the install command that keeps the `chat-context-index` import name. To use a locally
+built archive instead, run `npm install /path/to/chat-context-index-0.1.0.tgz`.
 
 New stores use schema version 2. For an existing version-1 store, stop all writer processes
 and run `await HistoryStore.migrate("conversation.db", { backupPath: "/absolute/path/conversation.before-v2.db" })`
