@@ -1,34 +1,41 @@
 ---
 import { Code } from 'astro:components';
 // Only public evidence files are imported; the page is rebuilt from them.
-import verification from '../../../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-verification.json';
-import packages from '../../../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-evidence/package-memory.json';
-import smoke from '../../../evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json';
-import perfPy from '../../../evaluations/results/release-readiness/performance-macos-20260924.json';
-import perfTs from '../../../evaluations/results/release-readiness/performance-typescript-macos-20260924.json';
+import verification from '../../../evaluations/results/production-readiness-20260924/execution/main-candidate-verification-20260925.json';
+import packages from '../../../evaluations/results/production-readiness-20260924/execution/main-candidate-package-memory-20260925.json';
+import smoke from '../../../evaluations/results/production-readiness-20260924/execution/live-smoke-candidate-004-summary.json';
+import perfSummary from '../../../evaluations/results/production-readiness-20260924/execution/hosted-performance-36083318975-summary.json';
 import recallLexical from '../../../evaluations/results/release-readiness/dev-recall-lexical-20260924.json';
 import recallTree from '../../../evaluations/results/release-readiness/dev-recall-tree-20260924.json';
 
 const repo = 'https://github.com/Ajitkumar-1001/Chat-context-index';
 const blob = `${repo}/blob/main`;
 const evidencePath = `${blob}/evaluations/results/production-readiness-20260924`;
-const smokeReport = `${evidencePath}/live-smoke-retry-003-summary.json`;
-const candidateReport = `${evidencePath}/execution/follow-up-hosted-verification.json`;
-const packageReports = import.meta.glob<typeof packages>(
-  '../../../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-evidence/packages-*.json',
-  { eager: true, import: 'default' },
-);
+const smokeReport = `${evidencePath}/execution/live-smoke-candidate-004-summary.json`;
+const candidateReport = `${evidencePath}/execution/main-candidate-verification-20260925.json`;
+const performanceRun = perfSummary.performance_run_url;
+const performanceReport = `${evidencePath}/execution/hosted-performance-36083318975-summary.json`;
+if (
+  packages.ci.GITHUB_SHA !== verification.source_commit ||
+  packages.ci.GITHUB_RUN_ID !== verification.ci_run_id ||
+  packages.source_report_sha256 !== verification.canonical_package_report_sha256 ||
+  JSON.stringify(packages.artifacts) !== JSON.stringify(verification.artifacts) ||
+  smoke.source_sha !== verification.source_commit ||
+  String(smoke.ci_run_id) !== verification.ci_run_id ||
+  perfSummary.source_sha !== verification.source_commit ||
+  perfSummary.ci_run_id !== verification.ci_run_id ||
+  JSON.stringify(perfSummary.artifacts) !== JSON.stringify(verification.artifacts) ||
+  !packages.artifacts.some((artifact) => artifact.filename.endsWith('.whl') && artifact.sha256 === smoke.wheel_sha256)
+) throw new Error('Candidate evidence source, run, or archive mismatch');
 const hosted = {
-  source_sha: verification.tested_pull_request_merge_sha,
-  run_url: verification.ci_url,
-  all_ci_jobs: verification.hosted_jobs_passed,
+  source_sha: verification.source_commit,
+  run_url: verification.ci_run_url,
+  all_ci_jobs: verification.jobs_passed,
   matrix_cells: verification.package_matrix_jobs_passed,
   writer_reader_checks_per_cell: packages.checks.length,
   tests: { python_passed: verification.python_tests_passed, node_passed: verification.node_tests_passed },
   artifacts: packages.artifacts,
-  cells: Object.entries(packageReports).map(([path, report]) => ({
-    ...report, cell: path.split('/').at(-1)!.replace(/\.json$/, ''),
-  })),
+  cells: verification.matrix,
 };
 // Gate wording mirrors docs/release-status.md; update both together.
 const asOf = 'September 25, 2026 (UTC)';
@@ -47,7 +54,7 @@ const toc = [
 type Status = 'pass' | 'open' | 'blocked';
 const statusLabel: Record<Status, string> = { pass: 'Passed', open: 'Not run', blocked: 'Blocked' };
 
-const ms = (n: number) => `${n.toFixed(1)} ms`;
+const ms = (n: number) => `${n.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })} ms`;
 const pct = (n: number) => `${Math.round(n * 100)}%`;
 const minor = (v: string) => v.split('.').slice(0, 2).join('.');
 const major = (v: string) => v.replace(/^v/, '').split('.')[0];
@@ -58,17 +65,17 @@ const gates: { name: string; status: Status; evidence: string; href?: string }[]
   { name: 'Static checks', status: 'pass', evidence: 'Hosted Python lint/typecheck, TypeScript typecheck, and bounded evaluator static checks passed.' },
   { name: 'Cross-language retrieval', status: 'pass', evidence: 'A shared fixture compares ordered search(), retrieve(), and prepared-context output across runtimes, including correction and duplicate cases.' },
   { name: 'Cache failure accounting', status: 'pass', evidence: 'Python stats() reports Redis errors and SQLite fallback lookups and hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend.' },
-  { name: 'Installed packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${evidencePath}/execution/follow-up-hosted-evidence/package-memory.json` },
+  { name: 'Installed packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${evidencePath}/execution/main-candidate-package-memory-20260925.json` },
   { name: 'Hosted package matrix', status: 'pass', evidence: `All ${hosted.matrix_cells} Python 3.11–3.14 × Node 22/24 × Ubuntu x64/macOS arm64 cells passed with matching source and archive hashes.`, href: hosted.run_url },
   { name: 'CI artifacts and security', status: 'pass', evidence: 'Retained CI passed security scans and candidate inspection. The independent artifact approval remains DRAFT_NOT_APPROVED; no package was published.', href: candidateReport },
-  { name: 'Linux performance', status: 'open', evidence: 'No run for the newer candidate. Hosted measurement preparation retains warm/cold latency targets and scale/concurrency completeness. The fixed 4-CPU/8-GiB reference gate is still open.' },
-  { name: 'Candidate live smoke', status: 'open', evidence: 'No live smoke is recorded for newer wheel 219fd1e7…. The earlier eight-call smoke passed only for wheel a3286616…; its result is preserved below.', href: smokeReport },
-  { name: 'Quality, cost, and human review', status: 'open', evidence: 'Three frozen held-out trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open.' },
+  { name: 'Linux performance', status: 'blocked', evidence: 'The 10k-message hosted run failed the 100 ms filesystem-cold search target: Python 638.076 ms / TypeScript 703.665 ms p95. All four observations completed with zero concurrency errors, but at 100k messages filesystem-cold p95 reached 5.10 / 6.54 seconds and concurrency-16 search p95 reached 11.92 / 9.83 seconds. Fixed 4-CPU/8-GiB reference qualification remains open.', href: performanceReport },
+  { name: 'Candidate live smoke', status: 'pass', evidence: 'Candidate wheel 219fd1e7… passed: eight calls, 1,066 input / 308 output tokens, $0.0010898 estimated cost, and original Oslo evidence recovered after reopening. Unchanged indexing made zero calls.', href: smokeReport },
+  { name: 'Quality, cost, and human review', status: 'open', evidence: 'Three frozen held-out trials, real-provider cache measurements, and answer review remain open; sustained capacity and the next paid allocation are unverified. Two developer-adoption bundles are prepared with blank NOT_RUN records; actual participants are still required.' },
   { name: 'Website public availability', status: 'blocked', evidence: 'Vercel deployment 6651358929 reported success, but its URL and the repository homepage redirect to Vercel login; public access is unverified.' },
-  { name: 'Registry setup and final approval', status: 'blocked', evidence: 'Release protections and the PyPI pending publisher (release.yml / release) are configured. npm ownership/publisher identity is unverified; final source/artifact approval is unset.' },
+  { name: 'Registry setup and final approval', status: 'blocked', evidence: 'Release protections and the PyPI pending publisher (release.yml / release) are configured. npm sign-in as ajitkumar1001 was observed, but 2FA is incomplete; package ownership, initial publication/bootstrap, and trusted publishing remain unresolved. Final source/artifact approval is unset.' },
 ];
 
-const cells = hosted.cells.map((c) => ({ ...c, os: c.cell.split('-py')[0].replace(/^packages-/, '') }));
+const cells = hosted.cells;
 const pythons = [...new Set(cells.map((c) => minor(c.python)))];
 const matrixRows = [...new Set(cells.map((c) => `${c.os} ${c.machine}|${major(c.node)}`))].map((key) => {
   const [platform, node] = key.split('|');
@@ -86,14 +93,28 @@ const writers = [...new Set(packages.checks.map((c) => c.writer))];
 const readers = [...new Set(packages.checks.map((c) => c.reader))];
 const checkStatus = (w: string, r: string) => packages.checks.find((c) => c.writer === w && c.reader === r)?.status;
 
+const perfPython10k = perfSummary.jobs.find((job) => job.language === 'python' && job.messages === 10000);
+const perfTypescript10k = perfSummary.jobs.find((job) => job.language === 'typescript' && job.messages === 10000);
+const perfPython100k = perfSummary.jobs.find((job) => job.language === 'python' && job.messages === 100000);
+const perfTypescript100k = perfSummary.jobs.find((job) => job.language === 'typescript' && job.messages === 100000);
+if (!perfPython10k || !perfTypescript10k || !perfPython100k || !perfTypescript100k) {
+  throw new Error('Missing performance observation');
+}
 const perfRows = [
-  ['store_open_ms', 'Open the store'],
-  ['batch_ingest_100_ms', 'Ingest a 100-message batch'],
-  ['lexical_search_top8_ms', 'Lexical search, top 8'],
-] as const;
+  { label: 'Warm lexical search, top 8', python: perfPython10k.warm_search_p95_ms, typescript: perfTypescript10k.warm_search_p95_ms },
+  { label: 'Process-cold first search', python: perfPython10k.process_cold_search_p95_ms, typescript: perfTypescript10k.process_cold_search_p95_ms },
+  { label: 'Filesystem-cold first search', python: perfPython10k.filesystem_cold_search_p95_ms, typescript: perfTypescript10k.filesystem_cold_search_p95_ms },
+];
+const scaleRows = [
+  { label: 'Warm lexical search, top 8', python: perfPython100k.warm_search_p95_ms, typescript: perfTypescript100k.warm_search_p95_ms },
+  { label: 'Process-cold first search', python: perfPython100k.process_cold_search_p95_ms, typescript: perfTypescript100k.process_cold_search_p95_ms },
+  { label: 'Filesystem-cold first search', python: perfPython100k.filesystem_cold_search_p95_ms, typescript: perfTypescript100k.filesystem_cold_search_p95_ms },
+  { label: 'Search at concurrency 16', python: perfPython100k.concurrency.search_top8_ms['16'].p95, typescript: perfTypescript100k.concurrency.search_top8_ms['16'].p95 },
+];
 
 const pythonInstall = `git clone ${repo}.git
 cd Chat-context-index
+git checkout ${hosted.source_sha}
 python3 -m venv .venv
 .venv/bin/python -m pip install -e ./packages/python
 .venv/bin/python examples/python/brand_memory.py`;
@@ -173,14 +194,16 @@ try {
       <div class="callout" role="note">
         <p>
           <span class="pill blocked">Release blocked</span>
-          Retained source <code>{hosted.source_sha.slice(0, 8)}</code> passed hosted regression and all
-          {hosted.matrix_cells} package combinations. Newer branch changes still need fresh CI evidence.
-          The successful live-model smoke belongs to an older wheel; the newer wheel has no recorded smoke.
+          Measured candidate <code>{hosted.source_sha.slice(0, 8)}</code> passed hosted regression, all
+          {hosted.matrix_cells} package combinations, and an installed Python live-model smoke.
+          Its 10k-message hosted Linux run failed the filesystem-cold search target. The 100k measurements
+          completed, with filesystem-cold search p95 above five seconds in both runtimes.
           Held-out quality and cost comparisons, reference performance, human review, developer adoption,
           and registry setup remain open.
         </p>
         <p>
-          No registry package is published. PyPI pending publishing is configured; npm ownership is unverified. The
+          No registry package is published. PyPI pending publishing is configured; npm sign-in was observed,
+          but 2FA, package ownership, and publishing setup remain incomplete. The
           <a href={`${repo}/releases/tag/pre-release`}>GitHub prerelease</a> has no assets.
         </p>
       </div>
@@ -222,9 +245,8 @@ try {
         <p class="muted">
           Mirrors <a href={`${blob}/docs/release-status.md`}>docs/release-status.md</a>. Retained candidate built from
           <a href={`${repo}/commit/${hosted.source_sha}`}><code>{hosted.source_sha.slice(0, 7)}</code></a>;
-          all {hosted.all_ci_jobs} jobs passed in <a href={hosted.run_url}>its pull-request merge run</a>.
-          This does not certify newer main changes: a checksum-only scanner false positive has a targeted fix
-          prepared for fresh validation.
+          all {hosted.all_ci_jobs} jobs passed in <a href={hosted.run_url}>its merged-main CI run</a>.
+          These results apply to that source and its recorded artifacts; later changes need their own validation.
         </p>
         <div class="table">
           <table class="stack">
@@ -333,10 +355,14 @@ try {
       <section data-section="performance">
         <h2>Performance</h2>
         <p class="muted">
-          Historical installed-package measurements on a local {perfPy.environment.platform} machine, using a
-          {perfPy.fixture.total_messages.toLocaleString('en-US')}-message reference fixture. These retain their
-          original artifact identities and do not close the dedicated Linux reference gate.
+          Candidate <code>{hosted.source_sha.slice(0, 8)}</code>, installed from its verified wheel and npm archive,
+          was measured on GitHub-hosted Ubuntu with 10,000 and 100,000 messages. All four observed hosts had
+          {perfPython10k.hardware.cpu_count} CPUs and approximately {(perfPython10k.hardware.memory_bytes / 2 ** 30).toFixed(2)} GiB RAM;
+          CPU models varied between jobs. The fixed 4-CPU/8-GiB reference gate remains
+          <code>{perfSummary.fixed_reference_gate}</code>.
+          <a class="more" href={performanceRun}>Measurement run</a> · <a href={performanceReport}>Verified observations</a>
         </p>
+        <h3>10,000 messages: filesystem-cold target failed</h3>
         <div class="table">
           <table>
             <thead>
@@ -348,42 +374,57 @@ try {
               </tr>
             </thead>
             <tbody>
-              {perfRows.map(([key, label]) => {
-                const py = perfPy.results[key];
-                const ts = perfTs.results[key];
-                return (
+              {perfRows.map((row) => (
                   <tr>
-                    <th scope="row">{label}</th>
-                    <td class="num">{ms(py.p95)} <span class={`pill ${py.pass ? 'pass' : 'blocked'}`}>{py.pass ? 'Pass' : 'Fail'}</span></td>
-                    <td class="num">{ms(ts.p95)} <span class={`pill ${ts.pass ? 'pass' : 'blocked'}`}>{ts.pass ? 'Pass' : 'Fail'}</span></td>
-                    <td class="num">{py.threshold_p95_ms.toLocaleString('en-US')} ms</td>
+                    <th scope="row">{row.label}</th>
+                    <td class="num">{ms(row.python)} <span class={`pill ${row.python <= 100 ? 'pass' : 'blocked'}`}>{row.python <= 100 ? 'Pass' : 'Fail'}</span></td>
+                    <td class="num">{ms(row.typescript)} <span class={`pill ${row.typescript <= 100 ? 'pass' : 'blocked'}`}>{row.typescript <= 100 ? 'Pass' : 'Fail'}</span></td>
+                    <td class="num">100 ms</td>
                   </tr>
-                );
-              })}
+              ))}
             </tbody>
           </table>
         </div>
         <ul class="notes">
           <li>
-            Process-cold first search p95: Python {ms(perfPy.process_cold.first_search_top8_ms.p95)}, TypeScript
-            {ms(perfTs.process_cold.first_search_top8_ms.p95)}.
+            Filesystem-cold first search failed in both runtimes: Python 638.076 ms and TypeScript 703.665 ms p95.
+            Each of the 20 cold trials used <code>sync</code> and <code>drop_caches=3</code> before a fresh process.
           </li>
           <li>
-            Search latency grows with concurrency: at 16 concurrent requests, p95 is Python
-            {ms(perfPy.concurrency.search_top8_ms['16'].p95)} and TypeScript {ms(perfTs.concurrency.search_top8_ms['16'].p95)}.
+            All four jobs recorded {perfSummary.measurement_scope.concurrency_errors_all_jobs} concurrency errors:
+            each ran 3,000 searches across concurrency 1, 4, and 16, plus 64 ingestion batches across concurrency 4 and 16.
+            Zero errors does not imply the latency target passed.
           </li>
           <li>
-            Dedicated Linux runner: {perfPy.environment.dedicated_linux_runner ? 'yes' : 'no'}. Filesystem-cold
-            pass: {perfPy.environment.filesystem_cold}.
+            All four measurement reports are complete. There is no full performance pass.
+            Earlier <a href={`${blob}/docs/benchmark-reproduction.md`}>local macOS results</a> remain historical.
           </li>
         </ul>
+        <h3>100,000 messages: completed scale observations</h3>
+        <p class="note">
+          These measurements show substantial search latency. Both benchmark CLIs returned exit code 1 because
+          warm search exceeded their 100 ms threshold; the hosted workflow accepts complete 100k observations
+          without treating those latencies as a pass.
+        </p>
+        <div class="table">
+          <table>
+            <thead>
+              <tr><th scope="col">Operation (p95)</th><th scope="col" class="num">Python</th><th scope="col" class="num">TypeScript</th></tr>
+            </thead>
+            <tbody>
+              {scaleRows.map((row) => (
+                <tr><th scope="row">{row.label}</th><td class="num">{ms(row.python)}</td><td class="num">{ms(row.typescript)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section data-section="quality">
         <h2>Retrieval quality</h2>
-        <h3>Historical Python live smoke <span class={`pill ${smoke.status === 'PASS' ? 'pass' : 'blocked'}`}>{smoke.status}</span></h3>
+        <h3>Measured candidate's Python live smoke <span class={`pill ${smoke.status === 'PASS' ? 'pass' : 'blocked'}`}>{smoke.status}</span></h3>
         <p>
-          Earlier wheel <code class="hash">{smoke.wheel_sha256}</code> completed a development-fixture smoke with <code>{smoke.model}</code>,
+          Candidate wheel <code class="hash">{smoke.wheel_sha256}</code> completed a development-fixture smoke with <code>{smoke.model}</code>,
           then retrieved the expected original evidence through tree navigation after reopening SQLite:
           <q>{smoke.checks.evidence[0].excerpt}</q>
           <a class="more" href={smokeReport}>Recorded result</a>
@@ -406,8 +447,10 @@ try {
           </div>
         </div>
         <p class="note">
-          This result does not validate newer wheel <code class="hash">{verification.new_wheel_sha256}</code>.
-          One visible development conversation; this does not measure held-out answer quality, TypeScript
+          The result preserved original sequence {smoke.checks.evidence[0].seq}, its message ID, and the
+          <code>{smoke.checks.evidence[0].source_pointer}</code> pointer. Unchanged indexing made
+          {smoke.checks.unchanged_index_calls} calls. This is one visible development conversation;
+          it does not measure held-out answer quality, TypeScript
           live-model behavior, sustained provider capacity, or cost savings. Cost uses actual tokens and the
           frozen prices; it is an estimate, not an invoice. Earlier failed calls retain their separate
           unknown-usage reservations. The three-trial quality/cost evaluation and human review remain open.
@@ -423,6 +466,10 @@ try {
           ))}
         </div>
         <p class="note">
+          These September 24 development reports record a local Python source import without a frozen
+          commit or archive hash. Their scores are not attributed to candidate <code>{hosted.source_sha.slice(0, 8)}</code>.
+          <a href={`${blob}/evaluations/results/release-readiness/dev-recall-lexical-20260924.json`}>Lexical report</a> ·
+          <a href={`${blob}/evaluations/results/release-readiness/dev-recall-tree-20260924.json`}>Tree report</a>.
           Development split only; this is iteration evidence, not release evidence. Tree mode uses a stub navigator
           that keeps every offered node, so it measures evidence loss after perfect navigation, not real navigation
           quality.
@@ -453,7 +500,7 @@ try {
       </section>
 
       <section data-section="install">
-        <h2>Try the candidate from source</h2>
+        <h2>Try the measured candidate from source</h2>
         <p>Registry installs will not work until the release gates close. Build locally instead.</p>
         <h3>Python</h3>
         <Code code={pythonInstall} lang="bash" />
@@ -511,7 +558,7 @@ try {
         <a href={`${blob}/UPSTREAM.md`}>Upstream attribution</a> (derived from VectifyAI/ChatIndex; not endorsed by
         VectifyAI).
       </p>
-      <p class="muted">Figures on this page are read from the public evidence files at build time.</p>
+      <p class="muted">Figures cite the public CI runs and retained evidence files linked on this page.</p>
     </footer>
 
     <script>
