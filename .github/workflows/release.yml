@@ -2,7 +2,8 @@ name: Release
 
 # A tag remains a separately authorized publication action. Before creating it, the owner
 # must configure protected tags, required release-environment reviewers and registry identities,
-# and set RELEASE_APPROVED_SHA to the source commit accepted in the final evidence review.
+# and set RELEASE_APPROVED_SHA plus the independent artifact approval values accepted in
+# final evidence review. See docs/release-artifact-approval.md; CI never self-approves.
 on:
   push:
     tags:
@@ -45,7 +46,13 @@ jobs:
           name: release-candidate-${{ github.sha }}
           path: candidate
       - name: Verify and select CI-tested archives without rebuilding
-        run: python scripts/release_controls.py artifacts --candidate candidate --sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --tag "$GITHUB_REF_NAME" --output publish
+        env:
+          APPROVED_MANIFEST: ${{ vars.RELEASE_APPROVED_ARTIFACT_MANIFEST }}
+          APPROVED_MANIFEST_SHA256: ${{ vars.RELEASE_APPROVED_ARTIFACT_MANIFEST_SHA256 }}
+        run: |
+          test -n "$APPROVED_MANIFEST" && test -n "$APPROVED_MANIFEST_SHA256"
+          printf '%s' "$APPROVED_MANIFEST" > approved-artifacts.json
+          python scripts/release_controls.py artifacts --candidate candidate --sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --tag "$GITHUB_REF_NAME" --output publish --approval approved-artifacts.json --approval-sha256 "$APPROVED_MANIFEST_SHA256"
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: publish/python
@@ -71,7 +78,13 @@ jobs:
           name: release-candidate-${{ github.sha }}
           path: candidate
       - name: Verify and select CI-tested archives without rebuilding
-        run: python scripts/release_controls.py artifacts --candidate candidate --sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --tag "$GITHUB_REF_NAME" --output publish
+        env:
+          APPROVED_MANIFEST: ${{ vars.RELEASE_APPROVED_ARTIFACT_MANIFEST }}
+          APPROVED_MANIFEST_SHA256: ${{ vars.RELEASE_APPROVED_ARTIFACT_MANIFEST_SHA256 }}
+        run: |
+          test -n "$APPROVED_MANIFEST" && test -n "$APPROVED_MANIFEST_SHA256"
+          printf '%s' "$APPROVED_MANIFEST" > approved-artifacts.json
+          python scripts/release_controls.py artifacts --candidate candidate --sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --tag "$GITHUB_REF_NAME" --output publish --approval approved-artifacts.json --approval-sha256 "$APPROVED_MANIFEST_SHA256"
       # Keep existing authentication until the registry-side OIDC identity is verified.
       - run: npm publish publish/npm/*.tgz --provenance --access public --ignore-scripts
         env:

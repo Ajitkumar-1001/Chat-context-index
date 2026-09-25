@@ -4,6 +4,8 @@ import hashlib
 import importlib.util
 import io
 import json
+import subprocess
+import sys
 import tarfile
 import zipfile
 from pathlib import Path
@@ -75,19 +77,25 @@ def candidate(tmp_path):
     report_path.parent.mkdir()
     report_path.write_text(json.dumps(report))
     (report_path.parent / "artifact-secrets.json").write_text("[]")
-    return candidate, root, tmp_path / "publish", report_path
+    approval = tmp_path / "approved.json"
+    approval.write_text(json.dumps({"schema_version": 1, "source_sha": SHA, "version": "0.1.0",
+                                    "artifacts": report["artifacts"]}))
+    digest = hashlib.sha256(approval.read_bytes()).hexdigest()
+    return candidate, root, tmp_path / "publish", report_path, approval, digest
 
 
 def verify(candidate, **overrides):
-    path, root, output, _ = candidate
-    options = {"sha": SHA, "run_id": "123", "tag": "v0.1.0"} | overrides
+    path, root, output, _, approval, digest = candidate
+    options = {"sha": SHA, "run_id": "123", "tag": "v0.1.0",
+               "approval": approval, "approval_sha256": digest} | overrides
     return CONTROLS.verify_artifacts(path, **options, output=output, root=root)
 
 
 def test_publish_copies_verified_archives_without_rebuilding(candidate):
     report = verify(candidate)
     assert report["rebuilt_for_publication"] is False
-    source, _, output, _ = candidate
+    source, _, output, _ = candidate[:4]
+    assert report["approval_manifest_sha256"] == candidate[5]
     for registry in ("python", "npm"):
         for path in (output / registry).iterdir():
             assert path.read_bytes() == (source / "verified-artifacts" / path.name).read_bytes()
@@ -108,6 +116,191 @@ def test_changed_archive_is_rejected(candidate):
     with pytest.raises(ValueError, match="checksum"):
         verify(candidate)
     assert not candidate[2].exists()
+
+
+def test_changed_archive_and_matching_report_are_rejected(candidate):
+    path = next((candidate[0] / "verified-artifacts").glob("*.tgz"))
+    path.write_bytes(path.read_bytes() + b"tampering")
+    report = json.loads(candidate[3].read_text())
+    for entry in report["artifacts"]:
+        if entry["filename"] == path.name:
+            entry["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    candidate[3].write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="approved artifacts"):
+        verify(candidate)
+    assert not candidate[2].exists()
+
+
+def test_archive_changed_during_copy_cannot_pass_publication(candidate, monkeypatch):
+    copyfile = CONTROLS.shutil.copyfile
+
+    def changed_copy(source, destination):
+        source.write_bytes(source.read_bytes() + b"changed after verification")
+        return copyfile(source, destination)
+
+    monkeypatch.setattr(CONTROLS.shutil, "copyfile", changed_copy)
+    with pytest.raises(ValueError, match="Copied archive checksum mismatch"):
+        verify(candidate)
+    assert not (candidate[2] / "manifest.json").exists()
+
+
+@pytest.mark.parametrize("options", [
+    {"approval": None}, {"approval_sha256": None}, {"approval_sha256": ""},
+    {"approval_sha256": "a" * 63}, {"approval_sha256": "A" * 64},
+])
+def test_missing_or_invalid_approval_is_rejected(candidate, options):
+    with pytest.raises(ValueError, match="artifact approval"):
+        verify(candidate, **options)
+    assert not candidate[2].exists()
+
+
+def test_publication_api_without_approval_fails_closed(candidate):
+    with pytest.raises(ValueError, match="artifact approval"):
+        CONTROLS.verify_artifacts(candidate[0], SHA, "123", "v0.1.0", candidate[2], root=candidate[1])
+    assert not candidate[2].exists()
+
+
+def test_substituted_approval_manifest_is_rejected(candidate):
+    approved = json.loads(candidate[4].read_text())
+    approved["artifacts"][0]["sha256"] = "b" * 64
+    candidate[4].write_text(json.dumps(approved))
+    with pytest.raises(ValueError, match="Approval manifest digest mismatch"):
+        verify(candidate)
+    assert not candidate[2].exists()
+
+
+@pytest.mark.parametrize("location", ["candidate", "symlink", "missing"])
+def test_approval_must_be_separate_regular_file(candidate, tmp_path, location):
+    path = tmp_path / "other.json"
+    if location == "candidate":
+        path = candidate[0] / "approval.json"
+        path.write_bytes(candidate[4].read_bytes())
+    elif location == "symlink":
+        path.symlink_to(candidate[4])
+    with pytest.raises(ValueError, match="separate file"):
+        verify(candidate, approval=path)
+    assert not candidate[2].exists()
+
+
+@pytest.mark.parametrize("field,value,reason", [
+    ("source_sha", "b" * 40, "Approval source commit mismatch"),
+    ("version", "0.2.0", "Approval package version mismatch"),
+])
+def test_approval_is_bound_to_source_and_version(candidate, field, value, reason):
+    approved = json.loads(candidate[4].read_text())
+    approved[field] = value
+    candidate[4].write_text(json.dumps(approved))
+    with pytest.raises(ValueError, match=reason):
+        verify(candidate, approval_sha256=hashlib.sha256(candidate[4].read_bytes()).hexdigest())
+    assert not candidate[2].exists()
+
+
+@pytest.mark.parametrize("mutation", [
+    "invalid_json", "duplicate_key", "duplicate_entry_key", "list", "schema_version", "boolean_schema",
+    "extra_field", "missing_entry", "duplicate_entry", "extra_entry_field", "unsafe_path", "empty_path",
+    "noncanonical_path", "backslash_path", "bad_digest", "nonstr_digest", "nonstr_name", "nondict_entry",
+    "nonstr_entries", "renamed_archive",
+])
+def test_malformed_or_ambiguous_approval_is_rejected(candidate, mutation):
+    approved = json.loads(candidate[4].read_text())
+    entries = approved["artifacts"]
+    if mutation == "list":
+        approved = []
+    elif mutation == "schema_version":
+        approved["schema_version"] = 2
+    elif mutation == "boolean_schema":
+        approved["schema_version"] = True
+    elif mutation == "extra_field":
+        approved["approved"] = True
+    elif mutation == "missing_entry":
+        entries.pop()
+    elif mutation == "duplicate_entry":
+        entries[-1] = entries[0]
+    elif mutation == "extra_entry_field":
+        entries[0]["approved"] = True
+    elif mutation in {"unsafe_path", "empty_path", "noncanonical_path", "backslash_path"}:
+        entries[0]["filename"] = {"unsafe_path": "../outside.whl", "empty_path": "",
+                                  "noncanonical_path": "./archive.whl",
+                                  "backslash_path": "directory\\archive.whl"}[mutation]
+    elif mutation == "bad_digest":
+        entries[0]["sha256"] = "z" * 64
+    elif mutation == "nonstr_digest":
+        entries[0]["sha256"] = None
+    elif mutation == "nonstr_name":
+        entries[0]["filename"] = None
+    elif mutation == "nondict_entry":
+        entries[0] = None
+    elif mutation == "nonstr_entries":
+        approved["artifacts"] = None
+    elif mutation == "renamed_archive":
+        entries[0]["filename"] = "different.whl"
+    data = json.dumps(approved)
+    if mutation == "invalid_json":
+        data = "{"
+    elif mutation == "duplicate_key":
+        data = '{"version":"0.2.0",' + data[1:]
+    elif mutation == "duplicate_entry_key":
+        data = data.replace('"sha256":', '"sha256":"invalid","sha256":', 1)
+    candidate[4].write_text(data)
+    with pytest.raises(ValueError):
+        verify(candidate, approval_sha256=hashlib.sha256(candidate[4].read_bytes()).hexdigest())
+    assert not candidate[2].exists()
+
+
+def test_approval_entry_order_does_not_change_artifact_identity(candidate):
+    approved = json.loads(candidate[4].read_text())
+    approved["artifacts"].reverse()
+    candidate[4].write_text(json.dumps(approved))
+    assert verify(candidate, approval_sha256=hashlib.sha256(candidate[4].read_bytes()).hexdigest())
+
+
+def cli(candidate, command, *extra):
+    script = candidate[1] / "scripts/release_controls.py"
+    script.parent.mkdir(exist_ok=True)
+    script.write_bytes(Path(CONTROLS.__file__).read_bytes())
+    return subprocess.run([sys.executable, str(script), command,
+                           "--candidate", str(candidate[0]), "--sha", SHA, "--run-id", "123",
+                           "--tag", "v0.1.0", "--output", str(candidate[2]), *extra],
+                          capture_output=True, text=True, check=False)
+
+
+@pytest.mark.parametrize("approval_flags", ["none", "manifest_only", "digest_only", "wrong_digest"])
+def test_cli_publication_without_valid_approval_fails_closed(candidate, approval_flags):
+    args = []
+    if approval_flags in {"manifest_only", "wrong_digest"}:
+        args += ["--approval", str(candidate[4])]
+    if approval_flags in {"digest_only", "wrong_digest"}:
+        args += ["--approval-sha256", "0" * 64]
+    result = cli(candidate, "artifacts", *args)
+    assert result.returncode != 0
+    assert "approval" in result.stderr.lower()
+    assert not candidate[2].exists()
+
+
+def test_cli_copies_exact_approved_archives(candidate):
+    result = cli(candidate, "artifacts", "--approval", str(candidate[4]), "--approval-sha256", candidate[5])
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout)["approval_manifest_sha256"] == candidate[5]
+    for path in (candidate[2] / "python").iterdir():
+        assert path.read_bytes() == (candidate[0] / "verified-artifacts" / path.name).read_bytes()
+
+
+def test_cli_draft_is_reviewable_without_creating_publication_archives(candidate):
+    result = cli(candidate, "approval-manifest")
+    assert result.returncode == 0, result.stderr
+    draft = candidate[2]
+    assert draft.is_file()
+    assert not draft.read_bytes().endswith(b"\n")
+    status = json.loads(result.stdout)
+    assert status["status"] == "DRAFT_NOT_APPROVED"
+    assert status["approval_manifest_sha256"] == hashlib.sha256(draft.read_bytes()).hexdigest()
+    approved = json.loads(candidate[4].read_text())
+    approved["artifacts"].sort(key=lambda item: item["filename"])
+    assert json.loads(draft.read_text()) == approved
+    with pytest.raises(ValueError, match="artifact approval"):
+        CONTROLS.verify_artifacts(candidate[0], SHA, "123", "v0.1.0", draft.parent / "unauthorized",
+                                  root=candidate[1])
+    assert not (draft.parent / "unauthorized").exists()
 
 
 def test_archive_scan_findings_block_publication(candidate):

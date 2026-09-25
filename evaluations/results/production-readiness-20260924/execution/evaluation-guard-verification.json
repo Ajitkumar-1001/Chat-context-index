@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "OFFLINE_AND_HOSTED_GUARDS_PASS",
+  "source_sha256": {
+    "evaluations/run_allocated_comparison.py": "5b55c07723eb5b777302332de0267cfd7186ccfd7d45bb7487686d0f7bfd625d",
+    "evaluations/run_allocated_release.py": "df6e649bf17394487e4845c4d2917babc48df89e1cf2896e35151b714745d3e1",
+    "tests/evaluations/test_allocated_comparison.py": "95710f59ac48f21d4ca18c3304db1b8cd01481816d38ae06f19e8d6b49adcf2e",
+    "tests/evaluations/test_allocated_release.py": "0eac01350af99dc8ef51c98507e3bb62cb08844eab90412b51166604c5b4f5df"
+  },
+  "validation": {
+    "focused_tests": 111,
+    "combined_checks_against_updated_main": 170,
+    "failures": 0,
+    "configured_ruff": "PASS",
+    "diff_check": "PASS",
+    "test_record": "combined-guard-tests.xml",
+    "note": "Final committed sources passed hosted CI; local test records are retained separately.",
+    "hosted_ci_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36064740436"
+  },
+  "regressions": [
+    "Canonical claims remain single-use through symlink aliases.",
+    "SDK timeouts and connection loss stop subsequent dispatch and retain unknown-usage reservations.",
+    "Redirects and SDK retries are disabled and transport settings are checked before dispatch.",
+    "Wrong resolved models stop dispatch even when response parsing fails.",
+    "Outer-plan replacement fails before claiming.",
+    "Preflight does not write evaluator bytecode.",
+    "Client cleanup failure cannot leave complete allocation accounting."
+  ],
+  "original_evaluators_and_fixture_modified": false,
+  "external_provider_calls": 0,
+  "paid_calls": 0,
+  "canonical_allocations_modified": false,
+  "test_fault_disclosure": "An initial failing race test attempted localhost:80 through the SDK. No remote provider was reached. Final fixtures forbid unmocked client construction.",
+  "claims": {
+    "real_model_quality": "NOT_ESTABLISHED",
+    "cost_savings": "NOT_ESTABLISHED",
+    "new_candidate_live_smoke": "NOT_RUN"
+  },
+  "publication_performed": false
+}

@@ -1,0 +1,56 @@
+{
+  "goal": "Complete docs/release-execution-plan.md through verified production release and delivery",
+  "status": "ENGINEERING_DELIVERED_EXTERNAL_INPUTS_REQUIRED",
+  "done": [
+    "Artifact approval binding merged in PR #8; 57 focused tests and four real-CI-bundle integration checks passed.",
+    "Artifact approval milestone passed all 21 hosted CI jobs, including 16 package combinations, at 4b9a26b2a98cfdb805d7b5e592df193d8f974ce0 (run 36062294482).",
+    "Guarded comparison and native/cache entry points pass 170 combined local checks against main 9a1a6fd.",
+    "Independent review findings have regression coverage; original evaluators and fixture remain unchanged.",
+    "Final follow-up CI passed all 21 jobs: 430 Python tests, 88 Node tests, 16 package combinations, static checks, and security scans; retained exact archives passed local candidate inspection.",
+    "PyPI pending GitHub Trusted Publisher configured for chat-context-index / Ajitkumar-1001/Chat-context-index / release.yml / release and verified after reload; no publication or OIDC exchange performed.",
+    "Evaluation safeguards merged in PR #10; the 21 CI jobs passed for head 1dbb412dfc71aca993fb4585f23eb1569ac7e144."
+  ],
+  "doing": null,
+  "blocked": [
+    {
+      "priority": "P0",
+      "gate": "Full real-model evaluations",
+      "reason": "New request/token/dollar allowance decision and sustained account capacity are pending; no additional calls dispatched"
+    },
+    {
+      "priority": "P0",
+      "gate": "Reference performance",
+      "reason": "No dedicated runner supplied or registered; requires actual reservation and cache-drop authorization"
+    },
+    {
+      "priority": "P0",
+      "gate": "Human review and adoption",
+      "reason": "No actual independent reviewer or unfamiliar-developer records supplied"
+    },
+    {
+      "priority": "P0",
+      "gate": "Registry publishing",
+      "reason": "PyPI pending publisher is configured and persisted; npm ownership/authentication/trusted publishing remain unverified. Actual PyPI OIDC publication and final release approval remain pending."
+    },
+    {
+      "priority": "P0",
+      "gate": "Website deployment",
+      "reason": "Production website destination and live deployment remain unverified; Vercel integration is now visible on PR #10."
+    }
+  ],
+  "next": "Supply the pending evaluation allowance/capacity, dedicated runner, human participants, and registry/hosting access; then freeze and evaluate the new candidate.",
+  "deferred": [],
+  "publication_performed": false,
+  "new_model_calls": 0,
+  "restore_path": "/private/tmp/cont-index-execution-20260924-prestate and isolated codex/release-evidence-binding worktree",
+  "candidate_notice": "Main received runtime changes after the earlier live smoke. That smoke applies only to wheel a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0; it is not proof for the new candidate.",
+  "pull_request": "https://github.com/Ajitkumar-1001/Chat-context-index/pull/10",
+  "merged_artifact_guard_pull_request": "https://github.com/Ajitkumar-1001/Chat-context-index/pull/8",
+  "final_ci": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36064740436",
+  "candidate_manifest": "follow-up-candidate-draft.json",
+  "candidate_approval": "DRAFT_NOT_APPROVED",
+  "pypi_publisher_configuration": "CONFIGURED_PENDING_FIRST_PUBLICATION",
+  "evaluation_guard_pr_state": "MERGED",
+  "evaluation_guard_pr_merged_at": "2026-09-24T22:19:12Z",
+  "website_note": "GitHub PR checks now show a Vercel integration; production URL and deployment have not been verified in this task."
+}
