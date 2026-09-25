@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "status": "PUBLISHED",
+  "verified_at_utc": "2026-09-25T20:36:30Z",
+  "registry": "https://npm.pkg.github.com",
+  "package": "@ajitkumar-1001/chat-context-index",
+  "version": "0.1.0",
+  "tag": "v0.1.0",
+  "source_commit": "46ac4c2fc18df916da3afaf485fa75d4f3d02b51",
+  "package_url": "https://github.com/Ajitkumar-1001/Chat-context-index/pkgs/npm/chat-context-index",
+  "workflow": ".github/workflows/github-packages.yml",
+  "workflow_commit": "d37cb09a2f73484db11e21cc9821e15d6140457f",
+  "dispatched_by": "Ajitkumar-1001",
+  "publish_run_id": "36185209650",
+  "publish_run_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36185209650",
+  "publish_job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36185209650/job/108236801594",
+  "verify_install_job_url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36185209650/job/108236867576",
+  "candidate_run_id": "36097901586",
+  "release_controls": "PASS",
+  "approval_manifest_sha256": "cd83c75be08d885b7ba3a18e6785b542d21716cba4b32d04fd770d0bc3218b5b",
+  "approved_archive": {
+    "filename": "chat-context-index-0.1.0.tgz",
+    "sha256": "2c13e40073f0cc9bf3290449210a22e6a263d1e395316ba1a02233f00d64526e"
+  },
+  "changes_from_approved_archive": "package.json name only; the other 51 files are byte-identical",
+  "published_archive": {
+    "filename": "ajitkumar-1001-chat-context-index-0.1.0.tgz",
+    "shasum": "7ec216f3cb8cbbca336be90238cd43b7246e1af7",
+    "integrity": "sha512-SpFEzIaq66mnIKeEcYJncBsxbK8pLBPZILUOF0Jf3L/yegKEcY20KHlC8PoMmTwgvmHYi5eSN9o2uOvlu3VkTg==",
+    "files": 52
+  },
+  "install_check": {
+    "status": "PASS",
+    "spec": "chat-context-index@npm:@ajitkumar-1001/chat-context-index@0.1.0",
+    "check": "Fresh runner installed from the registry, ingested a message, reopened the store, and prepareContext returned that message."
+  },
+  "visibility": "PUBLIC",
+  "install_requirement": "GitHub's npm registry requires a classic personal access token with read:packages, even for public packages.",
+  "npmjs": "NOT_PUBLISHED",
+  "scope": "Registry publication identity and one installed-package recall on Linux x64, Node 22. The archive's own compatibility evidence is release-0.1.0-verification.json."
+}
