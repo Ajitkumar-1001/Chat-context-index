@@ -22,10 +22,12 @@ import apsw.aio
 apsw.async_controller.set(apsw.aio.AsyncIO)  # type: ignore[attr-defined]
 
 
-async def open_worker_connection(path: str) -> apsw.AsyncConnection:
+async def open_worker_connection(
+    path: str, *, flags: int = apsw.SQLITE_OPEN_READWRITE | apsw.SQLITE_OPEN_CREATE,
+) -> apsw.AsyncConnection:
     """Open one AsyncConnection — this call is what actually starts the dedicated worker
     thread for this connection (apsw.Connection.as_async)."""
-    return await apsw.Connection.as_async(path)
+    return await apsw.Connection.as_async(path, flags=flags)
 
 
 async def fetchone(cursor: Any) -> tuple | None:

@@ -8,9 +8,10 @@
 import { BudgetExceeded, InputValidationError } from "./errors.js";
 import { HistoryStore } from "./store.js";
 import { mapStorageError } from "./ioWorker.js";
+import { requireSearchMetadata } from "./searchMetadata.js";
 
 const CLEARED_TABLES = [
-  "messages", "message_fts", "summary_fts", "ingest_receipts", "exchanges", "chunks", "nodes", "node_chunks",
+  "messages", "message_fts", "lexical_message_meta", "summary_fts", "ingest_receipts", "exchanges", "chunks", "nodes", "node_chunks",
 ];
 
 export interface ClearReport {
@@ -40,12 +41,13 @@ export async function clearHistory(store: HistoryStore, expectedHistoryId: strin
       const io = store.connection;
       try {
         await io.exec("BEGIN IMMEDIATE");
+        await requireSearchMetadata(io);
         for (const table of CLEARED_TABLES) {
           await io.exec(`DELETE FROM ${table}`);
         }
         await io.exec(
           "UPDATE store_meta SET cache_generation = cache_generation + 1, " +
-            "history_revision = history_revision + 1, index_revision = index_revision + 1, " +
+            "history_revision = history_revision + 1, search_metadata_revision = search_metadata_revision + 1, index_revision = index_revision + 1, " +
             "index_committed_seq = 0, index_pending_seq = 0 WHERE id = 1",
         );
         await io.exec("COMMIT");

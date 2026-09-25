@@ -7,12 +7,14 @@ import sys
 from pathlib import Path
 
 import cci
+from cci.errors import SchemaVersionError
 from cci.index import index
 from cci.ingest import ingest
 from cci.memory import pack_context, prepare_context
 from cci.models import InputMessage
 from cci.provider import MemoizedProvider, ProviderResponse
 from cci.retrieve import retrieve
+from cci.search import search
 from cci.store import HistoryStore
 
 assert Path(cci.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
@@ -38,6 +40,37 @@ class Router:
 
 async def main():
     phase, path = sys.argv[1:]
+    if phase == "migrate":
+        try:
+            unexpected = await HistoryStore.open(path, config={"cache_backend": "none"})
+        except SchemaVersionError:
+            pass
+        else:
+            await unexpected.aclose()
+            raise AssertionError("v1 open must require explicit migration")
+        backup = path + ".v1.bak"
+        await HistoryStore.migrate(path, backup_path=backup, config={"cache_backend": "none"})
+        backup_bytes = Path(backup).read_bytes()
+        await HistoryStore.migrate(path, backup_path=backup, config={"cache_backend": "none"})
+        assert Path(backup).read_bytes() == backup_bytes
+        return
+    if phase in ("migration-append", "migration-read"):
+        async with await HistoryStore.open(path, config={"cache_backend": "none"}) as store:
+            if phase == "migration-append":
+                await ingest(
+                    store, store.history_id, [InputMessage(role="user", content="Continue in Oslo.")],
+                    "after-migration", "continue",
+                )
+            messages = await store.get_messages(1, 100)
+            assert [m.seq for m in messages] == [5, 9, 20, 41]
+            assert [m.message_id for m in messages[:3]] == ["m_v1_first", "m_v1_tool", "m_v1_later"]
+            result = await search(store, "Oslo", limit=8)
+            assert [c.seq for c in result.candidates] == [41, 20, 5]
+            print(json.dumps({"history_id": store.history_id, "store_instance_id": store.store_instance_id,
+                              "message_ids": [m.message_id for m in messages],
+                              "sequences": [c.seq for c in result.candidates],
+                              "excerpts": [c.excerpt for c in result.candidates]}))
+        return
     if phase == "default":
         async with await HistoryStore.open(path) as store:
             assert store.config.cache_backend == "sqlite"

@@ -10,7 +10,7 @@ export type { Context, ContextItem, ContextOptions } from "./memory.js";
 export { BoundedProvider } from "./provider.js";
 export type { Provider, ProviderRequest, ProviderResponse } from "./provider.js";
 export type { InputMessage } from "./models.js";
-export type { NodeView } from "./store.js";
+export type { NodeView, SearchMaintenanceOptions } from "./store.js";
 export { ingest } from "./ingest.js";
 export { search } from "./search.js";
 export type { SearchResult, LexicalCandidate, Diagnostic } from "./search.js";

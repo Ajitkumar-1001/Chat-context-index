@@ -68,6 +68,15 @@ def inspect_candidate(candidate, sha, run_id, tag, root=ROOT):
             and {(check["writer"], check["reader"]) for check in checks}
             == {(writer, reader) for writer in runtimes for reader in runtimes},
             "Incomplete installed-package matrix")
+    migration_checks = report.get("migration_checks")
+    require(report.get("schema_v1_migration") == "PASS"
+            and isinstance(migration_checks, list) and len(migration_checks) == 9
+            and all(isinstance(check, dict) and check.get("status") == "PASS"
+                    and isinstance(check.get("migrator"), str) and isinstance(check.get("reader"), str)
+                    for check in migration_checks)
+            and {(check["migrator"], check["reader"]) for check in migration_checks}
+            == {(migrator, reader) for migrator in runtimes for reader in runtimes},
+            "Incomplete installed-package schema migration evidence")
     for language, directory, pattern in (
         ("python", root / "packages/python/src/cci", "*.py"),
         ("typescript", root / "packages/typescript/src", "*.ts"),

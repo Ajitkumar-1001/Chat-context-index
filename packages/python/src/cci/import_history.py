@@ -17,9 +17,10 @@ from dataclasses import dataclass
 
 import apsw
 
-from .errors import InputValidationError, StoreNotEmpty
+from .errors import InputValidationError, StoreNotEmpty, VersionConflict
 from .export import EXPORT_FORMAT_VERSION
 from .io_worker import fetchall
+from .search_metadata import assert_search_metadata, immediate_transaction, insert_search_metadata
 from .store import HistoryStore, map_storage_error
 
 _IMPORT_BATCH_SIZE = 500
@@ -110,10 +111,24 @@ async def import_history(store: HistoryStore, src_path: str) -> ImportReport:
     try:
         async with store.write_lock:
             connection = store.connection
+            expected_revision = None
             try:
-                for batch_start in range(0, len(records), _IMPORT_BATCH_SIZE):
+                for batch_start in range(0, max(len(records), 1), _IMPORT_BATCH_SIZE):
                     batch = records[batch_start:batch_start + _IMPORT_BATCH_SIZE]
-                    async with connection:
+                    async with immediate_transaction(connection):
+                        revision = await assert_search_metadata(connection)
+                        if expected_revision is None:
+                            count = await fetchall(await connection.execute(
+                                "SELECT count(*) FROM messages WHERE history_id=?", (store.history_id,),
+                            ))
+                            if count[0][0]:
+                                raise StoreNotEmpty(
+                                    "import target became nonempty before its first transaction"
+                                )
+                        elif revision != expected_revision:
+                            raise VersionConflict("history changed between committed import batches")
+                        if not batch:
+                            continue  # Empty imports still validate their snapshot, without a revision bump.
                         max_seq = 0
                         for record in batch:
                             payload_str = json.dumps(
@@ -152,13 +167,18 @@ async def import_history(store: HistoryStore, src_path: str) -> ImportReport:
                                     "VALUES (?, ?, ?)",
                                     (record["message_id"], store.history_id, text_projection),
                                 )
+                                await insert_search_metadata(
+                                    connection, record["message_id"], store.history_id, record["seq"],
+                                )
                             max_seq = max(max_seq, record["seq"])
                             imported += 1
                         await connection.execute(
                             "UPDATE store_meta SET history_revision = history_revision + 1, "
+                            "search_metadata_revision = search_metadata_revision + 1, "
                             "seq_high_water_mark = MAX(seq_high_water_mark, ?) WHERE id = 1",
                             (max_seq,),
                         )
+                    expected_revision = revision + 1
             except apsw.Error as exc:
                 # E4: truthfully report committed progress — earlier batches already committed
                 # (separate transactions) stay committed; never claim a whole-file rollback.

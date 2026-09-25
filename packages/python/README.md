@@ -6,6 +6,11 @@ then prepare recent context plus retrieved older evidence for your application's
 Pre-release candidate. Python 3.11–3.14 is required. Install a locally built wheel with
 `python -m pip install /path/to/chat_context_index-0.1.0-py3-none-any.whl`.
 
+New stores use schema version 2. For an existing version-1 store, stop all writer processes
+and run `await HistoryStore.migrate("conversation.db", backup_path="/absolute/path/conversation.before-v2.db")`
+before opening it. The backup path must be absolute and new. See
+[migration and recovery](https://github.com/Ajitkumar-1001/Chat-context-index/blob/main/docs/backup-and-migration.md).
+
 ```python
 import asyncio
 from cci import HistoryStore

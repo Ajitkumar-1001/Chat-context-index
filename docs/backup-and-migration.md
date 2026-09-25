@@ -18,10 +18,78 @@ that cannot be recomputed.
 
 ## Migration
 
-This is schema version 1, the first release — there is no prior schema version to migrate from.
-`open()` checks `schema_version` before touching any data: a store with a newer, unsupported
-`schema_version` raises `SchemaVersionError` without modifying the file, so a downgrade attempt
-is always safe (the file is left exactly as it was).
+New stores use **schema version 2**, which adds a compact, derived lexical search index.
+Original messages, identifiers, sequence numbers, tree data, receipts and cache generations
+are preserved. The portable JSONL export format remains version 1.
+
+Opening an existing schema-version-1 store raises `SchemaVersionError` and requires an
+explicit migration. Before migrating, stop every process using that history, including
+older SDK versions. Use a new, absolute backup path; existing backup files are never overwritten.
+
+```python
+import asyncio
+from pathlib import Path
+from cci import HistoryStore
+
+asyncio.run(HistoryStore.migrate(
+    "conversation.db", backup_path=str(Path("conversation.before-v2.db").absolute())
+))
+```
+
+```typescript
+import { HistoryStore } from "chat-context-index";
+import { resolve } from "node:path";
+
+await HistoryStore.migrate("conversation.db", {
+  backupPath: resolve("conversation.before-v2.db"),
+});
+```
+
+Migration takes a SQLite writer lock, creates a consistent backup through a separate
+connection, checks FTS integrity and the existing FTS-to-message mapping, then creates the compact index
+and updates the schema version in one transaction. The backup uses SQLite's
+[`VACUUM INTO`](https://www.sqlite.org/lang_vacuum.html#vacuum_with_an_into_clause)
+with full synchronization. No model calls or memo cache are involved.
+
+Failure rolls back the history changes; an interrupted backup may leave an incomplete
+backup file, which must not be treated as a successful backup. Repeating migration on a
+valid version-2 store makes no changes and leaves the original backup intact. Unsupported
+versions are rejected. Once migration succeeds, use upgraded SDKs for every subsequent
+access; an older SDK cannot open a version-2 store.
+
+To restore, stop all processes and restore the backup to a **different database path**.
+Do not copy it over an open database or combine it with the migrated store's WAL/SHM files.
+Use the older SDK with the version-1 backup, or migrate that backup using a fresh backup
+filename before opening it with the new SDK.
+
+## Recovering a stale search index
+
+The compact index records the history revision it covers. Search and history mutations
+raise `StoreCorrupt` if that revision is stale, including when an already-open older process
+wrote after migration. Stop every process first, then explicitly rebuild the derived search
+index with another new backup filename:
+
+```python
+asyncio.run(HistoryStore.rebuild_search_index(
+    "conversation.db", backup_path=str(Path("conversation.before-rebuild.db").absolute())
+))
+```
+
+```typescript
+await HistoryStore.rebuildSearchIndex("conversation.db", {
+  backupPath: resolve("conversation.before-rebuild.db"),
+});
+```
+
+Rebuilding reconstructs FTS and its compact mapping from stored message projections in one
+transaction. It preserves original payloads, identities and history/index/cache revisions.
+It cannot repair damaged original messages. Ordinary opening or ingestion never silently
+repairs or marks a stale index current.
+
+Recovery preserves FTS row identities from a valid existing FTS mapping, or from a valid
+compact mapping if the FTS mapping is damaged. If neither mapping is usable, it assigns
+new row identities in message sequence order. In that corruption fallback, bounded
+correction selection can change; original message identities and sequences stay unchanged.
 
 ## Cross-runtime migration (Python ↔ TypeScript)
 

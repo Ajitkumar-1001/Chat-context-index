@@ -23,6 +23,7 @@ from ._ids import prefixed_id
 from .cache import MemoCache, build_cache
 from .config import Config, resolve
 from .errors import (
+    InputValidationError,
     RuntimeCompatibilityError,
     SchemaVersionError,
     StoreBusy,
@@ -32,6 +33,14 @@ from .errors import (
 from .io_worker import IOWorker, fetchall, fetchone, open_worker_connection
 from .models import Message
 from .provider import UsageLog
+from .search_metadata import (
+    SEARCH_METADATA_DDL,
+    assert_search_metadata,
+    backfill_search_metadata,
+    immediate_transaction,
+    preserve_rebuild_rowids,
+    validate_search_metadata,
+)
 
 # get_messages() pagination (contracts/operations.md `search()`/`get_messages()`/`view_node()`
 # Pagination/size limits).
@@ -58,10 +67,8 @@ class NodeView:
 # version is installed (spec/storage-format.md).
 MIN_SQLITE_VERSION = (3, 51, 3)
 
-# This is the first schema version for the first release — there is no prior version to
-# migrate from (spec/storage-format.md Migrations and recovery). A future schema change
-# increments this and requires an explicit, versioned migration path.
-SCHEMA_VERSION = 1
+# Version 2 adds a derived compact lexical projection. Version 1 requires explicit migration.
+SCHEMA_VERSION = 2
 
 _SCHEMA_DDL = """
 CREATE TABLE IF NOT EXISTS store_meta (
@@ -70,6 +77,7 @@ CREATE TABLE IF NOT EXISTS store_meta (
     store_instance_id TEXT NOT NULL UNIQUE,
     schema_version INTEGER NOT NULL,
     history_revision INTEGER NOT NULL DEFAULT 0,
+    search_metadata_revision INTEGER NOT NULL DEFAULT 0,
     index_revision INTEGER NOT NULL DEFAULT 0,
     cache_generation INTEGER NOT NULL DEFAULT 0,
     index_committed_seq INTEGER NOT NULL DEFAULT 0,
@@ -165,7 +173,7 @@ CREATE TABLE IF NOT EXISTS pending_cache_purges (
     scope_id TEXT PRIMARY KEY,
     requested_at REAL NOT NULL
 );
-"""
+""" + SEARCH_METADATA_DDL
 
 
 def map_storage_error(exc: apsw.Error) -> Exception:
@@ -311,7 +319,7 @@ class HistoryStore:
             # typed taxonomy — never leaked to the caller as-is (Failure-Injection.md F2).
             await connection.aclose()
             raise map_storage_error(exc) from exc
-        except Exception:
+        except BaseException:
             await connection.aclose()
             raise
 
@@ -354,13 +362,109 @@ class HistoryStore:
                 f"({SCHEMA_VERSION}) — no file modification"
             )
         if schema_version < SCHEMA_VERSION:
-            # No prior schema version exists for the first release (spec/storage-format.md) —
-            # this branch has no real migration to run yet; documented here for when it does.
             raise SchemaVersionError(
                 f"store schema_version {schema_version} is older than this build "
-                f"({SCHEMA_VERSION}) and no migration path exists yet"
+                f"({SCHEMA_VERSION}); close all writers and call HistoryStore.migrate with a new backup_path"
             )
+        await assert_search_metadata(connection)
         return history_id, store_instance_id
+
+    @classmethod
+    async def migrate(cls, path: str, *, backup_path: str, config: dict | Config | None = None) -> None:
+        """Explicitly upgrade v1 to v2 with a new private backup; close every old handle first."""
+        await cls._maintain_search_metadata(path, backup_path=backup_path, config=config, rebuild=False)
+
+    @classmethod
+    async def rebuild_search_index(
+        cls, path: str, *, backup_path: str, config: dict | Config | None = None,
+    ) -> None:
+        """Back up a v2 store and reconstruct derived FTS/map data from original projections."""
+        await cls._maintain_search_metadata(path, backup_path=backup_path, config=config, rebuild=True)
+
+    @classmethod
+    async def _maintain_search_metadata(
+        cls, path: str, *, backup_path: str, config: dict | Config | None, rebuild: bool,
+    ) -> None:
+        resolved = config if isinstance(config, Config) else resolve(overrides=config)
+        resolved.validate()
+        if not os.path.isabs(backup_path):
+            raise InputValidationError("backup_path must be an absolute path to a new file")
+        source = os.path.realpath(os.path.abspath(path))
+        backup = os.path.abspath(backup_path)
+        connection = None
+        try:
+            connection = await open_worker_connection(source, flags=apsw.SQLITE_OPEN_READWRITE)
+            await _check_runtime(connection)
+            await connection.execute(f"PRAGMA busy_timeout={resolved.sqlite_busy_timeout_ms}")
+            await connection.execute("PRAGMA synchronous=FULL")
+            async with immediate_transaction(connection):
+                row = await fetchone(await connection.execute(
+                    "SELECT schema_version FROM store_meta WHERE id=1"
+                ))
+                if row is None:
+                    raise StoreCorrupt("missing store metadata")
+                version = row[0]
+                if version not in (1, 2) or (rebuild and version != 2):
+                    raise SchemaVersionError(
+                        "unsupported store version for explicit search-index maintenance"
+                    )
+                if version == 2 and not rebuild:
+                    await assert_search_metadata(connection)
+                    await validate_search_metadata(connection)
+                    return
+                if source == os.path.realpath(backup):
+                    raise StoreError("backup_path must be a new file distinct from the store")
+                # Reserve without following/overwriting an existing destination. SQLite accepts
+                # an existing empty target; VACUUM INTO produces a consistent committed snapshot.
+                fd = os.open(backup, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+                try:
+                    os.fchmod(fd, 0o600)
+                finally:
+                    os.close(fd)
+                reader = await open_worker_connection(source, flags=apsw.SQLITE_OPEN_READONLY)
+                try:
+                    await reader.execute("PRAGMA synchronous=FULL")
+                    await reader.execute("VACUUM main INTO ?", (backup,))
+                finally:
+                    await reader.aclose()
+                if version == 1:
+                    await validate_search_metadata(connection, include_map=False)
+                    await connection.execute(
+                        "ALTER TABLE store_meta ADD COLUMN "
+                        "search_metadata_revision INTEGER NOT NULL DEFAULT 0"
+                    )
+                    await connection.execute(SEARCH_METADATA_DDL)
+                else:
+                    await preserve_rebuild_rowids(connection)
+                    await connection.execute("DROP TABLE IF EXISTS lexical_message_meta")
+                    await connection.execute(SEARCH_METADATA_DDL)
+                    await connection.execute("DROP TABLE IF EXISTS message_fts")
+                    await connection.execute(
+                        "CREATE VIRTUAL TABLE message_fts USING fts5("
+                        "message_id UNINDEXED, history_id UNINDEXED, text)"
+                    )
+                    await connection.execute(
+                        "INSERT INTO message_fts(rowid,message_id,history_id,text) "
+                        "SELECT r.fts_rowid,m.message_id,m.history_id,m.text_projection "
+                        "FROM cci_rebuild_rowids r JOIN messages m ON m.message_id=r.message_id "
+                        "ORDER BY r.fts_rowid"
+                    )
+                    await connection.execute("DROP TABLE cci_rebuild_rowids")
+                await backfill_search_metadata(connection)
+                await validate_search_metadata(connection)
+                await connection.execute(
+                    "UPDATE store_meta SET search_metadata_revision=history_revision WHERE id=1"
+                )
+                if version == 1:
+                    await connection.execute("UPDATE store_meta SET schema_version=2 WHERE id=1")
+                await assert_search_metadata(connection)
+        except apsw.Error as exc:
+            raise map_storage_error(exc) from exc
+        except OSError as exc:
+            raise StoreError(f"cannot reserve backup: {exc}") from exc
+        finally:
+            if connection is not None:
+                await connection.aclose()
 
     @property
     def connection(self) -> apsw.AsyncConnection:
