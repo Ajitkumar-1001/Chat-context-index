@@ -6,7 +6,7 @@ The [CI-verified Python wheel passed the bounded live smoke](results/production-
 tree navigation retrieved the exact original evidence after closing and reopening SQLite.
 Eight calls reported 1,058 input tokens and 301 output tokens, with no errors or unknown
 usage. Earlier failures retain their reservations. This closes the development smoke;
-held-out quality, total cost savings, and the other [release gates](../docs/release-status.md)
+held-out quality, total cost savings, and the other release gates
 remain open. The sections below preserve earlier evaluation results.
 
 ## Evidence-selection fix (September 23, 2026)
@@ -225,6 +225,5 @@ python tests/packaging/verify_packages.py \
 The full local run also passed **106 Python tests** and **8 native TypeScript tests**, with
 real SQLite, disposable Redis containers, fresh artifact conformance, memory/RAG examples,
 and six evaluation-accounting regressions using a separate tiny fixture.
-Python lint and type checks and the TypeScript build passed. Reproduction commands and
-remaining release gates are in [release status](../docs/release-status.md). No real model was
+Python lint and type checks and the TypeScript build passed. No real model was
 called; these results establish package mechanics, not semantic recall or cost savings.

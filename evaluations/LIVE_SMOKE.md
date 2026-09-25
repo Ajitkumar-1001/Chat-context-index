@@ -5,9 +5,8 @@ six indexing and two tree-navigation calls reported 1,058 input / 301 output tok
 zero errors or unknown usage. It retrieved the exact original evidence after reopening SQLite.
 This run used `check_provider_capacity.py` with a fresh frozen allocation capped at 10 calls,
 100,000 reserved tokens, and $0.04; estimated usage cost was $0.0010699. It establishes one
-development smoke, not sustained account capacity or held-out quality. See the
-[current release status](../docs/release-status.md). Earlier runs and the standalone CLI's
-setup and limits are retained below.
+development smoke, not sustained account capacity or held-out quality. Earlier runs and the
+standalone CLI's setup and limits are retained below.
 
 This small evaluation subsystem checks one Python wheel against a selected model provider's
 Chat Completions compatibility endpoint. The provider, model ID, API key, and endpoint are configurable.

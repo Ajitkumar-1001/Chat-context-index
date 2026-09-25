@@ -3,8 +3,7 @@
 Persistent conversation memory for RAG chats and agents. Save original messages in SQLite,
 then prepare recent context plus retrieved older evidence for your application's model.
 
-Pre-release candidate. Python 3.11–3.14 is required. Install a locally built wheel with
-`python -m pip install /path/to/chat_context_index-0.1.0-py3-none-any.whl`.
+Python 3.11–3.14 is required. Install from PyPI with `python -m pip install chat-context-index`.
 
 New stores use schema version 2. For an existing version-1 store, stop all writer processes
 and run `await HistoryStore.migrate("conversation.db", backup_path="/absolute/path/conversation.before-v2.db")`

@@ -6,12 +6,14 @@
 <p>Persistent conversation memory for RAG chats and agents, with bounded tree retrieval.</p>
 
 <p>
-  <img src="https://img.shields.io/badge/status-pre--release-d97706?style=flat-square" alt="Status: pre-release">
+  <a href="https://pypi.org/project/chat-context-index/"><img src="https://img.shields.io/pypi/v/chat-context-index?style=flat-square" alt="PyPI version"></a>
+  <img src="https://img.shields.io/badge/python-3.11%E2%80%933.14-3776ab?style=flat-square" alt="Python 3.11–3.14">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache_2.0-475569?style=flat-square" alt="License: Apache 2.0"></a>
 </p>
 
 <p>
   <a href="#overview">Overview</a> ·
+  <a href="#install">Install</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#measured-example">Measured example</a> ·
   <a href="#how-it-works">How it works</a> ·
@@ -21,10 +23,10 @@
 </div>
 
 > [!NOTE]
-> **Pre-release.** Measured candidate `e762f7bd` passed 511 Python tests, 88 Node tests, all 16 package combinations, and an installed Python live-model smoke with actual token usage. Its hosted Linux 10k-message run failed the filesystem-cold search target. The 100k scale measurements completed, with filesystem-cold search p95 above five seconds in both runtimes. Quality/cost trials, human validation, registry setup, and final approval remain open. [Retained CI verification](evaluations/results/production-readiness-20260924/execution/main-candidate-verification-20260925.json) · [Release status](docs/release-status.md).
+> **Python 0.1.0 is released** on [PyPI](https://pypi.org/project/chat-context-index/0.1.0/) ([GitHub release `v0.1.0`](https://github.com/Ajitkumar-1001/Chat-context-index/releases/tag/v0.1.0), commit `46ac4c2`). [Release run 36097901586](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36097901586) rebuilt, checked and published a wheel and source archive byte-identical to those [main CI run 36094205085](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094205085) built and tested; their SHA-256 digests match PyPI's (wheel `411e7b8e…`, source `1d191e28…`). [Release verification record](evaluations/results/production-readiness-20260924/execution/release-0.1.0-verification.json). The TypeScript package is **not on npm yet**: its publish job failed. No live-model smoke, held-out answer-quality or cost trial, or human validation has been run on this build. The PyPI 0.1.0 page still shows the description written before upload, which calls the package a pre-release candidate; install it as shown below.
 
-Release validation now includes bounded native answer review, source-distribution installation checks,
-and a configured runtime/platform matrix. [Implementation progress and remaining gates](docs/release-status.md).
+That CI run passed 556 Python and 106 Node tests, rebuilt the wheel from the source archive, and
+passed all 16 install jobs (Python 3.11–3.14, Node 22/24, Linux x64 and macOS arm64).
 
 ## Overview
 
@@ -41,12 +43,27 @@ The host keeps its document retriever, model, and agent framework. ContIndex sup
 | **Answer** | Optional `ask()` synthesizes from retrieved evidence and checks citation references through a supplied provider. |
 | **Inspect** | Python APIs and CLI for reading, exporting, importing, clearing, and inspecting histories. |
 
+## Install
+
+Python 3.11–3.14:
+
+```bash
+python -m pip install chat-context-index
+```
+
+The package imports as `cci` and installs the `cci` command. Add `[redis]` for Redis memoization
+or `[openai]` for the CLI's `--provider openai`. Importing the package makes no model calls.
+
+The TypeScript package is not published yet. Build and pack it in `packages/typescript` with
+`npm ci && npm run build && npm pack`, then install the tarball as its [README](packages/typescript/README.md) shows.
+
 ## Quick start
 
 Existing schema-version-1 histories require an explicit, backed-up migration before opening
 with these SDKs. New histories use schema version 2. See [migration and recovery](docs/backup-and-migration.md).
 
-From the repository root, using Python 3.11–3.14:
+The examples and evaluations below run from a clone of this repository. From the repository root,
+using Python 3.11–3.14:
 
 ```bash
 python3 -m venv .venv
@@ -178,7 +195,7 @@ three failed calls have unknown usage. **These results do not support a lower-co
 A separate development probe reproduced loss of a needed message during context assembly,
 even when tree navigation found the correct chunk. The new implementation retains that source in
 [the installed-wheel probe](evaluations/results/context-selection-fixed-installed.json).
-These historical held-out scores must be rerun against the fixed implementation before release.
+These historical held-out scores predate that fix and have not been rerun against the released 0.1.0 build.
 
 The [tree dry run](evaluations/results/tree-memory.json) uses 128 synthetic messages and a deterministic provider double. Full-history evidence contains **207,260 characters**; selected memory contains **4,868**. Navigation adds **19,492 input characters across four calls**. Initial indexing takes **171 calls**; an unchanged rerun takes zero. These are reproducible mechanics and character counts, **not token savings, dollar savings, or semantic recall scores**. [Evaluation script](evaluations/tree_memory.py).
 
@@ -233,7 +250,7 @@ The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatInd
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- Measured candidate `e762f7bd` passed 511 Python tests, 88 Node tests, all 16 package combinations (144 writer/reader checks), and one Python live smoke. Hosted Linux 10k-message filesystem-cold search p95 was 638.076 ms in Python and 703.665 ms in TypeScript, above the 100 ms target. At 100k messages, filesystem-cold p95 was 5,101.497 / 6,535.564 ms, and concurrency-16 search p95 was 11,918.093 / 9,826.439 ms. Completing the scale observations with zero recorded errors does not close the latency or reference-hardware gates. Held-out quality/cost validation remains open. These results apply to that candidate's recorded artifacts. [Release status](docs/release-status.md).
+- The `0.1.0` archives CI built for commit `46ac4c2` (the Python wheel on PyPI and the unpublished TypeScript tarball) were measured on GitHub-hosted Linux (4 vCPUs, about 16 GB of memory) in [run 36094491463](https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36094491463). At 10k messages, filesystem-cold first-search p95 was 52.229 ms in Python and 54.025 ms in TypeScript, under the 100 ms target. At 100k messages it was 355.338 / 399.048 ms, and concurrency-16 search p95 was 858.685 / 1,254.134 ms. Before the compact search index, candidate `e762f7bd` measured 638.076 / 703.665 ms at 10k. Hosted machines do not close the dedicated reference-hardware gate. Held-out quality/cost validation remains open.
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 
