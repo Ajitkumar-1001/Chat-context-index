@@ -34,6 +34,6 @@ candidate, and do not close any reference latency gate. The Linux hardware and p
 cache-drop execution paths cannot be validated by these Mac checks.
 
 Next action: supply the exclusive 4-vCPU/8-GiB/Linux-x64/local-SSD host and reservation evidence,
-then follow [the operator guide](../../../../docs/reference-performance-runner.md) with the final
+then run `benchmarks/run_reference_gate.py` with the final
 CI-verified archives. No CI workflow was added because no qualifying self-hosted runner identity
 or inventory has been supplied.

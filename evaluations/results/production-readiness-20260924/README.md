@@ -32,13 +32,13 @@ identities are not established. This work created no registry publication or rel
 - The [fresh installed-package live smoke](live-smoke-retry-003-summary.json) passed with
   exact original-evidence retrieval after reopen, eight successful model calls, and complete
   actual token usage. The frozen fixture, evaluator, and CI-verified wheel were unchanged.
-- [Reference-runner tooling](../../../docs/reference-performance-runner.md) verifies
+- Reference-runner tooling (`benchmarks/run_reference_gate.py`) verifies
   hardware/reservation and installed archives, measures Python and TypeScript at 10k/100k,
   and includes process-cold and filesystem-cold checks. Seven gate tests and installed
   helper smokes pass; [local evidence](performance-preparation/README.md) is not a reference run.
-- [Human validation materials](../../../docs/validation/README.md) include a preregistered
+- Human validation materials, since removed from the repository, included a preregistered
   sample, offline packet exporter, independent adoption tasks, and empty attestation records.
-  Eleven invented-data tests pass; no human completion has been substituted by an agent.
+  Eleven invented-data tests passed; no human completion has been substituted by an agent.
 
 ## Live smoke and accounting
 
