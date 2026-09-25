@@ -216,14 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-vault-context/
+
 .claude/
-.specify/
+
 
 # Keep public documentation; local product strategy stays private.
-docs/project-brief.md
-docs/release-execution-plan.md
-docs/release-readiness/
+
 spec/**/*.md
 TODOS.md
 benchmarks/T083-macos-arm64-20260923/
@@ -263,4 +261,5 @@ evaluations/results/production-readiness-20260924/release-*-applied.json
 
 # Astro generated types (website/)
 .astro/
+
 .gstack/
