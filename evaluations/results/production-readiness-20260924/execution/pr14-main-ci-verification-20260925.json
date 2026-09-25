@@ -1,0 +1,331 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "pr": {
+    "number": 14,
+    "url": "https://github.com/Ajitkumar-1001/Chat-context-index/pull/14",
+    "head_sha": "5b78fa55fa925d1523a7fa4cf4a17aa3ba5e8b8a",
+    "merged_at": "2026-09-25T02:37:22Z",
+    "merge_sha": "09587634c430ac3b0ca5e3a6e48c8e29a5127548",
+    "merged_by": "Ajitkumar-1001",
+    "required_checks_query": "No required checks reported; all actual CI jobs were independently verified."
+  },
+  "pr_ci": {
+    "conclusion": "success",
+    "createdAt": "2026-09-25T02:36:24Z",
+    "event": "pull_request",
+    "headSha": "5b78fa55fa925d1523a7fa4cf4a17aa3ba5e8b8a",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "python-lint-and-typecheck",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107920871846"
+      },
+      {
+        "conclusion": "success",
+        "name": "typescript-typecheck",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107920871949"
+      },
+      {
+        "conclusion": "success",
+        "name": "security / dependencies-and-licenses",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107920871973"
+      },
+      {
+        "conclusion": "success",
+        "name": "security / source-secrets",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107920872043"
+      },
+      {
+        "conclusion": "success",
+        "name": "conformance-tests",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107920974322"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.13 / Node 24 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298885"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.13 / Node 22 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298899"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.12 / Node 24 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298906"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.14 / Node 22 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298909"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.12 / Node 24 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298910"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.11 / Node 22 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298914"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.11 / Node 24 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298922"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.11 / Node 24 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298925"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.12 / Node 22 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298928"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.11 / Node 22 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298950"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.13 / Node 22 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298962"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.14 / Node 24 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298969"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.12 / Node 22 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298986"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.14 / Node 22 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921298999"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.14 / Node 24 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921299018"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.13 / Node 24 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329/job/107921299022"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-09-25T02:40:04Z",
+    "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36086954329",
+    "job_count": 21,
+    "package_matrix_job_count": 16
+  },
+  "main_push_ci": {
+    "conclusion": "success",
+    "createdAt": "2026-09-25T02:37:24Z",
+    "event": "push",
+    "headSha": "09587634c430ac3b0ca5e3a6e48c8e29a5127548",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "typescript-typecheck",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921084871"
+      },
+      {
+        "conclusion": "success",
+        "name": "security / dependencies-and-licenses",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921085028"
+      },
+      {
+        "conclusion": "success",
+        "name": "security / source-secrets",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921085044"
+      },
+      {
+        "conclusion": "success",
+        "name": "python-lint-and-typecheck",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921085051"
+      },
+      {
+        "conclusion": "success",
+        "name": "conformance-tests",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921179376"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.11 / Node 22 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595312"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.14 / Node 22 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595315"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.14 / Node 24 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595321"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.11 / Node 22 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595323"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.12 / Node 24 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595337"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.12 / Node 22 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595347"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.13 / Node 24 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595364"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.13 / Node 22 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595374"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.11 / Node 24 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595381"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.13 / Node 22 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595406"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.12 / Node 22 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595423"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.13 / Node 24 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595426"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.14 / Node 22 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595430"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.12 / Node 24 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595506"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.11 / Node 24 on ubuntu-24.04",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595588"
+      },
+      {
+        "conclusion": "success",
+        "name": "Install Python 3.14 / Node 24 on macos-15",
+        "status": "completed",
+        "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065/job/107921595600"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-09-25T02:41:31Z",
+    "url": "https://github.com/Ajitkumar-1001/Chat-context-index/actions/runs/36087024065",
+    "job_count": 21,
+    "package_matrix_job_count": 16
+  },
+  "vercel": {
+    "preview_state": "success",
+    "preview_check_url": "https://vercel.com/ajits-projects-b59ab691/website/7vHXyRrdQh9aCytKv7mKMK3dYjtD",
+    "commit_status": {
+      "sha": "09587634c430ac3b0ca5e3a6e48c8e29a5127548",
+      "state": "success",
+      "statuses": [
+        {
+          "context": "Vercel",
+          "created_at": "2026-09-25T02:37:36Z",
+          "state": "success",
+          "target_url": "https://vercel.com/ajits-projects-b59ab691/website/F3jsXJZXxmwnTUEH1yoXE1JiWXYE",
+          "updated_at": "2026-09-25T02:37:36Z"
+        }
+      ]
+    },
+    "deployments": [
+      {
+        "created_at": "2026-09-25T02:37:36Z",
+        "environment": "Production",
+        "id": 6652516101,
+        "production_environment": false,
+        "sha": "09587634c430ac3b0ca5e3a6e48c8e29a5127548",
+        "statuses_url": "https://api.github.com/repos/Ajitkumar-1001/Chat-context-index/deployments/6652516101/statuses",
+        "transient_environment": false,
+        "updated_at": "2026-09-25T02:37:36Z"
+      }
+    ],
+    "latest_deployment_status": {
+      "created_at": "2026-09-25T02:37:36Z",
+      "environment": "Production",
+      "environment_url": "https://website-8r7vhu67y-ajits-projects-b59ab691.vercel.app",
+      "log_url": "https://website-8r7vhu67y-ajits-projects-b59ab691.vercel.app",
+      "state": "success",
+      "updated_at": "2026-09-25T02:37:36Z"
+    },
+    "canonical_domain_verified": false,
+    "public_page_verified": false
+  },
+  "scope": "CI and GitHub/Vercel deployment status only. Does not replace the earlier candidate archive evidence, qualify the fixed reference host, or approve package publication."
+}
