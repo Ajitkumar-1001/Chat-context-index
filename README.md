@@ -21,7 +21,7 @@
 </div>
 
 > [!NOTE]
-> **Pre-release.** The current installed Python wheel passed its real-model development smoke: it retrieved the expected original evidence after reopening SQLite, with complete token usage across eight calls. Held-out quality, cost savings, and the remaining production gates are still unverified. [Verified smoke result](evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json) · [Release status](docs/release-status.md).
+> **Pre-release.** The latest retained CI evidence applies to source `6dd96d7d`: 430 Python tests, 88 Node tests, and all 16 package combinations passed. The newer Python wheel (`219fd1e7…`) has not completed a live-model smoke; the earlier successful smoke applies only to wheel `a3286616…`. Newer branch changes still need fresh CI evidence. [Retained CI verification](evaluations/results/production-readiness-20260924/execution/follow-up-hosted-verification.json) · [Release status](docs/release-status.md).
 
 Release validation now includes bounded native answer review, source-distribution installation checks,
 and a configured runtime/platform matrix. [Implementation progress and remaining gates](docs/release-status.md).
@@ -107,9 +107,9 @@ CCI_API_KEY=your-provider-key
 Presets cover OpenAI, Gemini, Anthropic, Groq, OpenRouter, and local Ollama through their Chat Completions
 compatibility endpoints. Set `CCI_BASE_URL` for another compatible service. Other native APIs can implement
 the package's `Provider` contract. See [configuration and limits](evaluations/LIVE_SMOKE.md). All presets
-have offline routing tests; the current installed Python wheel passed the
+have offline routing tests; an earlier installed Python wheel (`a3286616…`) passed the
 [Gemini development smoke](evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json).
-Other providers have not passed a live run.
+The newer wheel (`219fd1e7…`) still needs its own smoke. Other providers have not passed a live run.
 
 ### Cache eligible model work
 
@@ -139,7 +139,9 @@ memoization backend.
 ## Measured example
 
 The [installed-package live smoke on September 24, 2026](evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json)
-**passed** using the CI-verified Python wheel and `gemini-3.5-flash-lite`. It indexed four synthetic
+**passed** using historical wheel `a3286616fa0051b1ba033e4b7cf9e4234036db5c9ed2825ea2cbe5c03d7f32f0`
+and `gemini-3.5-flash-lite`. This result does not validate the newer wheel
+`219fd1e7c189e5cd54cdfa9bfaef004cf6a8ac60aef3041177015a8ef7571d79`. The historical run indexed four synthetic
 messages, closed and reopened SQLite, then retrieved the original “The deployment target is Oslo.”
 for “Where should the service launch?” through tree navigation. The result preserved sequence 1,
 its message ID, and the `/content` source pointer. Lexical search found no evidence.
@@ -188,7 +190,7 @@ The [development evaluation](evaluations/brand_memory.py) uses 23 synthetic mess
 
 Lexical retrieval improved from 4/8 to 7/8; combined memory improved from 7/8 to 8/8 on the unchanged development fixture. The timezone preference now survives selection. These are small, hand-authored development cases. They establish neither general retrieval accuracy nor answer correctness. Two additional cases check behavior without supporting evidence. No model was called.
 
-The [current report](evaluations/results/brand-memory-evidence-selection.json) includes per-case results, source fingerprints, environment versions, and storage checks. The [earlier report](evaluations/results/brand-memory.json) is preserved for comparison.
+The [recorded development report](evaluations/results/brand-memory-evidence-selection.json) includes per-case results, source fingerprints, environment versions, and storage checks. The [earlier report](evaluations/results/brand-memory.json) is preserved for comparison.
 
 ## How it works
 
@@ -229,7 +231,7 @@ The hierarchy follows [VectifyAI/ChatIndex](https://github.com/VectifyAI/ChatInd
 - Context is historical text. The host retains execution checkpoints, pending tool work, and rules for replaying side effects. Memory alone cannot restart an interrupted executor.
 - Total cost includes index building, updates, navigation, and answering. Shorter final context alone does not prove savings.
 - The host owns authentication, authorization, user/brand-to-history mapping, and scheduling. Database separation in the example does not implement those policies.
-- The current hosted run passes 266 Python tests, 21 native TypeScript tests, and all 16 package combinations with nine writer/reader checks each. The installed Python live smoke also passes. Dedicated Linux performance and the held-out quality/cost gate remain open. [Release status](docs/release-status.md).
+- The latest retained hosted run, source `6dd96d7d`, passed 430 Python tests, 88 Node tests, and all 16 package combinations (144 writer/reader checks). These results do not certify newer branch changes. Live smoke for its newer wheel, Linux performance, and held-out quality/cost validation remain open. [Release status](docs/release-status.md).
 
 Implementation entry points: [storage](packages/python/src/cci/store.py), [ingestion](packages/python/src/cci/ingest.py), [retrieval](packages/python/src/cci/retrieve.py), and [answer synthesis](packages/python/src/cci/ask.py).
 

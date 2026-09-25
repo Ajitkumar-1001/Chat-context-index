@@ -1,8 +1,8 @@
 ---
 import { Code } from 'astro:components';
 // Only public evidence files are imported; the page is rebuilt from them.
-import hosted from '../../../evaluations/results/production-readiness-20260924/hosted-verification.json';
-import packages from '../../../evaluations/results/production-readiness-20260924/hosted-evidence/packages-ubuntu-24.04-py3.12-node22/package-memory.json';
+import verification from '../../../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-verification.json';
+import packages from '../../../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-evidence/package-memory.json';
 import smoke from '../../../evaluations/results/production-readiness-20260924/live-smoke-retry-003-summary.json';
 import perfPy from '../../../evaluations/results/release-readiness/performance-macos-20260924.json';
 import perfTs from '../../../evaluations/results/release-readiness/performance-typescript-macos-20260924.json';
@@ -13,8 +13,25 @@ const repo = 'https://github.com/Ajitkumar-1001/Chat-context-index';
 const blob = `${repo}/blob/main`;
 const evidencePath = `${blob}/evaluations/results/production-readiness-20260924`;
 const smokeReport = `${evidencePath}/live-smoke-retry-003-summary.json`;
+const candidateReport = `${evidencePath}/execution/follow-up-hosted-verification.json`;
+const packageReports = import.meta.glob<typeof packages>(
+  '../../../evaluations/results/production-readiness-20260924/execution/follow-up-hosted-evidence/packages-*.json',
+  { eager: true, import: 'default' },
+);
+const hosted = {
+  source_sha: verification.tested_pull_request_merge_sha,
+  run_url: verification.ci_url,
+  all_ci_jobs: verification.hosted_jobs_passed,
+  matrix_cells: verification.package_matrix_jobs_passed,
+  writer_reader_checks_per_cell: packages.checks.length,
+  tests: { python_passed: verification.python_tests_passed, node_passed: verification.node_tests_passed },
+  artifacts: packages.artifacts,
+  cells: Object.entries(packageReports).map(([path, report]) => ({
+    ...report, cell: path.split('/').at(-1)!.replace(/\.json$/, ''),
+  })),
+};
 // Gate wording mirrors docs/release-status.md; update both together.
-const asOf = 'September 24, 2026 (UTC)';
+const asOf = 'September 25, 2026 (UTC)';
 
 const toc = [
   ['summary', 'Summary'],
@@ -36,18 +53,19 @@ const minor = (v: string) => v.split('.').slice(0, 2).join('.');
 const major = (v: string) => v.replace(/^v/, '').split('.')[0];
 
 const gates: { name: string; status: Status; evidence: string; href?: string }[] = [
-  { name: 'Python regression', status: 'pass', evidence: `${hosted.tests.python_passed} tests passed in hosted CI, including Redis, evaluator, performance-gate, and release-control checks.` },
-  { name: 'TypeScript regression', status: 'pass', evidence: `${hosted.tests.node_passed} native memory tests passed; hosted TypeScript typecheck and package builds passed.` },
+  { name: 'Python regression', status: 'pass', evidence: `${hosted.tests.python_passed} tests passed for retained source ${hosted.source_sha.slice(0, 8)}, including Redis, evaluator, performance-gate, and release-control checks.` },
+  { name: 'TypeScript regression', status: 'pass', evidence: `${hosted.tests.node_passed} Node tests passed for the same retained source; TypeScript typecheck and package builds passed.` },
   { name: 'Static checks', status: 'pass', evidence: 'Hosted Python lint/typecheck, TypeScript typecheck, and bounded evaluator static checks passed.' },
   { name: 'Cross-language retrieval', status: 'pass', evidence: 'A shared fixture compares ordered search(), retrieve(), and prepared-context output across runtimes, including correction and duplicate cases.' },
   { name: 'Cache failure accounting', status: 'pass', evidence: 'Python stats() reports Redis errors and SQLite fallback lookups and hits; real-Redis failure tests exercise these counters. TypeScript has no Redis memo backend.' },
-  { name: 'Installed packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${evidencePath}/hosted-evidence/packages-ubuntu-24.04-py3.12-node22/package-memory.json` },
+  { name: 'Installed packages', status: 'pass', evidence: `Wheel, sdist, and npm archive installed outside the checkout; all ${packages.checks.length} writer/reader combinations, the TypeScript consumer typecheck, and package documentation passed.`, href: `${evidencePath}/execution/follow-up-hosted-evidence/package-memory.json` },
   { name: 'Hosted package matrix', status: 'pass', evidence: `All ${hosted.matrix_cells} Python 3.11–3.14 × Node 22/24 × Ubuntu x64/macOS arm64 cells passed with matching source and archive hashes.`, href: hosted.run_url },
-  { name: 'CI artifacts and security', status: 'pass', evidence: 'Hosted secret/dependency scans and the exact-archive publication guard passed. No package was published.', href: `${evidencePath}/hosted-verification.json` },
-  { name: 'Reference performance', status: 'open', evidence: 'Local macOS runs meet the three warm single-request thresholds. The dedicated Linux x64 runner, filesystem-cold pass, and scale point are outstanding.' },
-  { name: 'Installed-package live smoke', status: smoke.status === 'PASS' ? 'pass' : 'blocked', evidence: `Installed Python package retrieved the expected original evidence through tree navigation after SQLite reopen. ${smoke.attempts} calls recorded ${smoke.actual_input_tokens_observed.toLocaleString('en-US')} input / ${smoke.actual_output_tokens_observed} output tokens, with ${smoke.errors} errors and no unknown usage in this run.`, href: smokeReport },
+  { name: 'CI artifacts and security', status: 'pass', evidence: 'Retained CI passed security scans and candidate inspection. The independent artifact approval remains DRAFT_NOT_APPROVED; no package was published.', href: candidateReport },
+  { name: 'Linux performance', status: 'open', evidence: 'No run for the newer candidate. Hosted measurement preparation retains warm/cold latency targets and scale/concurrency completeness. The fixed 4-CPU/8-GiB reference gate is still open.' },
+  { name: 'Candidate live smoke', status: 'open', evidence: 'No live smoke is recorded for newer wheel 219fd1e7…. The earlier eight-call smoke passed only for wheel a3286616…; its result is preserved below.', href: smokeReport },
   { name: 'Quality, cost, and human review', status: 'open', evidence: 'Three frozen held-out trials, real-provider cache measurements, answer review, and two unfamiliar-developer integration trials remain open.' },
-  { name: 'Registry setup and final approval', status: 'blocked', evidence: 'Release protections are configured. Package ownership, trusted publisher identities, and final artifact approval remain open.' },
+  { name: 'Website public availability', status: 'blocked', evidence: 'Vercel deployment 6651358929 reported success, but its URL and the repository homepage redirect to Vercel login; public access is unverified.' },
+  { name: 'Registry setup and final approval', status: 'blocked', evidence: 'Release protections and the PyPI pending publisher (release.yml / release) are configured. npm ownership/publisher identity is unverified; final source/artifact approval is unset.' },
 ];
 
 const cells = hosted.cells.map((c) => ({ ...c, os: c.cell.split('-py')[0].replace(/^packages-/, '') }));
@@ -155,13 +173,14 @@ try {
       <div class="callout" role="note">
         <p>
           <span class="pill blocked">Release blocked</span>
-          The candidate passes hosted regression, package installation, cross-language checks, all
-          {hosted.matrix_cells} hosted package combinations, and an installed Python live-model smoke test.
+          Retained source <code>{hosted.source_sha.slice(0, 8)}</code> passed hosted regression and all
+          {hosted.matrix_cells} package combinations. Newer branch changes still need fresh CI evidence.
+          The successful live-model smoke belongs to an older wheel; the newer wheel has no recorded smoke.
           Held-out quality and cost comparisons, reference performance, human review, developer adoption,
           and registry setup remain open.
         </p>
         <p>
-          Nothing is published yet: PyPI and npm return 404 for 0.1.0, and the
+          No registry package is published. PyPI pending publishing is configured; npm ownership is unverified. The
           <a href={`${repo}/releases/tag/pre-release`}>GitHub prerelease</a> has no assets.
         </p>
       </div>
@@ -201,9 +220,11 @@ try {
       <section data-section="gates">
         <h2>Release gates</h2>
         <p class="muted">
-          Mirrors <a href={`${blob}/docs/release-status.md`}>docs/release-status.md</a>. Candidate built from
+          Mirrors <a href={`${blob}/docs/release-status.md`}>docs/release-status.md</a>. Retained candidate built from
           <a href={`${repo}/commit/${hosted.source_sha}`}><code>{hosted.source_sha.slice(0, 7)}</code></a>;
-          all {hosted.all_ci_jobs} jobs passed in <a href={hosted.run_url}>the verified main run</a>.
+          all {hosted.all_ci_jobs} jobs passed in <a href={hosted.run_url}>its pull-request merge run</a>.
+          This does not certify newer main changes: a checksum-only scanner false positive has a targeted fix
+          prepared for fresh validation.
         </p>
         <div class="table">
           <table class="stack">
@@ -237,8 +258,8 @@ try {
         <h3>Hosted package matrix</h3>
         <p class="muted">
           Each cell installs the wheel, sdist, and npm archive and runs {hosted.writer_reader_checks_per_cell}
-          writer/reader checks. <a href={hosted.run_url}>Verified main run</a> ·
-          <a href={`${evidencePath}/hosted-verification.json`}>Retained evidence</a>
+          writer/reader checks. <a href={hosted.run_url}>Verified candidate run</a> ·
+          <a href={candidateReport}>Retained evidence</a>
         </p>
         <div class="table">
           <table class="matrix">
@@ -360,9 +381,9 @@ try {
 
       <section data-section="quality">
         <h2>Retrieval quality</h2>
-        <h3>Installed Python live smoke <span class={`pill ${smoke.status === 'PASS' ? 'pass' : 'blocked'}`}>{smoke.status}</span></h3>
+        <h3>Historical Python live smoke <span class={`pill ${smoke.status === 'PASS' ? 'pass' : 'blocked'}`}>{smoke.status}</span></h3>
         <p>
-          The installed wheel completed a development-fixture smoke with <code>{smoke.model}</code>,
+          Earlier wheel <code class="hash">{smoke.wheel_sha256}</code> completed a development-fixture smoke with <code>{smoke.model}</code>,
           then retrieved the expected original evidence through tree navigation after reopening SQLite:
           <q>{smoke.checks.evidence[0].excerpt}</q>
           <a class="more" href={smokeReport}>Recorded result</a>
@@ -385,12 +406,13 @@ try {
           </div>
         </div>
         <p class="note">
+          This result does not validate newer wheel <code class="hash">{verification.new_wheel_sha256}</code>.
           One visible development conversation; this does not measure held-out answer quality, TypeScript
           live-model behavior, sustained provider capacity, or cost savings. Cost uses actual tokens and the
           frozen prices; it is an estimate, not an invoice. Earlier failed calls retain their separate
           unknown-usage reservations. The three-trial quality/cost evaluation and human review remain open.
         </p>
-        <h3>Development recall (no model calls)</h3>
+        <h3>Historical development recall (no model calls)</h3>
         <div class="stats">
           {[recallLexical, recallTree].map((r) => (
             <div class="stat">
@@ -465,8 +487,8 @@ try {
       <section data-section="artifacts">
         <h2>Candidate artifacts</h2>
         <p class="muted">
-          SHA-256 of the archives verified in every hosted cell. These files are not published; the hashes identify
-          the tested build.
+          SHA-256 of the retained source <code>{hosted.source_sha.slice(0, 8)}</code> archives verified in every
+          hosted cell. These files are not published or approved; the hashes identify that tested build.
         </p>
         <div class="table">
           <table>

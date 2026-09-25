@@ -73,6 +73,11 @@ jobs:
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
+      - name: Install pinned npm CLI for trusted publishing
+        run: |
+          npm install --global npm@11.19.1 --ignore-scripts --no-audit --no-fund
+          test "$(npm --version)" = "11.19.1"
+          node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 22 || (major === 22 && minor < 14)) process.exit(1)'
       - uses: actions/download-artifact@v4
         with:
           name: release-candidate-${{ github.sha }}
