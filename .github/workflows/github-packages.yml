@@ -1,0 +1,106 @@
+name: GitHub Packages
+
+# Publishes the approved, CI-tested npm archive to GitHub's npm registry. That registry only
+# accepts owner-scoped names, so package.json's name is the one change; every other file is the
+# archive CI tested. The npmjs name stays the unscoped chat-context-index. The release environment
+# only admits v* tag refs, so this manual dispatch plus the approval variables is the gate.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag of the approved source commit, for example v0.1.0
+        required: true
+      run_id:
+        description: Workflow run whose release-candidate artifact CI verified for that commit
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - name: Require the tag to name the approved source commit
+        env:
+          APPROVED_SHA: ${{ vars.RELEASE_APPROVED_SHA }}
+        run: test -n "$APPROVED_SHA" && test "$(git rev-parse HEAD)" = "$APPROVED_SHA"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@ajitkumar-1001"
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-candidate-${{ vars.RELEASE_APPROVED_SHA }}
+          path: candidate
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+      - name: Verify and select CI-tested archives without rebuilding
+        env:
+          APPROVED_SHA: ${{ vars.RELEASE_APPROVED_SHA }}
+          APPROVED_MANIFEST: ${{ vars.RELEASE_APPROVED_ARTIFACT_MANIFEST }}
+          APPROVED_MANIFEST_SHA256: ${{ vars.RELEASE_APPROVED_ARTIFACT_MANIFEST_SHA256 }}
+          RUN_ID: ${{ inputs.run_id }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          test -n "$APPROVED_MANIFEST" && test -n "$APPROVED_MANIFEST_SHA256"
+          printf '%s' "$APPROVED_MANIFEST" > approved-artifacts.json
+          python scripts/release_controls.py artifacts --candidate candidate --sha "$APPROVED_SHA" --run-id "$RUN_ID" --tag "$TAG" --output publish --approval approved-artifacts.json --approval-sha256 "$APPROVED_MANIFEST_SHA256"
+      - name: Rename to the owner scope GitHub's npm registry requires
+        run: |
+          mkdir scoped
+          tar -xzf publish/npm/*.tgz -C scoped
+          cd scoped/package && npm pkg set name=@ajitkumar-1001/chat-context-index
+      # npm provenance statements are npmjs-only, so there is no --provenance here. The ./ keeps
+      # npm from reading scoped/package as a GitHub user/repo shorthand.
+      - run: npm publish ./scoped/package --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  verify-install:
+    needs: publish-npm
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@ajitkumar-1001"
+      - name: Install the published package under its npmjs name and recall a message
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          mkdir consumer && cd consumer
+          npm init -y > /dev/null && npm pkg set type=module
+          npm install --omit=optional --no-audit --no-fund "chat-context-index@npm:@ajitkumar-1001/chat-context-index@${TAG#v}"
+          cat > smoke.mjs <<'EOF'
+          import { HistoryStore, ingest, prepareContext } from "chat-context-index";
+          const memory = await HistoryStore.open("conversation.db", { cacheBackend: "none" });
+          try {
+            await ingest(memory, memory.historyId,
+              [{ role: "user", content: "Deploy the service in Oslo." }], "chat", "turn-1");
+          } finally { await memory.close(); }
+          const resumed = await HistoryStore.open("conversation.db", { cacheBackend: "none" });
+          try {
+            const context = await prepareContext(resumed, "Oslo", { maxChars: 2000 });
+            if (!context.text.includes("Deploy the service in Oslo.")) throw new Error("recall failed");
+            console.log(context.text);
+          } finally { await resumed.close(); }
+          EOF
+          node smoke.mjs
+          npm ls chat-context-index
