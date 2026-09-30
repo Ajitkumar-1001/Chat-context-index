@@ -1,4 +1,4 @@
-"""Public Markdown is an explicit list, and every relative link in it resolves (plan-eng-review D14, D21, D22).
+"""Public Markdown is an explicit list, and every relative link in it resolves.
 
 Publishing a new Markdown file, README files included, means adding it to PUBLISHED_MARKDOWN in
 the same change; everything else stays local.

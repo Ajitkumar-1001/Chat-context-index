@@ -1,4 +1,4 @@
-"""Development evidence recall for `prepare_context` with the pre-registered bar (plan-eng-review D18).
+"""Development evidence recall for `prepare_context` with the pre-registered bar.
 
 No model calls. `--mode tree` uses a fake navigator that keeps every offered node, so it measures
 loss after perfect navigation, not real navigation quality. Iteration evidence only: this never
@@ -8,7 +8,7 @@ Scoring follows SC-011 as clarified on 2026-09-23: required evidence counts when
 excerpt contains the acceptable span of the annotated message or of any word-for-word copy of it
 in the same history. `context_recall_strict` keeps the original annotated-message-only scorer.
 
-Bar (D18): dev context recall >= 0.85 in both modes, dev correction-case recall >= 0.85, zero
+Bar: dev context recall >= 0.85 in both modes, dev correction-case recall >= 0.85, zero
 correction cases whose context shows a superseded value without the current one, paraphrase
 "names the old value" recall >= 0.80, and against a baseline report: at most 2 points worse on
 dev, not worse on paraphrase.

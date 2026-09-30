@@ -1,4 +1,4 @@
-"""The development bar's scoring rules (plan-eng-review D18; SC-011 verbatim-copy clarification)."""
+"""The development bar's scoring rules (SC-011 verbatim-copy clarification)."""
 
 import importlib.util
 from pathlib import Path

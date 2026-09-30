@@ -1,7 +1,7 @@
 """HistoryStore: open()/aclose() and the durable schema (spec/storage-format.md).
 
-Check order (contracts/operations.md `open()` Check order, `/plan-eng-review` finding
-2026-09-22): configuration is validated FIRST, before any store file is created or opened;
+Check order (contracts/operations.md `open()` Check order): configuration is validated FIRST,
+before any store file is created or opened;
 then the loaded SQLite runtime/FTS5 support is verified; then `schema_version` is checked;
 only then is the store created (fresh path) or resumed (existing path) transactionally.
 
@@ -232,12 +232,11 @@ class HistoryStore:
     usage_log: UsageLog = field(default_factory=UsageLog)
     _closed: bool = False
 
-    # Write coordination (clear_history() gating; `/plan-eng-review`-equivalent finding
-    # 2026-09-22 during T036 design: ingest()/import_history()/index() tree-publish all write
-    # on one AsyncConnection, which cannot run two `async with connection:` transactions
-    # concurrently — a lock serializes them; the gate/counter let clear_history() quiesce
-    # in-flight writers within its 10s deadline (data-model.md Snapshot/Generation lifecycle
-    # case 3) without needing to know each writer's specific operation.
+    # Write coordination (clear_history() gating): ingest()/import_history()/index() tree-publish
+    # all write on one AsyncConnection, which cannot run two `async with connection:`
+    # transactions concurrently — a lock serializes them; the gate/counter let clear_history()
+    # quiesce in-flight writers within its 10s deadline (data-model.md Snapshot/Generation
+    # lifecycle case 3) without needing to know each writer's specific operation.
     write_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     _write_gate: asyncio.Event = field(default_factory=_open_event)
     _inflight_writers: int = 0

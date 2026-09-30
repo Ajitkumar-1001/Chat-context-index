@@ -1,6 +1,6 @@
 """Bounded, owned I/O worker (plan.md Summary; contracts/operations.md `open()` Ownership).
 
-Reuses APSW's own built-in async support (`/plan-eng-review` finding 2026-09-06/2026-09-22)
+Reuses APSW's own built-in async support
 rather than a hand-rolled thread-pool wrapper: each connection runs in one dedicated
 background worker thread (`apsw.aio.AsyncIO`), and calls made on the event loop are
 forwarded to it. This module owns setting that controller and provides small fetch helpers

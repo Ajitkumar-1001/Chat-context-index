@@ -95,7 +95,7 @@ def text_keys(text: str) -> set[str]:
 def best_anchor(text: str, query_keys: set[str], hit_counts: Mapping[str, int]) -> str | None:
     """The most name-like non-query key in `text` that is rare among the current hits.
 
-    Eligible (plan-eng-review D16): not a stop word, key of 3+ characters, not a query key, and in
+    Eligible: not a stop word, key of 3+ characters, not a query key, and in
     at most 2 current hits. Rank: inner capitals, digits, or a mid-sentence capital (2) over a
     sentence-initial capital (1) over lowercase (0); then fewer hits; then later position.
     """

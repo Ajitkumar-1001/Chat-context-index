@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "purpose": "Development-only generalization check for correction linking (plan-eng-review D4, D16, D18). Never tuned on, never held-out release evidence.",
+  "purpose": "Development-only generalization check for correction linking. Never tuned on, never held-out release evidence.",
   "construction": "Hand-written statement/correction/question triples that avoid the held-out generator's templates and the former correction cue words. Each history has 45 messages: neutral filler, the statement at position 10, the correction at 30, and a verbatim stale repeat of the statement at 35.",
   "buckets": {
    "names_old_value": "The correction names the value it replaces (gated: recall >= 0.80).",

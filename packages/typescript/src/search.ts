@@ -101,7 +101,7 @@ export async function searchInSnapshot(store: HistoryStore, query: string, limit
 
 /**
  * Pair top hits with the newest later message naming the hit's anchor; mirrors search.py
- * linked_corrections (plan-eng-review D4). No correction vocabulary; copies of the source and
+ * linked_corrections. No correction vocabulary; copies of the source and
  * messages past the snapshot are never linked; at most MAX_LINKED pairs.
  */
 export async function linkedCorrections(

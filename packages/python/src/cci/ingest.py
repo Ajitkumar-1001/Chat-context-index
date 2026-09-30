@@ -1,6 +1,6 @@
 """ingest() (contracts/operations.md `ingest()`; spec/normalization.md).
 
-Check order (spec/normalization.md, `/speckit-clarify` CHK002, verified by Contract-Fixtures.md
+Check order (spec/normalization.md, verified by Contract-Fixtures.md
 I2): the batch/receipt-level IdempotencyConflict check runs before any per-message
 MessageConflict check.
 

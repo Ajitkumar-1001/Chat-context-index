@@ -4,7 +4,7 @@ Pipeline: retrieve() -> (if evidence found) one bounded synthesis attempt -> (if
 invalid) at most one bounded repair attempt -> suppress and downgrade status if still invalid.
 No evidence found skips synthesis entirely (FR-007) — zero provider calls.
 
-Answer validity (T048, INV-05, `/plan-eng-review`-equivalent advisor finding 2026-09-22): valid
+Answer validity (T048, INV-05): valid
 requires a non-empty string `answer`, at least one citation (an unbacked claim is not "cited
 synthesis," FR-007), and every citation's `evidence_id` resolving only within the CURRENT
 response's `evidence[]` (captured within this same `retrieve()` call's Snapshot) — never across

@@ -1,4 +1,4 @@
-// Evidence IDs encode retrieval priority; minting and parsing live together (plan-eng-review D9).
+// Evidence IDs encode retrieval priority; minting and parsing live together.
 import assert from "node:assert/strict";
 import test from "node:test";
 import { evidenceId, evidenceRank } from "../../packages/typescript/dist/retrieve.js";

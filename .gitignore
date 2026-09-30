@@ -261,5 +261,3 @@ evaluations/results/production-readiness-20260924/release-*-applied.json
 
 # Astro generated types (website/)
 .astro/
-
-.gstack/

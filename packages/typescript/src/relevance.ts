@@ -73,7 +73,7 @@ export function textKeys(text: string): Set<string> {
 
 /**
  * The most name-like non-query key in `text` that is rare among the current hits; mirrors
- * relevance.py best_anchor (plan-eng-review D16): inner capitals, digits, or a mid-sentence
+ * relevance.py best_anchor: inner capitals, digits, or a mid-sentence
  * capital (2) over a sentence-initial capital (1) over lowercase (0); then fewer hits; then later.
  */
 export function bestAnchor(text: string, queryKeys: Set<string>, hitCounts: Map<string, number>): string | undefined {

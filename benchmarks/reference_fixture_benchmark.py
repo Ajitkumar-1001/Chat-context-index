@@ -213,7 +213,7 @@ async def _run(
             search_by_concurrency[str(level)] = _summary(
                 latencies, errors=errors, throughput_per_s=len(calls) / elapsed
             )
-        # Opt-in: the full lexical retrieval and context paths (plan-eng-review D19).
+        # Opt-in: the full lexical retrieval and context paths.
         path_by_concurrency: dict[str, dict[str, dict]] = {}
         for name in (p for p in paths if p in extra_paths):
             key, call = extra_paths[name]
