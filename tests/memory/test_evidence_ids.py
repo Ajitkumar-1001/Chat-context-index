@@ -1,4 +1,4 @@
-"""Evidence IDs encode retrieval priority; minting and parsing live together (plan-eng-review D9)."""
+"""Evidence IDs encode retrieval priority; minting and parsing live together."""
 
 import pytest
 from cci.retrieve import evidence_id, evidence_rank

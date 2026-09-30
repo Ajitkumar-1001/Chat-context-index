@@ -180,9 +180,9 @@ async def retrieve_with_links(
 ) -> tuple[RetrievalResult, dict[CandidateKey, list[CandidateKey]]]:
     """`retrieve()` plus which returned evidence is a later mention linked to which source.
 
-    Priority (plan-eng-review D17): each lexical hit is followed by its linked later mention, then
+    Priority: each lexical hit is followed by its linked later mention, then
     tree-only candidates follow in navigator order. `max_selected_chunks` bounds the lexical and
-    linked items only (D5); tree candidates keep their chunk and excerpt-budget bounds.
+    linked items only; tree candidates keep their chunk and excerpt-budget bounds.
     """
     limit = store.config.max_selected_chunks if max_selected_chunks is None else max_selected_chunks
     if mode not in ("auto", "tree", "lexical") or not 1 <= limit <= 5000:

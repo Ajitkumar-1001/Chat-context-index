@@ -13,7 +13,7 @@ against a real disposable Redis container (harness boundaries: a mock cannot pro
 reconnection/command behavior).
 
 F-writer/T087 pauses a *writer* (`ingest()`, at its commit barrier) instead of a reader —
-data-model.md Snapshot/Generation lifecycle case 3, resolving `/speckit-analyze` finding G2.
+data-model.md Snapshot/Generation lifecycle case 3.
 """
 
 from __future__ import annotations

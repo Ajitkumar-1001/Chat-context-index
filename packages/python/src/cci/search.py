@@ -120,7 +120,7 @@ async def _search_in_snapshot(store: HistoryStore, query: str, limit: int = DEFA
 async def linked_corrections(
     store: HistoryStore, sources: list[LexicalCandidate], query: str, max_seq: int, limit: int,
 ) -> tuple[list[tuple[LexicalCandidate, LexicalCandidate]], bool]:
-    """Pair top hits with the newest later message naming the hit's anchor (plan-eng-review D4).
+    """Pair top hits with the newest later message naming the hit's anchor.
 
     No correction vocabulary: a later statement that names the same rare, name-like word is linked
     whatever its phrasing. Each of the top 4 sources links at most one message, `MAX_LINKED` in

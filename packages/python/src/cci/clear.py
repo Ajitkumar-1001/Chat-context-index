@@ -83,7 +83,7 @@ async def clear_history(store: HistoryStore, expected_history_id: str) -> ClearR
         )
         if not drained:
             # The clear itself fails; the still-running write is left unaffected — never the
-            # reverse (`/speckit-analyze` finding G1).
+            # reverse.
             raise BudgetExceeded(
                 f"clear_history() quiescence deadline "
                 f"({store.config.clear_history_quiescence_deadline_s}s) exceeded waiting for "

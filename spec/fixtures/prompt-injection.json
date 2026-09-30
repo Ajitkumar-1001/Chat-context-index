@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "source": "PRD §15 golden-fixture requirement, flagged as missing from Contract-Fixtures.md by /plan-eng-review 2026-09-22 (plan.md M0 fixture gap)",
+    "source": "PRD §15 golden-fixture requirement, missing from Contract-Fixtures.md as of 2026-09-22 (plan.md M0 fixture gap)",
     "description": "PRD §15: 'Golden fixtures must include quoted instructions embedded in user text, cached prompt-injection strings, JSON delimiters inside text, model-selected unknown IDs, and malformed tool records. Passing them supports the documented controls; it is not proof of universal model safety.' This file covers the two sub-requirements Contract-Fixtures.md's existing cases did not: quoted instructions and cached injection strings. 'Model-selected unknown IDs' is covered by tree-routing validation (contracts/operations.md retrieve()); 'malformed tool records' by unicode-source-mapping.json U4/U5.",
-    "consumer": "contracts/operations.md Context assembly section (/speckit-analyze finding F3) — the shared context-assembly renderer these fixtures exercise",
+    "consumer": "contracts/operations.md Context assembly section — the shared context-assembly renderer these fixtures exercise",
     "frozen_at": "2026-09-22"
   },
   "cases": [

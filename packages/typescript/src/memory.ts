@@ -19,7 +19,7 @@ export interface ContextOptions {
   recentMessages?: number; maxMessages?: number; maxChars?: number; excerptChars?: number;
   mode?: "auto" | "tree" | "lexical"; provider?: BoundedProvider;
   maxTokens?: number; tokenCounter?: (text: string) => number;
-  /** `${messageId}:${sourcePointer}` of a candidate -> newer candidates that restate it (plan-eng-review D15). */
+  /** `${messageId}:${sourcePointer}` of a candidate -> newer candidates that restate it. */
   links?: Map<string, string[]>;
 }
 

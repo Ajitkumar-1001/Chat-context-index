@@ -78,7 +78,7 @@ def pack_context(
     tokenizer estimate. Omission counts refer to supplied candidates, not the entire history.
     `links` maps a candidate's (message_id, source_pointer) to newer candidates that restate it.
     Such a source is packed with them; when both cannot fit, only the newer ones are packed, and
-    the source is never packed without them (plan-eng-review D15).
+    the source is never packed without them.
     """
     if any(not isinstance(n, int) or n <= 0 for n in (max_messages, max_chars, excerpt_chars)):
         raise ValueError("context limits must be positive integers")

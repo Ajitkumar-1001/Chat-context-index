@@ -141,9 +141,9 @@ const candidateKey = (c: Keyed) => JSON.stringify([c.messageId, c.sourcePointer]
 
 /**
  * retrieve() plus which returned evidence is a later mention linked to which source; mirrors
- * retrieve.py retrieve_with_links. Priority (plan-eng-review D17): each lexical hit, then its
+ * retrieve.py retrieve_with_links. Priority: each lexical hit, then its
  * linked later mention, then tree-only candidates in navigator order. maxSelectedChunks bounds
- * lexical and linked items only (D5); tree candidates keep their chunk and excerpt-budget bounds.
+ * lexical and linked items only; tree candidates keep their chunk and excerpt-budget bounds.
  */
 export async function retrieveWithLinks(
   store: HistoryStore,

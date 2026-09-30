@@ -1,5 +1,5 @@
 {
- "description": "Shared term normalization contract (plan-eng-review D10). Each word's query_terms and the FTS expression for its first key must be identical in Python and TypeScript. Generic suffix rules only; no word-specific cases (D4).",
+ "description": "Shared term normalization contract. Each word's query_terms and the FTS expression for its first key must be identical in Python and TypeScript. Generic suffix rules only; no word-specific cases.",
  "cases": [
   {
    "word": "a",
